@@ -1,0 +1,15 @@
+name: kb-check
+on:
+  push:
+  pull_request:
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate notes (frontmatter, folders, links, maps)
+        run: python3 tools/kb.py check
+      - name: Index must be up to date
+        run: |
+          python3 tools/kb.py index
+          git diff --exit-code README.md || { echo "README 인덱스가 오래됨: python3 tools/kb.py index 실행 후 커밋"; exit 1; }
