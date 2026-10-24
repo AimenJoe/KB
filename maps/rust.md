@@ -1,7 +1,7 @@
 ---
 title: "지도: Rust"
 type: map
-tags: [rust, wasm]
+tags: [rust, wasm, gamedev]
 status: verified
 created: 2026-10-24
 updated: 2026-10-24
@@ -13,6 +13,11 @@ updated: 2026-10-24
 - [GitHub Actions에서 Rust → wasm32 빌드](../reference/github-actions/rust-wasm-build.md) — 툴체인 액션, rust-cache, rust-toolchain.toml
 - [macroquad WASM 빌드와 JS 번들](../reference/macroquad/wasm-build.md) — 번들러 없는 wasm32-unknown-unknown 빌드, release 프로파일로 크기 축소
 - [정적 WASM 호스팅](../concepts/static-wasm-hosting.md)
+
+## 게임 엔진
+- [Rust 게임 엔진 비교: 웹 + Android 핸드헬드 + 컨트롤러](../reference/rust-game-engines/web-android-gamepad-support.md) — macroquad / Bevy / Godot(gdext) 플랫폼 커버리지
+- [macroquad 게임패드와 Android 입력 현황](../reference/macroquad/gamepad-and-android-input.md) — gilrs가 Android 미지원인 것이 생태계 공통 제약
+- [macroquad 픽셀 퍼펙트 렌더링](../reference/macroquad/pixel-perfect-rendering.md)
 
 ## 빌드·CI
 - [0001 Rust WASM은 GitHub Actions에서 빌드](../decisions/0001-build-rust-wasm-in-github-actions-deploy-via-netlify-cli.md) — 호스팅 빌더에 cargo 캐시가 없다는 점이 결정적
