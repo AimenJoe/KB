@@ -6,11 +6,14 @@ status: verified
 created: 2026-10-24
 updated: 2026-10-24
 verified: |
-  1차 출처로 확인: macroquad master src/texture.rs(render_target(), RenderTarget, Texture2D::set_filter 문서 주석
-  "Use Nearest if you need integer-ratio scaling for pixel art"), src/camera.rs(Camera2D::render_target 필드,
-  from_display_rect, set_camera/set_default_camera, render_target이 있으면 invert_y 처리), miniquad src/conf.rs(high_dpi 기본 false).
+  1차 출처로 확인: macroquad 0.4.16 src/texture.rs(render_target(), Texture2D::set_filter 문서 주석
+  "Use Nearest if you need integer-ratio scaling for pixel art", draw_texture_ex의 flip_y 처리), src/camera.rs(from_display_rect가
+  zoom.y를 음수로 두고, matrix()가 render_target이 있으면 invert_y = 1.0, 없으면 -1.0을 곱함), miniquad 0.4.11 src/conf.rs(high_dpi 기본 false).
+  직접 실행(2026-10-24, Linux Xvfb + Mesa llvmpipe, macroquad 0.4.16): 아래 스케치 그대로 돌리면 **렌더 타깃 결과가 상하 반전**되어 나온다.
+  월드 (2,2)에 그린 표식이 화면 아래쪽에, 글자는 거울상으로 찍혔다. X 서버 캡처(ImageMagick import)와 get_screen_data() 결과가 일치.
+  `DrawTextureParams { flip_y: true }`로 올리면 정상. 수정 후 캡처로 재확인.
   2차 출처만 있음: 없음.
-  확인 못 함: 아래 코드 스케치는 실행하지 않았다. 특히 render target 결과의 상하 반전 여부는 버전마다 달랐으므로 실행해 확인.
+  확인 못 함: 웹(WebGL)·macOS·Windows에서도 같은 방향인지는 데스크톱 GL과 동일한 코드 경로라 같다고 추정만 했다. 웹 빌드는 헤드리스 Chromium에서 flip_y 적용본이 바르게 나오는 것만 확인.
 sources:
   - https://github.com/not-fl3/macroquad/blob/master/src/texture.rs
   - https://github.com/not-fl3/macroquad/blob/master/src/camera.rs
@@ -67,6 +70,7 @@ async fn main() {
         let y = ((screen_height() - dh) / 2.0).floor();
         draw_texture_ex(&rt.texture, x, y, WHITE, DrawTextureParams {
             dest_size: Some(vec2(dw, dh)),
+            flip_y: true, // 0.4.16: from_display_rect + render_target 조합은 뒤집혀 나온다 (아래 함정)
             ..Default::default()
         });
         next_frame().await
@@ -79,11 +83,26 @@ async fn main() {
 - 마우스 좌표는 `(mouse_x - x) / scale`로 내부 좌표계로 되돌린다.
 
 ## 함정
-- **상하 반전**: 과거 버전에서는 render target 결과가 뒤집혀 `flip_y: true`가 필요했다. 현재 master의 `camera.rs`는 `render_target`이 있으면 `invert_y`를 적용해 보정한다. 어느 쪽이든 **실행해서 확인**하고 노트를 갱신할 것.
+- **상하 반전 (0.4.16에서 실행 확인)**: `Camera2D::from_display_rect`는 y가 아래로 가는 좌표계를 만들려고 `zoom.y`를 **음수**로 둔다. `matrix()`는 `render_target`이 있으면 `invert_y = 1.0`, 없으면 `-1.0`을 `zoom.y`에 곱한다. 화면에 직접 그릴 때는 둘이 상쇄되지만, 렌더 타깃에 그릴 때는 월드 y=0이 클립 공간 +1(텍스처의 마지막 행)로 가고, `draw_texture_ex`는 텍스처 첫 행을 위에 그리므로 **결과가 뒤집힌다**. 해결은 둘 중 하나: (a) 올릴 때 `flip_y: true`(위 스케치), (b) `from_display_rect` 대신 `zoom: vec2(2./w, 2./h)`(양수)로 카메라를 직접 만든다. 어느 쪽도 macroquad가 `invert_y` 논리를 바꾸면 다시 뒤집히므로, 버전을 올릴 때 **표식을 그려 실행 확인**한다(아래 "확인 방법").
 - **HiDPI**: miniquad `Conf::high_dpi`는 기본 `false`. false면 `screen_width()`가 논리 픽셀을 돌려주고 OS가 확대하므로 Retina/고배율 화면에서 흐려질 수 있다. 선명함이 중요하면 `high_dpi: true`로 물리 픽셀 기준으로 배율을 계산한다.
 - **텍스처 아틀라스 bleeding**: Nearest라도 타일 경계에서 인접 픽셀이 새어 들어올 수 있다. 타일 사이 1px 패딩 또는 UV를 반 픽셀 안쪽으로.
 - **텍스트**: 내장 폰트는 내부 해상도에서 작게 렌더되면 깨진다. 픽셀 폰트를 쓰거나 UI만 바깥(실제 해상도) 패스에서 그린다.
 
+## 확인 방법 (헤드리스 Linux)
+표식(왼쪽 위에 색 사각형 + 글자)을 월드에 그리고 캡처한다. 디스플레이가 없는 컨테이너/CI에서도 된다.
+
+```sh
+# Xvfb + Mesa 소프트웨어 GL. 창이 뜰 때까지 xdotool이 기다리고, ImageMagick으로 루트 창을 찍는다.
+xvfb-run -a -s "-screen 0 1280x720x24" bash -c '
+  LIBGL_ALWAYS_SOFTWARE=1 ./target/debug/game & 
+  xdotool search --sync --name "창 제목" >/dev/null
+  timeout 1.5 tail -f /dev/null          # sleep 대용
+  import -window root shot.png; kill %1'
+```
+- 필요한 패키지(Ubuntu): `xvfb x11-utils xdotool imagemagick libgl1-mesa-dri`. 소리 장치가 없으면 quad-snd가 "Audio thread died"를 찍지만 렌더에는 영향 없다.
+- `xdotool key j`로 키 입력도 넣을 수 있다(창에 `windowfocus` 먼저). miniquad X11 백엔드는 XTEST 입력을 받는다.
+- `get_screen_data().export_png()`로 앱 안에서 찍은 결과는 X 서버 캡처와 방향이 같았다(0.4.16).
+
 ## 관련 노트
+- [reference/macroquad/wasm-build.md](wasm-build.md) — 웹 빌드도 헤드리스로 확인하는 법
 - [guides/pixel-art-without-an-artist.md](../../guides/pixel-art-without-an-artist.md)
-- [reference/macroquad/wasm-build.md](wasm-build.md)
