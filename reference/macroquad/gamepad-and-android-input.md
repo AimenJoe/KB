@@ -77,7 +77,8 @@ Android 게임패드 버튼 키코드(공식 문서 확인값): `BUTTON_A 96(0x6
 
 1. **버튼**: `keycodes.rs`에 `0x60~0x6e` 매핑 추가. miniquad `KeyCode`에 게임패드 버튼 variant가 없으므로 임시로 키보드 키에 대응시키거나(가장 작은 패치) 새 variant를 추가.
 2. **축**: `MainActivity.java`에 `onGenericMotionEvent` 추가 → `SOURCE_JOYSTICK`이면 `AXIS_X/Y`(좌 스틱), `AXIS_Z/RZ`(우 스틱), `AXIS_HAT_X/Y`(D-pad 아날로그), `AXIS_LTRIGGER/RTRIGGER`를 JNI로 전달 → `android.rs`에 진입점과 새 `Message` → `EventHandler`에 콜백.
-3. **빌드**: `cargo-quad-apk`는 crates.io 0.1.4가 4년 이상 전 릴리스. 공식 글은 NDK r25b Docker 이미지 기준. 최신 NDK에서는 git 특정 커밋 + minSdk 패치가 필요하다는 커뮤니티 메모가 있다(단일 출처).
+3. **빌드**: `cargo-quad-apk`는 crates.io 0.1.4가 4년 이상 전 릴리스지만 **git master는 2025~2026에 갱신**됐다(API 36, aapt2·d8, NDK 29). 커밋을 고정해 설치하면 GitHub 러너 내장 SDK/NDK로 바로 빌드된다 → [guides/macroquad-android-apk-github-actions.md](../../guides/macroquad-android-apk-github-actions.md).
+4. **`gamepads` 크레이트는 Android 빌드에서 빼야 한다**: 0.1.7은 `android-winit` feature 없이 `poll_android_winit` 미정의로 컴파일 실패(2026-10-24 `cargo check --target aarch64-linux-android`로 재현). non-Android 전용 의존성으로 두고 코드에 `cfg(not(target_os = "android"))`.
 
 합쳐서 Java·Rust 200줄 안팎이지만 **miniquad 포크를 유지**하게 된다. 결정 전에 "Android 스파이크"(hello world APK + 실기 컨트롤러 테스트)로 비용을 실측할 것.
 
