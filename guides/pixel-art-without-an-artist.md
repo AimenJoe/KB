@@ -6,6 +6,7 @@ status: draft
 created: 2026-10-24
 updated: 2026-10-25
 verified: |
+  1차 출처로 확인(2026-10-25, 텍스트 격자 도트 원본·계단/외톨이 검사: nail-under-the-roots tools/pixel 직접 구현, 초상화 하나를 들여와 다듬고 검사 후보 5→2, 브라우저 편집기 헤드리스로 열기·칠하기·저장 왕복). 계단 길이 규칙 자체는 커뮤니티 튜토리얼(2차).
   1차 출처로 확인(2026-10-25, 코드 그림 v2: 같은 생성기로 v1·v2를 나란히 렌더해 비교, 무료 AI 생성 결과와도 비교). 1차 출처로 확인(2026-10-25, nail-under-the-roots 0062·0063·0068 직접 구현·단위 테스트·헤드리스·굽기 시간 측정): 네모 칸 충돌 위 둥근 지형 굽기(겹선형 + 잡음 문턱, 열 훑기 벼랑, 무리 장식, 비용 줄이기), 굴 방 모양 다듬기와 이어짐 되돌리기. dual grid가 16칸·blob이 47칸이라는 것은 2차 출처(Excalibur.js·Boris the Brave 블로그).
   1차 출처로 확인: 직접 실행(2026-10-25, nail-under-the-roots): 문자 격자 + 자동 외곽선 스프라이트 생성, 흰 실루엣 플래시,
   작은 얼굴 고치기(v1의 주둥이 옆 크림색 발톱이 "이빨"로 읽힌다는 사용자 피드백 → 발톱을 발 줄로 내리고 코 밑을 비워 해결, 8배 확대·게임 화면으로 확인),
@@ -23,6 +24,8 @@ verified: |
 sources:
   - https://www.wayline.io/learn/pixel-art/1
   - https://pixeljoint.com/pixelart/90047.htm
+  - https://pixeljoint.com/Forum/forum_posts.asp?TID=20478
+  - https://community.aseprite.org/t/how-do-i-make-straight-curved-lines-properly/10246/4
   - https://lospec.com/articles/pixel-art-outlines-part-2-using-color
   - https://blog.usesession.com/blog/ardouradvice/766774775809032192
   - https://www.boristhebrave.com/2023/05/31/quarter-tile-autotiling/
@@ -131,6 +134,20 @@ v1(타원 + 구 음영 + 몸 전체 2×2 디더)은 "자글자글"하고 형태�
   - 가장자리 빛 함정: 가는 가지까지 2px을 주면 주황 테두리가 된다(굵은 줄기만 2px, 가지 1px 옅게). 줄기 다각형으로 가장자리를 재면 줄기와 가지가 만나는 윗변에 직선이 생긴다 → 가장자리는 **전체 윤곽**으로 재고 칠하는 곳만 줄기로 자른다.
 - 같은 때 무료 AI(Pollinations 익명, 글만)와 비교: 형태는 매끈했지만 설정을 못 지켰다(굴토끼 → 토끼귀 사람, 두더지 → 여우, 잎 없는 나무 → 무성한 보라 나무), 도트가 아니고 워터마크가 붙었다. 참조 그림을 못 주는 생성기는 캐릭터 설정이 있는 게임에 쓰기 어렵다.
 - 참고(2차 출처): 색조 이동([Hue shifting](https://blog.usesession.com/blog/ardouradvice/766774775809032192)), 선택 외곽선([Lospec: outlines using color](https://lospec.com/articles/pixel-art-outlines-part-2-using-color)), 잎은 덩어리로·빛 방향 하나([PixelJoint 비평](https://pixeljoint.com/pixelart/90047.htm), [Videlais 타일](https://videlais.com/tag/drawing-tiles/)), 베개 음영·띠·더블([Wayline 픽셀 아트 2강](https://www.wayline.io/learn/pixel-art/1)).
+
+### 마지막 한 겹은 점으로: 텍스트 격자 원본
+코드 그림(도형 + 단)은 덩어리를 빨리 만들지만 고칠 수 없는 곳이 남는다. 이런 곳은 도형 매개변수로 못 고치고, **픽셀 몇 개를 직접 놓아야** 고쳐진다(2026-10-25 nail-under-the-roots 0070, 88×88 초상화로 직접 확인).
+- 남는 곳: 윤곽 계단, 작은 부위(발톱이 이빨로 읽힘), 무늬 소음(2칸 줄무늬).
+- **원본 형식**: 팔레트 머리(`글자 #rrggbb 이름`) + 한 글자 = 한 픽셀 격자의 텍스트 파일. diff로 바뀐 점이 보이고, 사람(브라우저 편집기)과 Claude(좌표 출력·한 줄 덮어쓰기)가 같은 파일을 번갈아 고친다.
+- **작업 순서**: 코드 그림 → PNG를 격자로 들여오기 → 글자를 뜻 있는 이름으로 바꾸기 → 다듬기 → 검사 → 렌더.
+  - 들여올 때 글자는 밝기 순으로 자동으로 붙는다.
+  - 이름 바꾸기 예: `4` = 털4, `O` = 외곽선, `@` = 눈동자. 자동 글자로는 격자를 읽을 수 없다.
+- **계단 검사**: 곡선은 줄마다 실루엣 끝 이동량이 한 방향으로 점점 늘거나 줄어야 매끈하다. 같은 방향에서 1, 3, 1이나 4, 3, 6처럼 튀는 줄을 기계로 찾을 수 있다.
+  - 귀·볼처럼 일부러 튀어나온 곳도 잡히니 후보로만 본다.
+  - 시연에서 정수리를 단조 계단으로 바꾸니 납작하게 뾰족하던 머리가 둥글어졌다.
+- **외톨이 검사는 8방향으로**: 4방향 기준이면 대각 계단의 외곽선 픽셀이 모두 외톨이로 잡힌다(90개 → 8방향 24개).
+- **발톱이 이빨로 읽히는 조건**: 크림·흰색, 뾰족한 끝, 일정한 간격, 위를 향함. 평평한 끝(2×3, 오른쪽 그늘), 바깥 발톱을 한 줄 낮춘 부채꼴, 넷 이하로 바꾸면 발로 읽힌다.
+- 참고(2차 출처): 계단 길이는 늘거나 줄게, 섞지 말 것([PixelJoint 포럼](https://pixeljoint.com/Forum/forum_posts.asp?TID=20478), [Wayline 2강](https://www.wayline.io/learn/pixel-art/1), [Aseprite 커뮤니티](https://community.aseprite.org/t/how-do-i-make-straight-curved-lines-properly/10246/4)).
 
 ### 2배 밀도 한 장 그림의 띠 자국
 - 계단 그라디언트(띠)는 1px 디더 없이 깔끔하지만 경계가 선으로 보인다. 1px 바둑판은 홀수 화면 배율에서 1.5배로 늘어 얼룩진다.
