@@ -25,6 +25,9 @@ verified: |
   임계값 0.5/0.3 자체는 2차 출처(포럼의 "임계 통과 시 1회, 중앙 복귀 후 재무장" 패턴) + 직접 조정이며 표준값은 찾지 못했다.
   확인 못 함: Android MotionEvent 축 상수(AXIS_X/Y/Z/RZ/HAT_X/HAT_Y/LTRIGGER/RTRIGGER)의 정확한 숫자값 — 패치 시 공식 문서로 확인.
 sources:
+  - https://www.smashingmagazine.com/2012/02/finger-friendly-design-ideal-mobile-touchscreen-target-sizes/
+  - https://www.uxpin.com/studio/blog/responsive-design-touch-devices-key-considerations/
+  - https://uxmovement.com/?p=5043
   - https://github.com/not-fl3/miniquad/blob/master/java/MainActivity.java
   - https://github.com/not-fl3/miniquad/blob/master/src/native/android.rs
   - https://github.com/not-fl3/miniquad/blob/master/src/native/android/keycodes.rs
@@ -97,6 +100,7 @@ macroquad 0.4.16의 `touches()`는 `Touch { id, phase, position }`를 돌려준�
 - **좌표 단위 불일치**: `screen_width()`·`mouse_position()`은 `miniquad::window::dpi_scale()`로 나눈 논리 픽셀을 주지만, `touches()`의 `position`은 **물리 픽셀 그대로**다(src/window.rs, src/input.rs 확인). `high_dpi: true`인 고해상도 폰(DPR 2~3)에서는 터치 좌표가 화면 크기의 2~3배로 들어와 버튼 판정이 전부 빗나간다. `t.position / screen_dpi_scale()`로 맞춘다. DPR 1인 데스크톱·헤드리스에서는 재현되지 않으므로 테스트할 때 `deviceScaleFactor`를 올려야 한다.
 - **위상(phase)에 기대지 말 것**: macroquad는 터치를 id별로 하나만 보관하고 프레임 끝에 Started/Moved→Stationary, Ended→삭제로 정리한다. 실제 손가락은 touchstart 직후 같은 프레임에 touchmove가 와서 Started가 Moved로 덮이고, 짧은 탭은 start·end가 한 프레임에 들어와 Ended만 보인다. "눌림"은 **지난 프레임까지 본 id 목록에 없는 새 id**로 판정하고, 새 id가 Ended여도 눌림으로 센다.
 - 웹 글루는 `touchstart/move/end/cancel`을 `canvas`에 걸고 `e.changedTouches`의 `identifier`를 id로 넘긴다. `simulate_mouse_with_touch`(기본 true)라 마우스 이벤트도 같이 생긴다.
+- **버튼 크기**: 플랫폼 최소 터치 크기(Apple 44pt, Material 48dp)는 바닥일 뿐이다. 게임은 엄지로 누르고(성인 엄지 폭 약 1인치), 가장 자주 누르는 버튼(공격)은 다른 버튼보다 확실히 크게 — 짧은 변 기준 비율로 정하면 기기마다 맞는다(예: 공격 지름 ≈ 짧은 변의 27%, 가로 폰에서 약 100pt). 나머지는 엄지가 쉬는 오른쪽 아래 둘레 호에. 배치는 순수 함수(폭, 높이) → 버튼 목록으로 빼서 "겹치지 않음·화면 안·공격이 가장 큼"을 여러 화면 크기로 테스트한다. 엄지 크기 출처는 2차(UX 글), 게임 버튼 크기 표준 문서는 못 찾았다.
 - `index.html`에 `touch-action: none; overscroll-behavior: none; user-select: none`과 `user-scalable=no` viewport를 두지 않으면 스크롤·확대·길게 누르기 메뉴가 끼어든다.
 
 ## 메뉴 탐색: 스틱을 한 칸 눌림으로
