@@ -87,6 +87,7 @@ _`python3 tools/kb.py index` 로 생성. 손으로 고치지 말 것._
 
 ### concepts
 - [1인 개발용 액션 로그라이트 설계 원칙](concepts/action-roguelite-for-solo-dev.md)
+- [개발용 시나리오 진입점과 스텝 스크립트 컷씬](concepts/dev-scenarios-and-scripted-cutscenes.md)
 - [고정 타임스텝 게임 루프와 히트스톱](concepts/fixed-timestep-and-hitstop.md)
 - [정적 WASM 호스팅](concepts/static-wasm-hosting.md)
 
@@ -101,10 +102,11 @@ _`python3 tools/kb.py index` 로 생성. 손으로 고치지 말 것._
 - `ci`: [0001: Rust WASM은 GitHub Actions에서 빌드하고 Netlify에는 CLI로 올린다](decisions/0001-build-rust-wasm-in-github-actions-deploy-via-netlify-cli.md), [macroquad WASM을 GitHub Actions로 빌드해 Netlify에 배포](guides/macroquad-wasm-netlify-github-actions.md), [지도: CI/CD와 호스팅](maps/ci-cd-hosting.md), [GitHub Actions에서 Rust → wasm32 빌드](reference/github-actions/rust-wasm-build.md), [CI에서 netlify-cli로 배포](reference/netlify/deploy-from-ci.md)
 - `ci-cd`: [macroquad 게임을 GitHub Actions에서 Android APK로 빌드하기 (cargo-quad-apk)](guides/macroquad-android-apk-github-actions.md)
 - `combat`: [1인 개발용 액션 로그라이트 설계 원칙](concepts/action-roguelite-for-solo-dev.md)
+- `cutscene`: [개발용 시나리오 진입점과 스텝 스크립트 컷씬](concepts/dev-scenarios-and-scripted-cutscenes.md)
 - `deploy`: [지도: CI/CD와 호스팅](maps/ci-cd-hosting.md), [CI에서 netlify-cli로 배포](reference/netlify/deploy-from-ci.md)
 - `game-design`: [1인 개발용 액션 로그라이트 설계 원칙](concepts/action-roguelite-for-solo-dev.md), [지도: 게임 개발](maps/gamedev.md)
-- `game-feel`: [고정 타임스텝 게임 루프와 히트스톱](concepts/fixed-timestep-and-hitstop.md), [지도: 게임 개발](maps/gamedev.md)
-- `gamedev`: [1인 개발용 액션 로그라이트 설계 원칙](concepts/action-roguelite-for-solo-dev.md), [고정 타임스텝 게임 루프와 히트스톱](concepts/fixed-timestep-and-hitstop.md), [macroquad WASM을 GitHub Actions로 빌드해 Netlify에 배포](guides/macroquad-wasm-netlify-github-actions.md), [그림 못 그려도 도트 게임 만들기 (에셋 전략)](guides/pixel-art-without-an-artist.md), [지도: 게임 개발](maps/gamedev.md), [지도: Rust](maps/rust.md), [macroquad 픽셀 퍼펙트 렌더링 (내부 해상도 고정 + 정수 배율)](reference/macroquad/pixel-perfect-rendering.md), [macroquad WASM 빌드와 JS 번들](reference/macroquad/wasm-build.md), [Rust 게임 엔진 비교 — 웹 + Android 핸드헬드 + 컨트롤러 요구사항 기준](reference/rust-game-engines/web-android-gamepad-support.md)
+- `game-feel`: [개발용 시나리오 진입점과 스텝 스크립트 컷씬](concepts/dev-scenarios-and-scripted-cutscenes.md), [고정 타임스텝 게임 루프와 히트스톱](concepts/fixed-timestep-and-hitstop.md), [지도: 게임 개발](maps/gamedev.md)
+- `gamedev`: [1인 개발용 액션 로그라이트 설계 원칙](concepts/action-roguelite-for-solo-dev.md), [개발용 시나리오 진입점과 스텝 스크립트 컷씬](concepts/dev-scenarios-and-scripted-cutscenes.md), [고정 타임스텝 게임 루프와 히트스톱](concepts/fixed-timestep-and-hitstop.md), [macroquad WASM을 GitHub Actions로 빌드해 Netlify에 배포](guides/macroquad-wasm-netlify-github-actions.md), [그림 못 그려도 도트 게임 만들기 (에셋 전략)](guides/pixel-art-without-an-artist.md), [지도: 게임 개발](maps/gamedev.md), [지도: Rust](maps/rust.md), [macroquad 픽셀 퍼펙트 렌더링 (내부 해상도 고정 + 정수 배율)](reference/macroquad/pixel-perfect-rendering.md), [macroquad WASM 빌드와 JS 번들](reference/macroquad/wasm-build.md), [Rust 게임 엔진 비교 — 웹 + Android 핸드헬드 + 컨트롤러 요구사항 기준](reference/rust-game-engines/web-android-gamepad-support.md)
 - `gamepad`: [macroquad 게임패드와 Android 입력 현황](reference/macroquad/gamepad-and-android-input.md), [Rust 게임 엔진 비교 — 웹 + Android 핸드헬드 + 컨트롤러 요구사항 기준](reference/rust-game-engines/web-android-gamepad-support.md)
 - `github-actions`: [0001: Rust WASM은 GitHub Actions에서 빌드하고 Netlify에는 CLI로 올린다](decisions/0001-build-rust-wasm-in-github-actions-deploy-via-netlify-cli.md), [macroquad 게임을 GitHub Actions에서 Android APK로 빌드하기 (cargo-quad-apk)](guides/macroquad-android-apk-github-actions.md), [macroquad WASM을 GitHub Actions로 빌드해 Netlify에 배포](guides/macroquad-wasm-netlify-github-actions.md), [지도: CI/CD와 호스팅](maps/ci-cd-hosting.md), [GitHub Actions에서 Rust → wasm32 빌드](reference/github-actions/rust-wasm-build.md)
 - `godot`: [Rust 게임 엔진 비교 — 웹 + Android 핸드헬드 + 컨트롤러 요구사항 기준](reference/rust-game-engines/web-android-gamepad-support.md)
@@ -119,7 +121,9 @@ _`python3 tools/kb.py index` 로 생성. 손으로 고치지 말 것._
 - `roguelite`: [1인 개발용 액션 로그라이트 설계 원칙](concepts/action-roguelite-for-solo-dev.md)
 - `rust`: [고정 타임스텝 게임 루프와 히트스톱](concepts/fixed-timestep-and-hitstop.md), [정적 WASM 호스팅](concepts/static-wasm-hosting.md), [0001: Rust WASM은 GitHub Actions에서 빌드하고 Netlify에는 CLI로 올린다](decisions/0001-build-rust-wasm-in-github-actions-deploy-via-netlify-cli.md), [macroquad 게임을 GitHub Actions에서 Android APK로 빌드하기 (cargo-quad-apk)](guides/macroquad-android-apk-github-actions.md), [macroquad WASM을 GitHub Actions로 빌드해 Netlify에 배포](guides/macroquad-wasm-netlify-github-actions.md), [지도: 게임 개발](maps/gamedev.md), [지도: Rust](maps/rust.md), [GitHub Actions에서 Rust → wasm32 빌드](reference/github-actions/rust-wasm-build.md), [macroquad 게임패드와 Android 입력 현황](reference/macroquad/gamepad-and-android-input.md), [macroquad 픽셀 퍼펙트 렌더링 (내부 해상도 고정 + 정수 배율)](reference/macroquad/pixel-perfect-rendering.md), [macroquad WASM 빌드와 JS 번들](reference/macroquad/wasm-build.md), [Rust 게임 엔진 비교 — 웹 + Android 핸드헬드 + 컨트롤러 요구사항 기준](reference/rust-game-engines/web-android-gamepad-support.md)
 - `solo-dev`: [1인 개발용 액션 로그라이트 설계 원칙](concepts/action-roguelite-for-solo-dev.md), [그림 못 그려도 도트 게임 만들기 (에셋 전략)](guides/pixel-art-without-an-artist.md)
+- `testing`: [개발용 시나리오 진입점과 스텝 스크립트 컷씬](concepts/dev-scenarios-and-scripted-cutscenes.md)
 - `touch`: [macroquad 게임패드와 Android 입력 현황](reference/macroquad/gamepad-and-android-input.md)
+- `ui`: [개발용 시나리오 진입점과 스텝 스크립트 컷씬](concepts/dev-scenarios-and-scripted-cutscenes.md)
 - `wasm`: [정적 WASM 호스팅](concepts/static-wasm-hosting.md), [0001: Rust WASM은 GitHub Actions에서 빌드하고 Netlify에는 CLI로 올린다](decisions/0001-build-rust-wasm-in-github-actions-deploy-via-netlify-cli.md), [macroquad WASM을 GitHub Actions로 빌드해 Netlify에 배포](guides/macroquad-wasm-netlify-github-actions.md), [지도: Rust](maps/rust.md), [GitHub Actions에서 Rust → wasm32 빌드](reference/github-actions/rust-wasm-build.md), [macroquad WASM 빌드와 JS 번들](reference/macroquad/wasm-build.md), [Rust 게임 엔진 비교 — 웹 + Android 핸드헬드 + 컨트롤러 요구사항 기준](reference/rust-game-engines/web-android-gamepad-support.md)
 
 <!-- index:end -->
