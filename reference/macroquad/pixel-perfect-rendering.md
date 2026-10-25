@@ -12,9 +12,15 @@ verified: |
   직접 실행(2026-10-24, Linux Xvfb + Mesa llvmpipe, macroquad 0.4.16): 아래 스케치 그대로 돌리면 **렌더 타깃 결과가 상하 반전**되어 나온다.
   월드 (2,2)에 그린 표식이 화면 아래쪽에, 글자는 거울상으로 찍혔다. X 서버 캡처(ImageMagick import)와 get_screen_data() 결과가 일치.
   `DrawTextureParams { flip_y: true }`로 올리면 정상. 수정 후 캡처로 재확인.
-  2차 출처만 있음: 없음.
+  직접 실행(2026-10-25, nail-under-the-roots, 웹 빌드 + 헤드리스 Chromium): 걷기 90px/s(틱당 1.5px)에서 정수로 굴린 카메라가
+  프레임마다 1,1,1,2,3,3,2px로 고르지 않게 움직이는 것을 콘솔 로그로 확인(사람 피드백 "화면 전체가 떨려 눈이 피로"). 아래 "부드러운 카메라"로
+  바꾼 뒤 화면 밀기 값이 0~4 화면 px(배율 4)로 바뀌고 가장자리 여분이 안 보이는 것을 확인. 눈의 피로가 줄었는지는 사람 확인 전.
+  2차 출처만 있음: 렌더 타깃을 1px 크게 + 소수점만큼 올릴 때 밀기 — MonoGame 포럼 답, 엔진별 블로그(bugnet). 표준 문서는 못 찾았다.
   확인 못 함: 웹(WebGL)·macOS·Windows에서도 같은 방향인지는 데스크톱 GL과 동일한 코드 경로라 같다고 추정만 했다. 웹 빌드는 헤드리스 Chromium에서 flip_y 적용본이 바르게 나오는 것만 확인.
 sources:
+  - https://community.monogame.net/t/jittering-with-lerping-camera/15899
+  - https://bugnet.io/blog/how-to-debug-pixel-perfect-2d-rendering-issues
+  - https://forum.godotengine.org/t/smooth-camera-in-pixel-perfect-game/112586
   - https://github.com/not-fl3/macroquad/blob/master/src/texture.rs
   - https://github.com/not-fl3/macroquad/blob/master/src/camera.rs
   - https://github.com/not-fl3/miniquad/blob/master/src/conf.rs
@@ -81,6 +87,16 @@ async fn main() {
 - 오프셋 `x, y`를 `floor()`로 정수화해야 반 픽셀 번짐이 없다.
 - 월드 안에서도 스프라이트 위치를 정수로 반올림해 그리면 더 깨끗하다(카메라 스크롤 포함).
 - 마우스 좌표는 `(mouse_x - x) / scale`로 내부 좌표계로 되돌린다.
+
+## 부드러운 카메라(스크롤 떨림 없애기)
+정수 배율 + 정수 카메라는 픽셀은 고르지만, **이동 속도가 정수 px/프레임이 아니면 화면 전체가 고르지 않게 걷는다**(틱당 1.5px → 1·2px 번갈아 = 30Hz 떨림). 캐릭터 하나가 떨리는 것보다 배경 전체가 떨리는 게 훨씬 눈에 피로하다.
+1. 카메라는 반올림하지 않고 보간한다(스프라이트 위치 반올림 함수를 카메라에 같이 쓰면 카메라가 늘 정수가 된다 — 실제로 그랬다).
+2. 렌더 타깃을 **오른쪽·아래로 1px 크게**(320×180 → 321×181) 만들고, 카메라의 **정수 부분**으로 그린다.
+3. 화면에 올릴 때 `소수점 × 배율`(반올림한 화면 px)만큼 왼쪽 위로 밀어 그린다. 화면 칸 밖으로 나온 여분은 검정 사각형으로 덮는다.
+4. 화면에 고정된 HUD는 렌더 타깃에서 빼서 화면 패스에(같이 밀리면 HUD가 흔들린다). 화면 전체 덮개(페이드·번쩍임)는 여분까지 덮는다.
+- 결과: 배경은 화면 px 단위(배율 4면 게임 px의 1/4)로 부드럽게 흐르고, 그림은 렌더 타깃의 정수 격자 그대로다.
+- 대가: 스프라이트는 게임 px 단위로만 움직이므로 화면 위에서 최대 반 게임 px 흔들린다. 카메라를 플레이어의 반올림 위치에 묶으면 반대로 배경이 떨린다 — 둘 중 하나는 진다. 넓은 면적(배경)을 부드럽게 두는 쪽이 덜 피로하다는 판단.
+- 대안: 다음 정수 배율로 크게 그리고 bilinear로 줄이기(격자는 남고 합성만 부드럽게), 또는 이동 속도를 정수 px/틱으로 맞추기(손맛이 숫자에 묶인다).
 
 ## 함정
 - **상하 반전 (0.4.16에서 실행 확인)**: `Camera2D::from_display_rect`는 y가 아래로 가는 좌표계를 만들려고 `zoom.y`를 **음수**로 둔다. `matrix()`는 `render_target`이 있으면 `invert_y = 1.0`, 없으면 `-1.0`을 `zoom.y`에 곱한다. 화면에 직접 그릴 때는 둘이 상쇄되지만, 렌더 타깃에 그릴 때는 월드 y=0이 클립 공간 +1(텍스처의 마지막 행)로 가고, `draw_texture_ex`는 텍스처 첫 행을 위에 그리므로 **결과가 뒤집힌다**. 해결은 둘 중 하나: (a) 올릴 때 `flip_y: true`(위 스케치), (b) `from_display_rect` 대신 `zoom: vec2(2./w, 2./h)`(양수)로 카메라를 직접 만든다. 어느 쪽도 macroquad가 `invert_y` 논리를 바꾸면 다시 뒤집히므로, 버전을 올릴 때 **표식을 그려 실행 확인**한다(아래 "확인 방법").
