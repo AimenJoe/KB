@@ -11,7 +11,7 @@ verified: |
   Cargo.toml(macroquad 0.4.16 → miniquad =0.4.11 고정), .github/workflows/rust.yml.
   직접 재현(2026-10-24, rustc 1.99.1 stable, macroquad 0.4.16 + audio feature + gamepads 0.1.7): wasm 링크가
   "undefined symbol: audio_init / getGamepads"로 실패하고, `-C link-arg=--import-undefined`로 해결됨. 번들 소스에서
-  quad_net 플러그인의 strict 모드 ReferenceError, 플러그인 버전 비교가 `!=`(느슨한 비교)임을 확인. 헤드리스 Chromium(Playwright)
+  quad_net 플러그인의 strict 모드 ReferenceError, 전역 wasm_memory로 문자열 바이트 주고받기(2026-10-25 직접 실행), 플러그인 버전 비교가 `!=`(느슨한 비교)임을 확인. 헤드리스 Chromium(Playwright)
   콘솔로 위 두 가지와 AudioContext 자동재생 경고를 관찰.
   2차 출처만 있음: 번들 버전 불일치로 게임이 깨진 사례(itch.io devlog), 버전 체계 변경 배경(TWiQ #2).
   Rust 블로그 2026-04-04 "Changes to WebAssembly targets and handling undefined symbols"(wasm 타깃에서 `--allow-undefined` 제거,
@@ -124,6 +124,24 @@ Rust 쪽은 `extern "C" { fn nail_pref_get(i: u32) -> u32; fn nail_pref_set(i: u
 - 첫 칸에 **형식 표식**(예: `0x4E410001`)을 두고 다르면 통째로 무시한다(형식을 바꿀 때 올린다).
 - `localStorage`는 사생활 보호 모드·차단 정책에서 예외를 던질 수 있어 try/catch로 감싼다.
 - 확인(2026-10-25, nail-under-the-roots): 헤드리스 Chromium에서 키를 다시 붙이고 새로고침 → 그대로 복원, `localStorage`에 `nail.pref.0..17`.
+
+## 문자열 주고받기: wasm 메모리를 직접 (기록 저장)
+정수 칸으로 모자라는 것(런을 넘는 기록처럼 키가 늘어나는 것)은 글 한 칸으로 저장한다. 번들의 전역 `wasm_memory`(`var`로 선언돼 다른 `<script>`에서 보인다)로 Rust가 잡은 버퍼를 JS가 직접 읽고 쓴다.
+
+```js
+importObject.env.nail_save_len  = function ()         { return new TextEncoder().encode(get()).length; };
+importObject.env.nail_save_read = function (ptr, len) { new Uint8Array(wasm_memory.buffer, ptr, len).set(new TextEncoder().encode(get()).subarray(0, len)); };
+importObject.env.nail_save_write= function (ptr, len) { set(new TextDecoder().decode(new Uint8Array(wasm_memory.buffer, ptr, len))); };
+```
+```rust
+let n = unsafe { nail_save_len() } as usize;          // 0이면 저장 없음(플러그인이 없어도 0)
+let mut buf = vec![0u8; n];
+unsafe { nail_save_read(buf.as_mut_ptr(), n as u32) };  // JS가 이 버퍼에 쓴다
+unsafe { nail_save_write(s.as_ptr(), s.len() as u32) }; // JS가 이 범위를 읽는다
+```
+- 길이는 **UTF-8 바이트 수**로 센다. JS 문자열 `.length`는 UTF-16 단위라 한글이 섞이면 어긋난다.
+- `wasm_memory.buffer`는 메모리가 자라면 새 객체가 된다. 뷰(`Uint8Array`)는 **부를 때마다 새로** 만든다(전역에 잡아 두지 않는다).
+- 확인(2026-10-25, nail-under-the-roots): 헤드리스 Chromium에서 `addInitScript`로 localStorage에 기록을 넣고 시작 → 읽힘. 게임이 쓴 기록이 `localStorage.getItem`에 그대로 나옴.
 
 ## 로딩 화면 (번들을 고치지 않고)
 
