@@ -6,6 +6,7 @@ status: draft
 created: 2026-10-25
 updated: 2026-10-25
 verified: |
+  1차 출처로 확인(2026-10-25, macroquad 0.4 소스 text/atlas.rs + 헤드리스 콘솔): 그리는 도중 넘치면 텍스처를 지웠다 새로 만들어 같은 프레임 글이 지워진 ID를 본다, ASCII·두 배 크기를 함께 미리 구우면 경고가 사라진다.
   1차 출처로 확인: macroquad 0.4.16 소스 — text.rs(draw_text_ex·measure_text가 `font_size × dpi_scale`로 글자를 굽고
   처음 보는 (글자, 크기)를 cache_glyph), text/atlas.rs(cache_sprite가 dirty를 켜고, texture()가 그릴 때
   `texture_update(전체 이미지)`; 자리가 모자라면 가로세로 2배로 키우고 전부 다시 담음), miniquad 0.4.11 js/gl.js(`now()` = `Date.now()/1000`).
@@ -47,6 +48,12 @@ macroquad는 글자를 **`font_size × dpi` 크기로 구워** 아틀라스에 �
 - 헤드리스 Chromium(소프트웨어 GL)의 프레임 시간은 픽셀 수에 비례해 느려질 뿐 GPU 사정을 보여 주지 않는다. **WebGL 함수를 감싸 올린 바이트를 세는 쪽**이 원인을 가르는 데 낫다.
 - 벡터(매끈한) 폰트에 같은 방법을 쓰면 흐려진다. 픽셀 폰트일 때만.
 - dpi가 어중간하면(1.25 등) 정수배 조합이 없을 수 있다 → 예전처럼 화면 크기로 굽는다.
+- **그리는 도중 아틀라스가 커지면 그 프레임 글이 지워진 텍스처를 본다.**
+  - 넘칠 때 `cache_sprite`는 이미지를 두 배로 만들고, `texture()`는 옛 텍스처를 `delete_texture` 한 뒤 새로 만든다.
+  - 같은 프레임에 이미 쌓인 글 그리기는 옛 텍스처 ID를 들고 있다. 웹 콘솔에 `glBindTexture called with an already deleted texture ID`가 찍히고, 그 프레임 글이 빠질 수 있다.
+  - 미리 굽기 목록이 **언어 표의 글자만**이면 표 밖에서 찍는 글자를 놓친다(버튼 이름 "Enter"·"J", 로고, 숫자, 개발 화면). 그러면 그 글자들이 처음 그려질 때 넘친다.
+  - 출력 가능한 ASCII 전부와 **다른 크기(두 배 제목 등)**도 같이 굽는다.
+  - 표를 고치기만 해도 언제 넘치는지가 바뀐다. 예: 이름을 라틴 문자에서 현지 글자로 바꾸면 그 라틴 글자가 목록에서 빠진다.
 
 ## 관련 노트
 - [픽셀 퍼펙트 렌더링](pixel-perfect-rendering.md)
