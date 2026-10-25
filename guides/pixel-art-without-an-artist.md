@@ -26,6 +26,7 @@ sources:
   - https://pixeljoint.com/pixelart/90047.htm
   - https://pixeljoint.com/Forum/forum_posts.asp?TID=20478
   - https://community.aseprite.org/t/how-do-i-make-straight-curved-lines-properly/10246/4
+  - https://itch.io/t/1977247/pixel-tutorial-yeti-final-fantasy-14
   - https://lospec.com/articles/pixel-art-outlines-part-2-using-color
   - https://blog.usesession.com/blog/ardouradvice/766774775809032192
   - https://www.boristhebrave.com/2023/05/31/quarter-tile-autotiling/
@@ -159,6 +160,11 @@ v1(타원 + 구 음영 + 몸 전체 2×2 디더)은 "자글자글"하고 형태�
   - 털결은 둘레보다 한 단 어둡게 다시 칠한다.
 - **하이라이트 덩어리는 작게**: 정수리 빛 덩어리는 머리의 몇 %만 차지해야 한다. 444px이면 머리 전체가 바래 보였고, 132px이면 둥근 빛으로 읽혔다.
 - 단을 다시 나눈 뒤에는 외톨이를 한 번 더 정리한다. 경계에서 한 칸짜리 섬이 생긴다.
+- **털 동물이 대머리로 보이는 이유**(같은 초상화, 명암을 고친 다음 사용자 지적): 실루엣이 매끈하고, 단 경계가 매끈한 곡선이고, 하이라이트가 반들반들한 타원이면 피부로 읽힌다. 명암을 "올바르게" 할수록 이렇게 된다. 털은 한 올씩 그리지 않고 아래 셋으로 보여 준다.
+  - **단 경계를 털 뭉치 모양으로**: 빛 중심 둘레 각도로 톱니를 넣어, 경계가 한쪽으로 기운 삼각(털끝)이 되게 한다. 88×88 머리에 톱니 40개, 세기는 단 너비의 절반쯤이었다. 빛 중심 가까이는 톱니가 한 점에 모여 자글자글하니 약하게 한다.
+  - **실루엣 삐침**: 끝이 털이 자라는 쪽(코에서 뒤로)을 보게 2~3px 삐침을 일부러 고르지 않은 간격으로 찍는다. 빛 쪽 삐침 끝을 가장 어두운 색으로 찍으면 털이 아니라 점으로 보인다. 그 자리 단 색으로 찍는다.
+  - **정수리 한 가닥**: 1px 선은 과일 꼭지로 읽혔다. 너비 3~4px 잎 모양으로 얼굴 쪽으로 기울이고, 빛 쪽 가장자리는 밝게, 그늘 쪽만 어둡게 한다.
+  - 참고(2차 출처): 털은 암시하고 다 그리지 않는다([itch.io](https://itch.io/post/6047047)), 음영 덩어리 가장자리를 뾰족하게 = 털 뭉치([yeti 튜토리얼](https://itch.io/t/1977247/pixel-tutorial-yeti-final-fantasy-14)), 형태를 만드는 곳에만 작은 명암 대비([DeviantArt 비평](https://www.deviantart.com/bluedrgnmethy/journal/Critique-2-727677363)).
 - 참고(2차 출처): 계단 길이는 늘거나 줄게, 섞지 말 것([PixelJoint 포럼](https://pixeljoint.com/Forum/forum_posts.asp?TID=20478), [Wayline 2강](https://www.wayline.io/learn/pixel-art/1), [Aseprite 커뮤니티](https://community.aseprite.org/t/how-do-i-make-straight-curved-lines-properly/10246/4)).
 
 ### 2배 밀도 한 장 그림의 띠 자국
