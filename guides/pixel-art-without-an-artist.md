@@ -37,6 +37,19 @@ sources:
 - 캐릭터 후보(해금 캐릭터 등)는 세계관으로 먼저 정하지 말고 **쓸 수 있는 팩에 그 동물·직업이 있는지**로 먼저 거른다.
 - 무료 팩은 작가가 라이선스를 바꾸거나 내릴 수 있다. 받은 시점의 라이선스 파일을 함께 보관한다.
 
+## 3/4 탑다운 16×16 팩 후보 (2026-10-25 조사, 2차 출처: itch.io 페이지 요약)
+"귀여운 동물 + 3/4 탑다운 + 16×16 + 상업 가능"을 모두 만족하는 팩은 없었다. 동물(두더지·고슴도치·아르마딜로·개미핥기)은 어느 팩에도 없어서 **캐릭터는 따로 그리거나 의뢰**하고, 팩은 타일·소품·UI·적 템플릿으로 쓴다고 생각해야 한다.
+
+| 팩 | 내용 | 라이선스(페이지 기준, 구매 전 재확인) |
+|---|---|---|
+| [Sprout Lands](https://cupnooble.itch.io/sprout-lands-asset-pack) (Cup Nooble) | 농장 타일·소품, 닭·소·양 | 무료판 비상업, 프리미엄($3.99+) 상업 가능, 재배포 금지 |
+| [Mystic Woods](https://game-endeavor.itch.io/mystic-woods) (Game Endeavor) | 숲 타일·소품, 슬라임·해골 등 적, 16×16 탑다운 | 무료판 비상업, 유료판 상업 가능 |
+| [Sunnyside World](https://danieldiggle.itch.io/sunnyside) (danieldiggle) | 타일셋, 사람·고블린 20동작 | 상업 가능, 수정 가능, 크레딧 선택, 재판매·AI 학습 금지. 동물 없음 |
+| [Gridwright Animals & Pets](https://v3su.itch.io/animals-pets-16x16-pixel-art-top-down-sprites) | 15종 32마리 탑다운 동물(고슴도치 포함), 4방향 | "Royalty Free" 표기, 원문 미확인 |
+| [Animal Asset Pack 16×16](https://deepdivegamestudio.itch.io/animalassetpack) (DeepDive) | 45종 동물 스프라이트, 판타지·로그라이크 톤 | Name your own price, 원문 미확인 |
+
+고르는 기준: (1) 바닥·벽 타일과 소품이 먼저(방이 게임의 80%), (2) 적 템플릿이 있으면 팔레트를 맞춰 동물로 고친다, (3) 팔레트가 좁은 팩이 섞어 쓰기 쉽다. 두더지 주인공은 어차피 직접 그려야 하니 팩의 팔레트·해상도에 맞춰 그린다.
+
 ## 한글 UI 폰트 (에셋 팩과 별개의 인프라)
 게임 엔진 내장 폰트에는 한글이 없다. 픽셀 게임에 맞는 한글 폰트는 다음 조건으로 고른다: OFL 같은 재배포 허용 라이선스, 픽셀 격자(8·10·12px)에 맞는 윤곽선 TTF, 2,350자 이상.
 
