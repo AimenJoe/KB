@@ -23,6 +23,7 @@ updated: 2026-10-25
 
 ## 다국어
 - [작은 게임 다국어 구조](../guides/small-game-localization.md) — 고정 키 표, 자리표시자, 폰트 커버리지 테스트, 브라우저 언어 읽기
+- [중국어·일본어 픽셀 폰트](../reference/fonts/cjk-pixel-fonts.md) — 중국어 폰트 ≠ 일본어 폰트, Ark Pixel·Fusion·Galmuri 범위와 라이선스
 
 ## 엔진·플랫폼 선택
 - [Rust 게임 엔진 비교: 웹 + Android 핸드헬드 + 컨트롤러](../reference/rust-game-engines/web-android-gamepad-support.md) — macroquad / Bevy / Godot, Android 게임패드가 공통 공백

@@ -43,6 +43,7 @@ sources:
 - 데스크톱·Android는 `sys-locale`(Android는 시스템 속성 `persist.sys.locale`).
 
 ## 폰트
+- 중국어·일본어는 폰트가 따로다(한자 통합·일본식 약자). 후보와 범위: [중국어·일본어 픽셀 폰트](../reference/fonts/cjk-pixel-fonts.md).
 - 서브셋 폰트는 언어를 늘릴 때마다 다시 만든다. 일본어는 가나만으로도 쓸 수 있지만(어린이용 게임의 히라가나 모드처럼) 한자가 필요하면 한자 있는 픽셀 폰트를 따로 들여야 한다. 라이선스부터 확인.
 - 예: Galmuri11 Condensed는 한글 11,172자·가나·키릴은 있고 한자는 없다(npm galmuri 2.40.3 기준).
 
@@ -58,6 +59,7 @@ sources:
 - 기기 언어 감지는 "처음 한 번"이다. 설정 저장이 없으면 바꾼 언어가 다음 실행에 돌아간다.
 
 ## 관련 노트
+- [중국어·일본어 픽셀 폰트](../reference/fonts/cjk-pixel-fonts.md) — 한자 통합, 12px 후보, PNG 원본에서 언어별 서브셋
 - [WASM 빌드와 JS 번들](../reference/macroquad/wasm-build.md) — `--import-undefined`, 플러그인 버전 계약
 - [그림 못 그려도 도트 게임 만들기](pixel-art-without-an-artist.md) — 한글 픽셀 폰트 서브셋
 - [게임패드와 Android 입력 현황](../reference/macroquad/gamepad-and-android-input.md) — 커서 없는 메뉴 탐색
