@@ -17,7 +17,7 @@ verified: |
   src/lib.rs(웹 is_just_pressed는 직전 poll과 비교).
   터치(2026-10-25): macroquad src/window.rs·src/input.rs·src/lib.rs(touches()는 물리 픽셀, screen_width()·mouse_position()은 DPI로 나눔,
   프레임 끝 위상 정리)를 읽고, Pixel 7 프로필(DPR 2.625) 헤드리스 Chromium에서 버튼 판정 실패를 재현한 뒤 DPI 나눗셈으로 해결 확인.
-  실기 Android 13 브라우저에서 사용자가 같은 증상을 보고함.
+  실기 Android 13 브라우저에서 사용자가 같은 증상을 보고했고, DPI 나눗셈·비표준 매핑 허용 뒤 터치와 패드 모두 동작함을 확인(2026-10-25).
   2차 출처만 있음: macroquad 문서의 "gamepads soon" 문구, cargo-quad-apk 유지보수 상태(crates.io 0.1.4가 4년 이상 전,
   커뮤니티 이슈의 NDK/minSdk 패치 메모).
   확인 못 함: Android MotionEvent 축 상수(AXIS_X/Y/Z/RZ/HAT_X/HAT_Y/LTRIGGER/RTRIGGER)의 정확한 숫자값 — 패치 시 공식 문서로 확인.
