@@ -64,6 +64,8 @@ gamepads = { version = "0.1", default-features = false }  # macroquad는 wasm-bi
 - **스틱 y 부호**: 두 백엔드 모두 **위가 +**다. 브라우저 Gamepad API는 위가 −인데 플러그인 JS가 축 1·3의 부호를 뒤집고, gilrs도 위가 +. 화면 좌표(아래가 +)로 쓰려면 `-y`.
 - **데드존**: 웹 플러그인이 0.04 데드존을 빼고 0..1로 다시 편다. 데스크톱은 gilrs가 드라이버 데드존을 쓴다. 게임 쪽에서 반지름 데드존(0.2 정도)을 한 번 더 두는 편이 안전하다.
 - **눌림(edge)**: 웹의 `is_just_pressed`는 "직전 `poll()` 때 안 눌렸고 지금 눌림"이므로 `poll()`은 프레임당 정확히 한 번. 고정 타임스텝이면 눌림을 래치에 모아 틱이 소비한다([concepts/fixed-timestep-and-hitstop.md](../../concepts/fixed-timestep-and-hitstop.md)).
+- **비표준 매핑 패드는 통째로 무시된다**: 플러그인 JS는 `gamepad.mapping !== "standard"`이면 그 패드를 연결 안 된 것으로 기록한다. Android Chrome의 블루투스 패드·핸드헬드 내장 패드는 `mapping`이 `""`인 경우가 많아 "컨트롤러가 전혀 안 먹는" 증상이 된다(2026-10-25, 가짜 `navigator.getGamepads`로 재현: standard면 인식, ""면 pads 0). 복사본에서 그 조건을 빼면 표준 인덱스 가정으로 받는다. 어떤 패드가 어떻게 잡히는지는 https://hardwaretester.com/gamepad 로 본다.
+- **브라우저는 버튼을 한 번 눌러야 패드를 노출한다**: Gamepad API는 사용자 제스처 전까지 `getGamepads()`에 패드를 넣지 않는다. 페이지를 연 뒤 아무 버튼이나 눌러야 한다.
 - **Standard Gamepad 매핑 인덱스**: `Button` enum 순서 = W3C 표준 인덱스. ActionDown(0, A/×) ActionRight(1, B/○) ActionLeft(2, X/□) ActionUp(3, Y/△) FrontLeftUpper(4, L1) FrontRightUpper(5, R1) FrontLeftLower(6, L2) FrontRightLower(7, R2) LeftCenterCluster(8, Select) RightCenterCluster(9, Start) LeftStick(10) RightStick(11) DPad Up/Down/Left/Right(12~15) Mode(16). 웹은 `mapping === "standard"`인 패드만 보고한다.
 - **Linux 데스크톱 빌드 의존성**: gilrs → libudev-sys → `libudev-dev`, `pkg-config`. 없으면 build.rs가 "Package libudev was not found"로 실패.
 - Cargo.toml의 `android-winit` feature는 winit 0.30 + `android-native-activity` 전용이다. miniquad는 winit을 쓰지 않으므로 **macroquad Android 빌드에서는 쓸 수 없다.** gilrs 자체도 Android 미지원.
