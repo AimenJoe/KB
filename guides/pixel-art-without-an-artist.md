@@ -15,6 +15,8 @@ verified: |
   그 밖의 팩(Gridwright, DeepDive)은 원문 미확인 — 내려받을 때 반드시 팩의 라이선스를 직접 읽을 것.
   2차 출처/경험: 1인 개발 통념(한 팩 중심, 해상도 통일, Aseprite 손보기). Creative Commons 라이선스 종류 자체는 공식 정의를 따른다.
 sources:
+  - https://devdocs.xbox.com/gaming/accessibility/xbox-accessibility-guidelines/102
+  - https://bugnet.io/blog/readable-game-art-why-clarity-beats-detail
   - https://creativecommons.org/share-your-work/cclicenses/
   - https://itch.io/game-assets/free/tag-pixel-art
   - https://opengameart.org/
@@ -93,6 +95,12 @@ sources:
 - **눈이 생명**: 큰 흰 반사 + 작은 반사 + 아래쪽 푸른 반사광. 표정은 눈(^ 감은 눈, 눈꺼풀 눌러 결의)·눈썹(안쪽 올림 = 걱정, 내림 = 결의)·입(ω) 세 곳만 바꿔도 충분하다.
 - 확인 순서: 원본 3배(전체 구성) → 얼굴만 12배(입·반사 픽셀) → 게임 대화창 안(실제 크기). 같은 어두운 단에 같은 색 입을 그리면 묻힌다 — 입은 별색.
 - 16×16 스프라이트와 같은 함정: 얼굴 아래 밝은 면 + 하얀 발톱 줄은 이빨로 읽힌다.
+
+### 무리 속에서 내 캐릭터가 보이게
+- 실패의 대부분은 **값(밝기) 실패**다: 같은 갈색·같은 밝기·같은 크기면 실루엣이 달라도 섞인다(두더지 주인공과 흙갈색 들쥐, 2026-10-25 nail-under-the-roots).
+- 고치는 순서: ① 적 팔레트를 한쪽으로 기울이기(물든 적 = 보라 쪽 28% + 밝기 82%, 외곽선도 더 어둡고 차갑게) — 종 색은 남는다 ② 주인공은 따뜻하고 밝은 쪽 그대로 ③ **색이 아닌 표시** 하나(발밑 빛 고리, 바닥에 그려 다른 그림을 가리지 않게).
+- 확인: 게임 화면을 **흑백**으로 바꿔 주인공이 가장 밝은 덩어리로 남는지. 흑백에서 사라지면 색약 플레이어에게도 사라진다(2차 출처: 게임 아트 가독성 글, Xbox 접근성 가이드라인 102 — 윤곽선·대비, 색만으로 정보를 주지 말 것).
+- 참고: [Xbox Accessibility Guideline 102](https://devdocs.xbox.com/gaming/accessibility/xbox-accessibility-guidelines/102), [Readable game art](https://bugnet.io/blog/readable-game-art-why-clarity-beats-detail), [80.lv 실루엣과 대비](https://80.lv/articles/studying-character-art-silhouette-and-contrast)
 
 ## 3/4 환경을 "깊이"로 바꾸기
 같은 타일에 색조(바닥·벽 따로), 장식표(꽃 → 뿌리·조약돌 → 이끼·빛나는 버섯), 바닥 재질(풀 → 흙), 화면 어둠(플레이어 주변만 밝은 원형 마스크)을 단계별로 입히면 타일 세트를 더 사지 않고도 "내려갈수록 어둡고 음습해지는" 흐름이 나온다. 칸 경계가 보이지 않게 반대 재질 얼룩(가장자리 불규칙, 투명 배경)을 반 칸 어긋나게 덮는다. 빛나는 장식은 어둠을 그린 뒤 한 번 더 그린다.
