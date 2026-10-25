@@ -50,5 +50,6 @@ sources:
 - HUD 글자는 화면 위 끝에 붙이지 말 것: 글꼴의 위쪽 여백 때문에 y가 음수가 되면 숫자 윗부분이 잘린다.
 
 ## 관련 노트
+- [능력치·장비 설계](action-rpg-stats-and-equipment.md) — 회복을 퀵 아이템으로 바꾼 뒤의 설계(먹기 버튼, 큰 회복 = 목숨)
 - [1인 개발용 액션 로그라이트 설계 원칙](action-roguelite-for-solo-dev.md)
 - [고정 타임스텝 게임 루프와 히트스톱](fixed-timestep-and-hitstop.md)

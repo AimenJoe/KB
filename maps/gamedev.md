@@ -17,6 +17,7 @@ updated: 2026-10-25
 
 ## 보상·경제
 - [회복과 화폐 드롭](../concepts/roguelite-healing-and-currency.md) — 깎인 만큼 확률 + 불운 보정, 자석·줍기 지연·오르는 소리
+- [능력치·장비 설계](../concepts/action-rpg-stats-and-equipment.md) — 무기는 모양·장신구는 수치·성장은 영구, 공격 속도 = 시계 배율, 큰 회복 = 목숨
 
 ## 게임 루프·전투감
 - [고정 타임스텝 게임 루프와 히트스톱](../concepts/fixed-timestep-and-hitstop.md) — 누적기 루프, 입력 래치, 보간, 히트스톱은 로직 시계만, trauma² 흔들림
