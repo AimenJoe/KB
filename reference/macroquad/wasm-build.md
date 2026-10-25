@@ -125,6 +125,15 @@ Rust 쪽은 `extern "C" { fn nail_pref_get(i: u32) -> u32; fn nail_pref_set(i: u
 - `localStorage`는 사생활 보호 모드·차단 정책에서 예외를 던질 수 있어 try/catch로 감싼다.
 - 확인(2026-10-25, nail-under-the-roots): 헤드리스 Chromium에서 키를 다시 붙이고 새로고침 → 그대로 복원, `localStorage`에 `nail.pref.0..17`.
 
+## 로딩 화면 (번들을 고치지 않고)
+
+첫 프레임 전까지 macroquad는 아무것도 그리지 않는다(wasm 받기·컴파일 + main의 `load_*().await` 동안 검은 화면).
+- **HTML 덮개**: 캔버스 위 `div`(z-index), 게임 배경색, 스프라이트 시트 한 줄을 CSS `steps()` 애니메이션 + `image-rendering: pixelated`로. 이 시점엔 게임의 언어·폰트가 없으니 **글 없이** 그림과 막대만.
+- **wasm 진행**: 번들 `load()`는 `fetch(path)` → `compileStreaming`. 번들보다 먼저 `window.fetch`를 감싸 `*.wasm`이면 `body.getReader()`로 바이트를 세고, 모은 조각으로 `new Response(new Blob(chunks, {type:"application/wasm"}), {headers:{"Content-Type":"application/wasm"}})`를 돌려준다(compileStreaming은 MIME을 본다).
+- **압축 전송 주의**: gzip/br이면 `Content-Length`(압축 크기)가 읽은 바이트(푼 크기)보다 작다 → `max(Content-Length, 받은 양 × 1.05)`로 나누고 95%에서 멈춘다.
+- **게임 안 준비**: 정수 플러그인(`nail_load_step(done, total)`, `nail_load_ready()`)으로 main이 폰트·그림·소리마다 알린다. `ready`는 **첫 `next_frame().await` 뒤**에 — 그 전에 덮개를 걷으면 검은 화면이 한 번 보인다.
+- 확인(2026-10-25, nail-under-the-roots): Playwright `page.route`로 응답마다 지연을 넣어 느린 회선을 흉내, 막대가 0 → 60 → 68 … 100%로 차고 덮개가 걷힘.
+
 ## 헤드리스로 웹 빌드 확인 (Playwright)
 배포 전에 콘솔 에러·입력·렌더를 자동으로 본다. `python3 -m http.server --directory dist`로 띄우고:
 ```js
