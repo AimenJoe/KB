@@ -1,5 +1,5 @@
 ---
-title: macroquad 글자 그리기 비용과 브라우저 프레임레이트 — 아틀라스 통째 올리기, 레티나, Safari 저전력 30fps
+title: macroquad 글자 그리기 비용과 브라우저 프레임레이트 — 아틀라스 통째 올리기, 레티나, WebGL 안티에일리어싱 기본값, Safari 저전력 30fps
 type: reference
 tags: [macroquad, wasm, performance, safari, fonts, gamedev]
 status: draft
@@ -11,6 +11,7 @@ verified: |
   `texture_update(전체 이미지)`; 자리가 모자라면 가로세로 2배로 키우고 전부 다시 담음), miniquad 0.4.11 js/gl.js(`now()` = `Date.now()/1000`).
   직접 측정(2026-10-25, nail-under-the-roots, 헤드리스 Chromium + WebGL 후킹): 한국어 대화가 한 글자씩 찍히는 동안
   texImage2D/texSubImage2D가 새 글자마다 4MB(1024² RGBA)씩, 대화 몇 장에 40번·160MB. 언어 글자를 미리 구우니 0번.
+  번들의 getContext 호출에 옵션이 없어 antialias·alpha가 켜진다(getContextAttributes로 확인), 옵션을 끼우면 꺼진다.
   원래 크기(12 물리 px)로 굽고 정수배로 키운 화면이 화면 크기로 구운 것과 픽셀 단위로 같음(dpi 1·2).
   확인 못 함: 실제 Safari에서의 프레임 시간(컨테이너에 Safari·GPU 없음. 헤드리스 Chromium은 소프트웨어 GL이라 절대 시간은 의미 없다).
   2차 출처만 있음: Safari가 저전력 모드에서 requestAnimationFrame을 30fps로 낮추고 의도된 동작이라는 것, ProMotion에서
@@ -35,6 +36,7 @@ macroquad는 글자를 **`font_size × dpi` 크기로 구워** 아틀라스에 �
 - **원래 크기로 굽기**(픽셀 폰트만): 구운 크기 = 12 × m 물리 px, 키우는 배 = 12 × 배율 × dpi ÷ (12 × m)가 정수인 가장 작은 m. dpi 1·2·3·1.5는 m = 1(12px 그대로)로 된다. 결과는 화면 크기로 구운 것과 같다(폰트 픽셀이 정사각형 윤곽이라).
 - **미리 굽기**: 언어 표의 모든 글자를 이어 붙인 문자열을 한 번 `measure_text` → 굽기만 하고 올리기는 다음 그리기에서 한 번. 언어·배율·dpi가 바뀌면 다시. 12px 글자면 수백 자도 1024²에 넉넉하다.
 - **브라우저 프레임레이트**: Safari는 저전력 모드(맥북 배터리 기본값, iPhone 저전력)에서 rAF를 30fps로 낮춘다(의도된 동작). ProMotion 120Hz도 설정에 따라 60에 묶인다. 고정 타임스텝 + 보간이면 속도는 그대로지만 눈에는 끊겨 보인다 — 게임 쪽에서 고칠 수 없으니 "전원을 꽂고 비교"가 먼저다.
+- **WebGL 컨텍스트 기본값**: 번들(`mq_js_bundle.js`)은 `canvas.getContext("webgl")`/`("webgl2")`를 옵션 없이 부른다 → 브라우저 기본값 `antialias: true`, `alpha: true`. `high_dpi: true`면 아이폰(dpr 3)에서 캔버스가 2532×1170이고 매 프레임 4배 샘플을 칠하고 합친다. 도트 게임엔 쓸모가 없으니 `index.html`에서 번들보다 먼저 `HTMLCanvasElement.prototype.getContext`를 감싸 `{antialias:false, alpha:false, powerPreference:"high-performance"}`를 끼운다(번들 복사본은 그대로). 헤드리스 Chromium(같은 조건, 3초)에서 그린 프레임 62 → 144(2026-10-25, 실제 iPhone 측정은 아님).
 - **시계**: miniquad 웹의 `now()`는 `Date.now()/1000`(ms 단위, 벽시계). 프레임 시간이 1ms씩 흔들리는 정도는 누적기 + 보간이 흡수한다.
 
 ## 왜?
