@@ -19,6 +19,10 @@ verified: |
     assets/configs/fallback.yaml). 현재 레포 LICENSE-OFL엔 Reserved Font Name이 없지만, npm @fontsource/fusion-pixel-*-jp 5.3.0의 LICENSE에는
     "Reserved Font Name 'Fusion Pixel'"이 있다 — 판마다 다르니 서브셋은 이름을 바꿔 둔다. fontsource 패키지는 라틴 서브셋 파일만 들어 있어 CJK용으로 못 쓴다.
   2차 출처만 있음: 한자 통합(Han unification) 일반 설명, 범CJK 폰트가 언어별 빌드를 내는 이유.
+  직접 빌드(2026-10-25): Ark 12px PNG → fontTools FontBuilder TTF(픽셀 줄마다 이어진 칸을 사각형 하나로, upem 1200 = 12px).
+    기준선은 pixel-font-knife의 `horizontal_offset` 식(offset_y = baseline − em − bottom_space; 12×12 한자는 −1, 18px 캔버스 라틴은 −4)을 그대로.
+    게임 표의 글자만 넣어 일본어 377자 77KB, 간체 406자 100KB. 실제로 없던 글자: 層(일), 奖·摇·纵(간) → 문구를 바꿈.
+    macroquad 0.4.16에서 Galmuri와 같은 줄 높이(ascent 1200/descent −200)로 섞어 찍어 어긋남 없음을 헤드리스 Chromium 스크린숏으로 확인.
   확인 못 함: GitHub 릴리스 TTF(이 환경에서 릴리스 다운로드가 막힘), Zpix·PixelMplus·k8x12의 현재 라이선스 원문.
 sources:
   - https://github.com/TakWolf/ark-pixel-font
@@ -55,6 +59,14 @@ sources:
 - 빠진 글자가 나오면 빌드를 실패시키고 ① 문구를 바꾸거나(攻撃 → こうげき: 귀여운 톤엔 히라가나가 오히려 맞다) ② 12×12 PNG를 직접 찍어 보충한다.
 - 서브셋·가공한 폰트는 OFL의 "수정본"이다. RFN이 있는 판에서 나왔다면 원래 이름을 쓰면 안 된다 → 늘 이름을 바꿔 두면 안전하다. 고지 파일에 OFL 원문과 출처를 싣는다.
 - 테스트는 [작은 게임 다국어](../../guides/small-game-localization.md)의 "모든 글자가 폰트 cmap에 있는가"를 언어별 폰트로 돌린다.
+
+## PNG 원본에서 TTF 짓기 (확인한 방법)
+- 글자 고르기: `XXXX <언어>.png`가 있으면 그것, 없으면 `XXXX.png`. `proportional/`이 `common/`보다 우선. `monospaced/`는 쓰지 않는다.
+- 잉크: 알파 > 127. 줄마다 이어진 잉크 칸을 사각형 윤곽 하나로(시계 방향). 전진 폭 = PNG 폭 × 100.
+- 세로 위치: `offset_y = baseline(11) − em(12) − (캔버스높이 − 12)/2`, 픽셀 행 r의 아래 y = `(offset_y + 높이 − 1 − r) × 100`.
+- 줄 높이(hhea)는 함께 쓰는 한글 폰트와 같게 두면 언어를 바꿔도 화면 배치가 그대로다.
+- 넣는 글자: 그 언어 문자열 표 + ASCII + 코드에 직접 쓴 UI 기호(▶ ♥ …) + (일본어) 가나 전부. 표에 없는 글자를 실수로 쓰면 커버리지 테스트가 잡는다.
+- 없는 기호는 같은 격자의 OFL 폰트(예: Galmuri Condensed)에서 윤곽을 복사해 와도 된다. 한자가 없으면 빌드를 실패시키고 문구를 바꾼다.
 
 ## 함정
 - npm `@fontsource/fusion-pixel-*`는 웹용 라틴 조각만 들어 있다(CJK는 CDN 조각 로딩용이라 패키지에 없음).
