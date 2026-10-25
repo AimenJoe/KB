@@ -20,6 +20,9 @@ verified: |
   실기 Android 13 브라우저에서 사용자가 같은 증상을 보고했고, DPI 나눗셈·비표준 매핑 허용 뒤 터치와 패드 모두 동작함을 확인(2026-10-25).
   2차 출처만 있음: macroquad 문서의 "gamepads soon" 문구, cargo-quad-apk 유지보수 상태(crates.io 0.1.4가 4년 이상 전,
   커뮤니티 이슈의 NDK/minSdk 패치 메모).
+  메뉴 스틱 탐색(2026-10-25, nail-under-the-roots): "첫 칸은 키·D패드 눌림 에지, 스틱은 반복만" 구조에서 스틱 플릭이 무시되는 것을
+  실기 사용자가 보고 → 스틱도 첫 칸을 내게 바꾸고(히스테리시스 0.5/0.3, 큰 축 하나) 가짜 Gamepad 헤드리스 Chromium에서 플릭 1회 = 1칸 확인.
+  임계값 0.5/0.3 자체는 2차 출처(포럼의 "임계 통과 시 1회, 중앙 복귀 후 재무장" 패턴) + 직접 조정이며 표준값은 찾지 못했다.
   확인 못 함: Android MotionEvent 축 상수(AXIS_X/Y/Z/RZ/HAT_X/HAT_Y/LTRIGGER/RTRIGGER)의 정확한 숫자값 — 패치 시 공식 문서로 확인.
 sources:
   - https://github.com/not-fl3/miniquad/blob/master/java/MainActivity.java
@@ -31,6 +34,8 @@ sources:
   - https://github.com/not-fl3/cargo-quad-apk
   - https://macroquad.rs/articles/android/
   - https://github.com/BunnyEncoder20/king-tongue-2/issues/2
+  - https://forum.babylonjs.com/t/how-to-use-the-gamepads-left-analog-to-navigate-a-game-menu-screen/40099
+  - https://www.shawnhargreaves.com/blog/gamepads-suck.html
 ---
 
 # macroquad 게임패드와 Android 입력 현황
@@ -93,6 +98,14 @@ macroquad 0.4.16의 `touches()`는 `Touch { id, phase, position }`를 돌려준�
 - **위상(phase)에 기대지 말 것**: macroquad는 터치를 id별로 하나만 보관하고 프레임 끝에 Started/Moved→Stationary, Ended→삭제로 정리한다. 실제 손가락은 touchstart 직후 같은 프레임에 touchmove가 와서 Started가 Moved로 덮이고, 짧은 탭은 start·end가 한 프레임에 들어와 Ended만 보인다. "눌림"은 **지난 프레임까지 본 id 목록에 없는 새 id**로 판정하고, 새 id가 Ended여도 눌림으로 센다.
 - 웹 글루는 `touchstart/move/end/cancel`을 `canvas`에 걸고 `e.changedTouches`의 `identifier`를 id로 넘긴다. `simulate_mouse_with_touch`(기본 true)라 마우스 이벤트도 같이 생긴다.
 - `index.html`에 `touch-action: none; overscroll-behavior: none; user-select: none`과 `user-scalable=no` viewport를 두지 않으면 스크롤·확대·길게 누르기 메뉴가 끼어든다.
+
+## 메뉴 탐색: 스틱을 한 칸 눌림으로
+게임플레이는 스틱 벡터를 그대로 쓰지만, 메뉴는 "한 칸" 눌림이 필요하다. 키·D패드는 눌림 에지(`is_key_pressed`, `is_just_pressed`)가 있고 **아날로그 스틱에는 없다.**
+- 함정: "첫 칸은 버튼 에지, 반복은 이동 벡터"로 짜면 스틱은 반복 지연(예 0.35초)만큼 누르고 있어야 겨우 움직인다. 사용자는 "왼쪽 스틱이 무시된다"고 느낀다.
+- 패턴: 이동 벡터(키·D패드·스틱 합친 것)에서 방향을 만들고, **방향이 새로 잡히는 순간 한 칸**, 누르고 있으면 지연 뒤 일정 간격으로 반복. 키 에지와 같은 프레임에 겹치면 OR이라 한 칸이다.
+- 스틱은 **큰 축 하나**만 본다(대각선 = 큰 쪽). 메뉴 축은 서로 독립이다(Hargreaves의 축별 데드존 논의).
+- **히스테리시스**: 잡는 임계(0.5)와 푸는 임계(0.3)를 다르게. 경계에서 손이 떨려도 한 칸만 나간다. 중앙(0.3 밑)으로 돌아와야 다시 잡힌다.
+- 데드존을 뺀(0..1로 다시 편) 값에 임계를 건다. 데드존 없이 메뉴 경로를 짜면 스틱 드리프트로 커서가 저절로 움직인다(RetroPie·UE 보고).
 
 ## 설계 함의
 - 코드가 `KeyCode`를 직접 보지 않고 **액션(`Attack`, `Dodge`, `Move(Vec2)`)** 을 보게 입력 레이어를 처음부터 둔다. 키보드·`gamepads`·Android 패치가 전부 이 뒤에 들어간다.
