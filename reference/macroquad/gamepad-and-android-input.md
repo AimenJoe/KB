@@ -1,10 +1,10 @@
 ---
 title: macroquad 게임패드와 Android 입력 현황
 type: reference
-tags: [macroquad, miniquad, gamepad, android, input, rust]
+tags: [macroquad, miniquad, gamepad, android, input, touch, rust]
 status: verified
 created: 2026-10-24
-updated: 2026-10-24
+updated: 2026-10-25
 verified: |
   1차 출처로 확인: miniquad master의 java/MainActivity.java(onTouch/onKey만 구현, onGenericMotionEvent 없음),
   src/native/android.rs(surfaceOnKeyDown/Up → keycodes::translate_keycode), src/native/android/keycodes.rs(109개 매핑,
@@ -15,6 +15,9 @@ verified: |
   `gamepads_crate_version()`(정수 65543)이 달라 mq_js_bundle이 "version mismatch"를 찍는 것을 헤드리스 Chromium 콘솔로 확인.
   소스 확인: js/gamepads-src-0.1.js(스틱 y 부호 반전, 데드존 0.04 재매핑), src/backend_gilrs.rs(gilrs 축 그대로, 드라이버 데드존 사용),
   src/lib.rs(웹 is_just_pressed는 직전 poll과 비교).
+  터치(2026-10-25): macroquad src/window.rs·src/input.rs·src/lib.rs(touches()는 물리 픽셀, screen_width()·mouse_position()은 DPI로 나눔,
+  프레임 끝 위상 정리)를 읽고, Pixel 7 프로필(DPR 2.625) 헤드리스 Chromium에서 버튼 판정 실패를 재현한 뒤 DPI 나눗셈으로 해결 확인.
+  실기 Android 13 브라우저에서 사용자가 같은 증상을 보고함.
   2차 출처만 있음: macroquad 문서의 "gamepads soon" 문구, cargo-quad-apk 유지보수 상태(crates.io 0.1.4가 4년 이상 전,
   커뮤니티 이슈의 NDK/minSdk 패치 메모).
   확인 못 함: Android MotionEvent 축 상수(AXIS_X/Y/Z/RZ/HAT_X/HAT_Y/LTRIGGER/RTRIGGER)의 정확한 숫자값 — 패치 시 공식 문서로 확인.
@@ -81,6 +84,13 @@ Android 게임패드 버튼 키코드(공식 문서 확인값): `BUTTON_A 96(0x6
 4. **`gamepads` 크레이트는 Android 빌드에서 빼야 한다**: 0.1.7은 `android-winit` feature 없이 `poll_android_winit` 미정의로 컴파일 실패(2026-10-24 `cargo check --target aarch64-linux-android`로 재현). non-Android 전용 의존성으로 두고 코드에 `cfg(not(target_os = "android"))`.
 
 합쳐서 Java·Rust 200줄 안팎이지만 **miniquad 포크를 유지**하게 된다. 결정 전에 "Android 스파이크"(hello world APK + 실기 컨트롤러 테스트)로 비용을 실측할 것.
+
+## 터치 (웹·모바일 브라우저)
+macroquad 0.4.16의 `touches()`는 `Touch { id, phase, position }`를 돌려준다. 실제로 붙여 보고 확인한 함정 두 가지(2026-10-25, Pixel 7 프로필 헤드리스 Chromium과 실기 Android 13 브라우저):
+- **좌표 단위 불일치**: `screen_width()`·`mouse_position()`은 `miniquad::window::dpi_scale()`로 나눈 논리 픽셀을 주지만, `touches()`의 `position`은 **물리 픽셀 그대로**다(src/window.rs, src/input.rs 확인). `high_dpi: true`인 고해상도 폰(DPR 2~3)에서는 터치 좌표가 화면 크기의 2~3배로 들어와 버튼 판정이 전부 빗나간다. `t.position / screen_dpi_scale()`로 맞춘다. DPR 1인 데스크톱·헤드리스에서는 재현되지 않으므로 테스트할 때 `deviceScaleFactor`를 올려야 한다.
+- **위상(phase)에 기대지 말 것**: macroquad는 터치를 id별로 하나만 보관하고 프레임 끝에 Started/Moved→Stationary, Ended→삭제로 정리한다. 실제 손가락은 touchstart 직후 같은 프레임에 touchmove가 와서 Started가 Moved로 덮이고, 짧은 탭은 start·end가 한 프레임에 들어와 Ended만 보인다. "눌림"은 **지난 프레임까지 본 id 목록에 없는 새 id**로 판정하고, 새 id가 Ended여도 눌림으로 센다.
+- 웹 글루는 `touchstart/move/end/cancel`을 `canvas`에 걸고 `e.changedTouches`의 `identifier`를 id로 넘긴다. `simulate_mouse_with_touch`(기본 true)라 마우스 이벤트도 같이 생긴다.
+- `index.html`에 `touch-action: none; overscroll-behavior: none; user-select: none`과 `user-scalable=no` viewport를 두지 않으면 스크롤·확대·길게 누르기 메뉴가 끼어든다.
 
 ## 설계 함의
 - 코드가 `KeyCode`를 직접 보지 않고 **액션(`Attack`, `Dodge`, `Move(Vec2)`)** 을 보게 입력 레이어를 처음부터 둔다. 키보드·`gamepads`·Android 패치가 전부 이 뒤에 들어간다.
