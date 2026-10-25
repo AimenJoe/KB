@@ -7,13 +7,14 @@ created: 2026-10-24
 updated: 2026-10-25
 verified: |
   1차 출처로 확인: 직접 실행(2026-10-25, nail-under-the-roots): 문자 격자 + 자동 외곽선 스프라이트 생성, 흰 실루엣 플래시,
-  환경 색조·장식·어둠 마스크, 비공개 에셋 레포 checkout CI 단계(YAML 검증). 특정 에셋 팩의 현재 라이선스 원문은 확인하지 않았다
-  (itch.io가 이 환경에서 막힘) — 내려받을 때 반드시 팩의 라이선스 파일을 직접 읽을 것.
+  환경 색조·장식·어둠 마스크, 비공개 에셋 레포 checkout CI 단계(YAML 검증). Sunnyside World 라이선스 V1은 itch.io 페이지 원문으로 확인(2026-10-25).
+  그 밖의 팩(Gridwright, DeepDive)은 원문 미확인 — 내려받을 때 반드시 팩의 라이선스를 직접 읽을 것.
   2차 출처/경험: 1인 개발 통념(한 팩 중심, 해상도 통일, Aseprite 손보기). Creative Commons 라이선스 종류 자체는 공식 정의를 따른다.
 sources:
   - https://creativecommons.org/share-your-work/cclicenses/
   - https://itch.io/game-assets/free/tag-pixel-art
   - https://opengameart.org/
+  - https://danieldiggle.itch.io/sunnyside
 ---
 
 # 그림 못 그려도 도트 게임 만들기
@@ -46,7 +47,7 @@ sources:
 |---|---|---|
 | [Sprout Lands](https://cupnooble.itch.io/sprout-lands-asset-pack) (Cup Nooble) | 농장 타일·소품, 닭·소·양 | 무료판 비상업, 프리미엄($3.99+) 상업 가능, 재배포 금지 |
 | [Mystic Woods](https://game-endeavor.itch.io/mystic-woods) (Game Endeavor) | 숲 타일·소품, 슬라임·해골 등 적, 16×16 탑다운 | 무료판 비상업, 유료판 상업 가능 |
-| [Sunnyside World](https://danieldiggle.itch.io/sunnyside) (danieldiggle) | 타일셋, 사람·고블린 20동작 | 상업 가능, 수정 가능, 크레딧 선택, 재판매·AI 학습 금지. 동물 없음 |
+| [Sunnyside World](https://danieldiggle.itch.io/sunnyside) (danieldiggle) | 타일셋, 사람·고블린 20동작 | **원문 확인(V1, 2026-10-25)**: 무료·상업 사용, 수정 가능, 크레딧 불필요. 재배포는 튜토리얼·교육 과정에 링크와 함께만. 수정해도 재포장·재판매 금지(NFT 포함). AI 학습 금지. Name your own price. 동물 없음 → 공개 레포엔 넣지 않는다 |
 | [Gridwright Animals & Pets](https://v3su.itch.io/animals-pets-16x16-pixel-art-top-down-sprites) | 15종 32마리 탑다운 동물(고슴도치 포함), 4방향 | "Royalty Free" 표기, 원문 미확인 |
 | [Animal Asset Pack 16×16](https://deepdivegamestudio.itch.io/animalassetpack) (DeepDive) | 45종 동물 스프라이트, 판타지·로그라이크 톤 | Name your own price, 원문 미확인 |
 
