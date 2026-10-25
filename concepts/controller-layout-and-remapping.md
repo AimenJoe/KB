@@ -1,0 +1,47 @@
+---
+title: 컨트롤러 버튼 배치와 다시 붙이기 — 오른쪽 넷은 자주 쓰는 넷, 메뉴 키는 고정, 안내는 배치를 따라
+type: concept
+tags: [gamedev, input, accessibility, game-design, macroquad]
+status: draft
+created: 2026-10-25
+updated: 2026-10-25
+verified: |
+  1차 출처로 확인(직접 구현·실행, 2026-10-25, nail-under-the-roots, macroquad 0.4 + gamepads 0.1.7): 동작마다 키 하나·패드 버튼 하나의
+  배치표, 겹치면 맞바꾸기, 이동·메뉴 확인/뒤로·Start 고정, 화면 안내를 "마지막으로 만진 장치"의 이름으로 채우기, 웹 localStorage 저장·복원을
+  단위 테스트와 헤드리스 Chromium(다시 붙인 뒤 새로고침해도 유지)으로 확인. 실기 패드로 다시 붙이기는 아직 확인 못 함.
+  2차 출처만 있음: Hades·Hades II의 기본 배치(X 공격·A 대시·B 캐스트·Y 특수 — 공략 기사·위키 표, 공식 문서 아님).
+  가이드라인 사이트(Game Accessibility Guidelines, Xbox Accessibility Guidelines 107, Can I Play That)의 권고는 원문 요약으로 봤다.
+sources:
+  - https://gameaccessibilityguidelines.com/allow-controls-to-be-remapped-reconfigured
+  - https://devdocs.xbox.com/gaming/accessibility/xbox-accessibility-guidelines/107
+  - https://caniplaythat.com/?p=8886
+  - https://www.shacknews.com/article/146103/hades-2-controls-pc-keybindings
+---
+
+# 컨트롤러 버튼 배치와 다시 붙이기
+
+## 요약
+엄지가 쉬는 자리(오른쪽 네 버튼)에 **가장 자주 누르는 넷**을, 어깨·가운데 버튼에 가끔 쓰는 것을 둔다. 게임 동작은 설정에서 **다시 붙일 수 있게** 하고(겹치면 맞바꾸기), 메뉴로 돌아오는 키는 고정한다. 화면의 버튼 안내는 글에 박지 말고 **지금 배치에서 읽는다**.
+
+## 본문
+- **기본 배치(액션 로그라이트 관례)**: 왼쪽 버튼 = 기본 공격, 아래 = 회피, 오른쪽·위 = 특수·아이템. Hades가 X 공격·A 대시·B 캐스트·Y 특수(2차 출처). 어깨 = 아이템/탭 넘기기, Select = 지도, Start = 메뉴.
+- **키보드는 같은 모양으로**: 패드의 다이아몬드를 키 다이아몬드(I 위·J 왼쪽·K 아래·L 오른쪽)로 옮기면 패드·키보드 설명이 같은 그림이 된다. 왼손은 WASD.
+- **배치표 = 동작 → (키 하나, 버튼 하나)**. 저장은 표의 번호(정수)로. 다시 붙일 때 이미 다른 동작이 쓰던 키면 **서로 바꾼다**(빈 동작이 생기지 않는다).
+- **고정할 것**: 이동, 메뉴 열기(Esc/Start), 메뉴 확인·뒤로(Enter/A, Esc/B). 이걸 바꾸게 하면 배치를 망쳤을 때 메뉴로 돌아올 길이 없다. 권고(메뉴까지 전부 바꿀 수 있게)와 부딪히면 "기본값으로"를 메뉴 안에 둔다.
+- **다시 붙이기 화면**: 위아래로 동작, 좌우로 키보드/패드 칸, 확인 → "누르세요… 5"(시간 제한, Esc로 취소). 확인을 누른 그 프레임의 키가 바로 잡히지 않게 다음 프레임부터 받는다.
+- **안내 글**: "{0} 세 번" 같은 자리표시자에 `prompt(동작)`. 패드를 만지면 패드 이름, 키를 누르면 키 이름(마지막 장치).
+
+## 왜?
+- 손이 가장 자주 가는 넷을 같은 손가락 한 개로 오갈 수 있는 자리에 모으면, 회피 → 공격 같은 연계가 엄지 굴리기 하나로 된다. 어깨 버튼은 다른 손가락이라 동시에 누르기는 쉽지만 연타는 어렵다 → 가끔 쓰는 것.
+- 다시 붙이기는 접근성 불만 1위권이다(손 크기·장애·왼손잡이·패드 종류). 하드코딩 키(특히 Esc·WASD)가 흔한 실패로 꼽힌다.
+- 안내 글이 배치를 따라가지 않으면, 바꾼 사람에게 튜토리얼이 거짓말을 한다.
+
+## 함정
+- 닌텐도 배치 패드는 A/B 자리가 반대다. 버튼 이름을 **위치**(W3C 표준 인덱스) 기준으로 붙이고, 글자는 한 가지(Xbox)로 보이면 헷갈릴 수 있다.
+- 웹 Gamepad API는 `mapping === "standard"`인 패드만 위치가 보장된다(KB: reference/macroquad/gamepad-and-android-input.md).
+- 저장 형식에 버전 표식을 둔다. 표가 바뀌었는데 옛 번호를 그대로 읽으면 엉뚱한 키가 붙는다 → 표식이 다르거나 겹치면 기본값.
+
+## 관련 노트
+- [게임패드와 Android 입력 현황](../reference/macroquad/gamepad-and-android-input.md)
+- [WASM 빌드와 JS 번들](../reference/macroquad/wasm-build.md) — 설정 저장용 정수 플러그인
+- [작은 게임 다국어 구조](../guides/small-game-localization.md) — 자리표시자

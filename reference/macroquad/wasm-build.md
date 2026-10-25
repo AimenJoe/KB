@@ -4,7 +4,7 @@ type: reference
 tags: [macroquad, miniquad, rust, wasm, gamedev]
 status: verified
 created: 2026-10-24
-updated: 2026-10-24
+updated: 2026-10-25
 verified: |
   1차 출처로 확인: macroquad 0.4.16 README(빌드 명령, 산출물 경로, index.html 템플릿),
   js/mq_js_bundle.js 소스(프로토콜 version=2, 플러그인 버전, 버전 체크 로직),
@@ -101,6 +101,29 @@ README 원문은 `https://not-fl3.github.io/miniquad-samples/mq_js_bundle.js`를
 1. `Cargo.lock`의 macroquad 버전과 같은 git 태그에서 `js/mq_js_bundle.js`를 받아 `web/mq_js_bundle.js`로 커밋한다.
 2. macroquad를 올릴 때 번들도 같이 갱신한다. (체크리스트에 넣을 것)
 3. 배포 후 브라우저 콘솔에서 `Version mismatch`가 없는지 확인한다.
+
+## 내 JS 플러그인: 정수로만 주고받기 (언어 읽기·설정 저장)
+
+wasm-bindgen 없이 브라우저 기능(선호 언어, localStorage)을 쓰려면 `index.html`에서 번들 다음에 플러그인을 하나 등록한다.
+
+```js
+miniquad_add_plugin({
+  name: "nail_prefs", version: 1,
+  register_plugin: function (importObject) {
+    importObject.env.nail_pref_get = function (i) { try { var v = parseInt(localStorage.getItem("nail.pref." + i), 10); return isNaN(v) ? 0 : (v >>> 0); } catch (e) { return 0; } };
+    importObject.env.nail_pref_set = function (i, v) { try { localStorage.setItem("nail.pref." + i, String(v >>> 0)); } catch (e) {} };
+  }
+});
+load("nail.wasm");
+```
+
+Rust 쪽은 `extern "C" { fn nail_pref_get(i: u32) -> u32; fn nail_pref_set(i: u32, v: u32); }`(wasm32에서만)와 버전 함수 `#[no_mangle] pub extern "C" fn nail_prefs_crate_version() -> u32 { 1 }`.
+
+- **문자열 대신 정수 칸**: 문자열은 wasm 메모리 포인터·길이를 다뤄야 한다. 설정(소리·언어·키 번호)은 정수 칸 십여 개면 충분하고, 언어 태그는 "칸 i의 k번째 네 글자를 u32 하나로"(빅엔디언 ASCII) 접어 넘긴다.
+- **0 = 없음**으로 정하고 값은 +1 해서 저장한다. 플러그인이 없을 때 번들이 끼워 넣는 스텁은 `undefined`를 돌려주는데, JS → wasm i32 변환(ToInt32)에서 0이 된다 → "저장 없음"과 같아진다.
+- 첫 칸에 **형식 표식**(예: `0x4E410001`)을 두고 다르면 통째로 무시한다(형식을 바꿀 때 올린다).
+- `localStorage`는 사생활 보호 모드·차단 정책에서 예외를 던질 수 있어 try/catch로 감싼다.
+- 확인(2026-10-25, nail-under-the-roots): 헤드리스 Chromium에서 키를 다시 붙이고 새로고침 → 그대로 복원, `localStorage`에 `nail.pref.0..17`.
 
 ## 헤드리스로 웹 빌드 확인 (Playwright)
 배포 전에 콘솔 에러·입력·렌더를 자동으로 본다. `python3 -m http.server --directory dist`로 띄우고:
