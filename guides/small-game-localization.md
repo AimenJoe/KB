@@ -7,7 +7,8 @@ created: 2026-10-25
 updated: 2026-10-25
 verified: |
   1차 출처로 확인: 직접 실행(2026-10-25, nail-under-the-roots, Rust + macroquad 0.4.16): 언어별 `static Strings` 구조체(키 누락 = 컴파일 에러),
-  `{0}` 자리표시자 + 언어 간 일치 테스트, TTF cmap(형식 4·12)을 직접 읽는 폰트 커버리지 테스트(fontTools 결과와 교차 확인 — 285자 모두 있음,
+  `{0}` 자리표시자 + 언어 간 일치 테스트, 선호 목록 고르기(navigator.languages를 ['ja-JP','ko-KR'] / ['fr-FR','de'] / ['ko-KR']로 바꿔
+  각각 한국어·영어·한국어로 시작함을 헤드리스 Chromium에서 확인), TTF cmap(형식 4·12)을 직접 읽는 폰트 커버리지 테스트(fontTools 결과와 교차 확인 — 285자 모두 있음,
   가나 'あ'는 없음), 헤드리스 Chromium `locale` 옵션으로 ko-KR/en-US 화면 스크린숏을 찍어 영어에서 넘치는 곳 3군데를 찾아 고침.
   sys-locale 0.3.2 소스(src/android.rs가 `__system_property_get("persist.sys.locale")`, wasm은 wasm-bindgen 선택 기능)를 읽음.
   Galmuri11 Condensed(npm galmuri 2.40.3)의 cmap: 가나 있음(히라가나 82·가타카나 84), 한자(U+4E00–9FFF) 0, 키릴 140.
@@ -31,12 +32,12 @@ sources:
 1. **글을 코드에서 빼서 표로**: 키 = 의미 있는 고정 이름(`gift_title`), 값 = 언어별 글. Rust라면 `struct Strings { gift_title: &'static str, … }`와 언어마다 `static KO/EN: Strings` — 한 언어라도 필드가 빠지면 컴파일이 안 된다. 키 목록은 매크로 한 번으로 구조체와 `all()`(테스트용 열거)을 같이 만든다.
 2. **데이터 표는 글 대신 "글을 고르는 함수"를 든다**: `type Tr = fn(&Strings) -> &'static str;` 무기·퀘스트·대사 표에 `name: |s| s.w_mole`. 게임 로직은 언어를 모르고, 그릴 때만 지금 언어로 꺼낸다.
 3. **숫자는 자리표시자**: `"{0}연타 · 마지막 타 피해 {1}"` / `"{0}-hit combo · finisher damage {1}"`. 위치 번호라 어순이 달라도 된다. 문장을 조각으로 이어 붙이지 않는다.
-4. **시작 언어 = 기기 언어, 설정에서 바꿈**: 웹은 `navigator.languages`, 네이티브는 OS 로캘. 모르는 언어는 영어. 언어 이름은 그 언어로 쓴다("한국어", "English").
+4. **시작 언어 = 기기 언어, 설정에서 바꿈**: 첫 선호 언어만 보지 말고 **선호 목록을 앞에서부터 보고 가진 첫 언어**, 하나도 없으면 영어. 일본어·한국어 순으로 둔 사람은 한국어를, 프랑스어·독일어만 둔 사람은 영어를 받는다. 웹은 `navigator.languages`, 네이티브는 OS 선호 목록(`sys_locale::get_locales()`). 언어 이름은 그 언어로 쓴다("한국어", "English").
 5. **테스트 세 개**(CI): (a) 모든 언어의 모든 글자가 쓰는 폰트의 cmap에 있는가 (b) 같은 키의 자리표시자 집합이 언어끼리 같은가 (c) 빈 글이 없는가.
 6. **두 언어로 화면을 찍어 본다**: 헤드리스 브라우저의 로캘 옵션(Playwright `newContext({ locale })`)으로 언어별 스크린숏. 고정 폭 칸·한 줄 안내가 넘친다. 칸 폭은 가장 긴 글에 맞추고 긴 안내는 줄바꿈한다.
 
 ## macroquad(wasm-bindgen 없음)에서 브라우저 언어 읽기
-- `sys-locale`은 웹에서 wasm-bindgen 선택 기능을 쓴다. macroquad는 wasm-bindgen을 쓰지 않으므로 **wasm에서는 빼고** 작은 miniquad 플러그인으로 읽는다: `index.html`에서 `miniquad_add_plugin({ name, version, register_plugin(io) { io.env.nail_locale = () => … } })`, Rust는 `extern "C" { fn nail_locale() -> u32; }`(문자열 대신 코드 번호). 링크는 `--import-undefined`(wasm-build 노트).
+- `sys-locale`은 웹에서 wasm-bindgen 선택 기능을 쓴다. macroquad는 wasm-bindgen을 쓰지 않으므로 **wasm에서는 빼고** 작은 miniquad 플러그인으로 읽는다: `index.html`에서 `miniquad_add_plugin({ name, version, register_plugin(io) { io.env.nail_locale = () => … } })`, Rust는 `extern "C" { fn nail_locale(i: u32) -> u32; }` — i번째 선호 언어의 주 언어 두 글자를 `(c0 << 8) | c1` 정수로 접어 받고 0이면 끝. 문자열을 넘기지 않고, 지원 언어 목록은 Rust 쪽(`Lang::from_tag`) 한 곳에만 둔다. 링크는 `--import-undefined`(wasm-build 노트).
 - 플러그인에 `name`·`version`을 주면 번들이 `<name>_crate_version` 내보내기를 찾는다. 없으면 콘솔 로그만 남지만, 같은 값을 돌려주는 `#[no_mangle] extern "C" fn` 하나를 두면 깔끔하다.
 - 옛 `index.html`(플러그인 없음)에서는 번들이 빈 함수를 끼워 넣어 `undefined` → 0이 된다. 0을 "모름"으로 두면 안전하다.
 - 데스크톱·Android는 `sys-locale`(Android는 시스템 속성 `persist.sys.locale`).
