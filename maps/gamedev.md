@@ -31,6 +31,7 @@ updated: 2026-10-25
 - [필살기의 임팩트](../concepts/special-move-impact.md) — 시동 정지(슈퍼 플래시), 화면 한 폭 거리, 넉백 > 속도로 끌고 가기, 소리 하나
 
 ## 이야기
+- [로그라이트 다회차의 세 축](../concepts/roguelite-replay-axes.md) — 실력(단계식·골라 묶기 난이도)·다양성(캐릭터·결)·궁금함(엔딩 뒤 이야기·도감·허브), 일일 시드·보스 다시, 도움 모드, 옆으로 넓히기
 - [로그라이트에서 이야기를 전하는 방법](../concepts/roguelite-narrative-delivery.md) — 죽음에 세계 안의 이유, 귀환 대사 = 조건 + 가장 구체적인 것 + 대비책 + 한 번만, 지는 사람도 이야기를 본다, 환경·허브 변화
 - [캐릭터 설정에 쓰는 실제 동물·생태 사실](../reference/nature/animal-behavior-for-character-design.md) — 두더지 독립·침의 독, 라쿤 "손 씻기"는 씻기가 아님, 땅강아지 수렴 진화, 뽕나무버섯, 균근 공생, 다람쥐 저장
 
