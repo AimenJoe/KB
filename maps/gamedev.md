@@ -19,8 +19,12 @@ updated: 2026-10-25
 - [회복과 화폐 드롭](../concepts/roguelite-healing-and-currency.md) — 깎인 만큼 확률 + 불운 보정, 자석·줍기 지연·오르는 소리
 - [능력치·장비 설계](../concepts/action-rpg-stats-and-equipment.md) — 무기는 모양·장신구는 수치·성장은 영구, 공격 속도 = 시계 배율, 큰 회복 = 목숨
 
+## 월드 구조
+- [탑다운 모험 구조](../concepts/adventure-field-and-procedural-dungeon.md) — 격자 하나, 카메라 경계 사각형(연속 스크롤 = 큰 경계, 방 밀기 = 경계 바뀜), 방 그래프 던전·잠금, 저장 지점 부활
+
 ## 게임 루프·전투감
 - [고정 타임스텝 게임 루프와 히트스톱](../concepts/fixed-timestep-and-hitstop.md) — 누적기 루프, 입력 래치, 보간, 히트스톱은 로직 시계만, trauma² 흔들림
+- [공격 타이밍 패링](../concepts/timing-parry.md) — 버튼 없이 스윙 첫 창 + 앞쪽, 회피 = 안전·패링 = 이득
 
 ## 테스트·연출
 - [개발용 시나리오 진입점과 스텝 스크립트 컷씬](../concepts/dev-scenarios-and-scripted-cutscenes.md) — 시나리오 목록 → 월드 구성, JRPG식 대화창, 건너뛰기
@@ -45,7 +49,7 @@ updated: 2026-10-25
   - [0001 빌드는 CI, 호스팅은 Netlify](../decisions/0001-build-rust-wasm-in-github-actions-deploy-via-netlify-cli.md)
 
 ## 아직 없는 것
-- 상태 관리, 절차적 방 생성, 저장(localStorage/파일), 사운드(에셋 파이프라인) — 노트가 생기면 추가
+- 상태 관리, 저장(localStorage/파일), 사운드(에셋 파이프라인) — 노트가 생기면 추가
 
 ## 다른 지도
 - [Rust](rust.md) · [CI/CD와 호스팅](ci-cd-hosting.md)
