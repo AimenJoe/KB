@@ -13,6 +13,11 @@ verified: |
   대화창에 찍고 헤드리스 Chromium으로 확인. 배 쪽 밝은 털이 발·발톱과 겹쳐 "벌린 입"으로 읽히는 것을 확대 이미지로 확인하고 뺐다.
   itch.io 도메인 구조(작가 페이지 `<작가>.itch.io`는 열렸고 루트 `itch.io`·이미지 `img.itch.zone`은 따로 막혀 있었다 — 프록시 거부 기록),
   환경 색조·장식·어둠 마스크, 비공개 에셋 레포 checkout CI 단계(YAML 검증). Sunnyside World 라이선스 V1은 itch.io 페이지 원문으로 확인(2026-10-25).
+  비공개 에셋 레포 실제 운용(2026-10-25, nail-under-the-roots → AimenJoe/nail-assets): fine-grained 토큰(그 레포 하나, Contents 읽기)으로 웹·APK CI가 받음,
+  APK `unzip -l`에 팩 파일 4개가 들어간 것을 CI 로그로 확인. GitHub 문서 원본(github/docs): Free 개인 계정은 비공개 레포 무제한(기능 제한), 공개 레포의
+  표준 러너 Actions는 무료, 러너 비용은 호출한 쪽에 붙는다. Anthropic 공지(2025-08-28): 소비자 계정에서 학습 설정을 끄면 새 대화·코딩 세션을 학습에 쓰지 않는다.
+  2차/확인 못 함: fine-grained 토큰 만료 상한(개인 계정 1년이라는 글은 있으나 현재 규칙은 원문 미확인), 피드백(👍/👎)을 보낸 대화·안전 검토 대화의 학습 예외는
+  Anthropic 개인정보 센터 안내로 이전 세션에 읽었고 이번엔 접속이 막혀 다시 확인 못 함.
   그 밖의 팩(Gridwright, DeepDive)은 원문 미확인 — 내려받을 때 반드시 팩의 라이선스를 직접 읽을 것.
   2차 출처/경험: 1인 개발 통념(한 팩 중심, 해상도 통일, Aseprite 손보기). Creative Commons 라이선스 종류 자체는 공식 정의를 따른다.
 sources:
@@ -24,6 +29,9 @@ sources:
   - https://itch.io/game-assets/free/tag-pixel-art
   - https://opengameart.org/
   - https://danieldiggle.itch.io/sunnyside
+  - https://github.com/github/docs/blob/main/content/get-started/learning-about-github/githubs-plans.md
+  - https://github.com/github/docs/blob/main/content/billing/concepts/product-billing/github-actions.md
+  - https://www.anthropic.com/news/updates-to-our-consumer-terms
 ---
 
 # 그림 못 그려도 도트 게임 만들기
@@ -74,7 +82,13 @@ sources:
     with: { repository: ${{ secrets.ASSETS_REPO }}, token: ${{ secrets.ASSETS_TOKEN }}, path: assets/vendor }
   ```
   `secrets`는 `if:`에서 직접 못 쓰므로 job `env`로 옮겨 검사한다.
-- "AI 학습 금지" 조항이 있는 팩은 이미지를 생성형 AI 도구(업스케일·스타일 변환 포함)에 넣지 않는다.
+- **비용**: GitHub Free 개인 계정은 비공개 레포가 무제한이다. Actions 분은 **워크플로가 도는 레포** 기준이라, 공개 게임 레포의 워크플로가 비공개 레포를 checkout만 하면 공짜 그대로다. 반대로 게임 레포 자체를 비공개로 돌리면 월 무료 분이 생기고 Release APK도 테스터가 못 받는다.
+- **토큰**: fine-grained personal access token, Repository access = 그 에셋 레포 하나, Permissions = Contents 읽기 전용. 만료되면 CI는 팩 없이(대체 그림으로) 빌드되며 멈추지 않는다 → 그림이 갑자기 옛날로 돌아가면 토큰 만료부터 본다. 토큰 화면은 github.com 웹의 Settings → Developer settings에 있다(직접 주소 `github.com/settings/personal-access-tokens/new`).
+- **게임이 쓰는 파일만** 비공개 레포에 올린다(우리는 49MB 팩 중 4장, 0.3MB). 노출 범위가 줄고, 빌드가 무엇에 의존하는지 목록이 된다. 라이선스 원문은 그 레포 README에 함께.
+- 배포된 웹 빌드 안의 PNG는 누구나 브라우저에서 꺼낼 수 있다. 게임 배포에 원래 따르는 일이고 라이선스가 허락하는 "게임의 일부"다. 막아야 하는 것은 **원본 팩 묶음**의 재배포다.
+- "AI 학습 금지" 조항: 팩 이미지를 학습 데이터로 내거나, 생성형 도구(업스케일·스타일 변환·"이 그림처럼" 참조)에 넣지 않는다.
+  - AI 어시스턴트가 팩을 **보고 고르고 화면에서 확인하는 것**은 원래 용도(게임 만들기)라 허용으로 정할 수 있다. 다만 그 대화가 학습에 쓰이지 않는 설정인지 먼저 본다(Anthropic 소비자 계정: 학습 설정 끔). 그 대화에 피드백(👍/👎)을 보내면 예외가 될 수 있으니 보내지 않는다(2차, 위 verified).
+  - 이 선은 작가가 정한 문장이 아니라 해석이다. 작가 의도가 다르면 작가 뜻을 따른다.
 
 ## 직접 찍기: 코드로 그리는 스프라이트
 - 문자 격자(한 글자 = 한 픽셀, 글자 = 팔레트 색)로 채움만 적고 **외곽선은 자동**(채운 칸에 4방향으로 닿은 빈 칸)으로 두르면, 부위를 옮겨 동작 프레임을 만들어도 외곽선이 깨지지 않는다. 걷기는 1px 통통 튀기 + 발 이동, 공격은 상체 기울기 + 발 위치, 피격은 눈 모양 교체로 원본에서 파생한다.

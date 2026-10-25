@@ -13,16 +13,16 @@ updated: 2026-10-25
 
 ## 설계
 - [1인 개발용 액션 로그라이트 설계 원칙](../concepts/action-roguelite-for-solo-dev.md) — 런 구조 vs 메트로배니아, 탑다운 vs 사이드뷰, 전투감 먼저, 캐릭터=반복 단위, 장기 프로젝트 단계
-- [그림 못 그려도 도트 게임 만들기](../guides/pixel-art-without-an-artist.md) — 에셋 팩 하나 중심, 라이선스 확인, Aseprite 손보기
+- [그림 못 그려도 도트 게임 만들기](../guides/pixel-art-without-an-artist.md) — 에셋 팩 하나 중심, 라이선스 확인, 공개 레포 + 비공개 에셋 레포(토큰·비용·AI 조항), 둥근 지형 굽기
 - [게임 그림 외주 맡기기](../guides/commissioning-game-art.md) — 임시 그림으로 먼저 판정, 사양서(안전 영역·색 약속), 계약: 저작재산권 + 2차적저작물작성권 특약(한국 제45조②), 공개 레포 커밋 허락
 
 ## 보상·경제
-- [회복과 화폐 드롭](../concepts/roguelite-healing-and-currency.md) — 깎인 만큼 확률 + 불운 보정, 자석·줍기 지연·오르는 소리, 메타 화폐 맡기기(쉼터 자동)·둘 중 하나 영구 기술
+- [회복과 화폐 드롭](../concepts/roguelite-healing-and-currency.md) — 깎인 만큼 확률 + 불운 보정, 자석·줍기 지연·오르는 소리, 메타 화폐 맡기기(쉼터 자동)·둘 중 하나 영구 기술·살 수 있을 때 쓰는 곳이 빛나기
 - [능력치·장비 설계](../concepts/action-rpg-stats-and-equipment.md) — 무기는 모양·장신구는 수치·성장은 영구, 공격 속도 = 시계 배율, 큰 회복 = 목숨
 - [로그라이트 저널(목표 목록)](../concepts/roguelite-journal-goals.md) — 평소 플레이를 런을 넘는 목표로, 앞 목표 뒤에 펼쳐짐, 받기 보상(재화·힘 아닌 것·옆으로), 진행은 기록에서 계산
 
 ## 월드 구조
-- [탑다운 모험 구조](../concepts/adventure-field-and-procedural-dungeon.md) — 격자 하나, 카메라 경계 사각형(연속 스크롤 = 큰 경계, 방 밀기 = 경계 바뀜), 방 그래프 던전·잠금, 저장 지점 부활
+- [탑다운 모험 구조](../concepts/adventure-field-and-procedural-dungeon.md) — 격자 하나, 카메라 경계 사각형(연속 스크롤 = 큰 경계, 방 밀기 = 경계 바뀜), 방 그래프 던전·잠금, 저장 지점 부활, 보스 뒤 출구는 쓰러진 자리에서 멀리·밟을 때만
 - [선형 진행을 갈래 길로 느끼게 하는 지도](../concepts/branching-route-map.md) — 층 + 이어진 구간(엇갈림 없음·합류), 칸 종류가 결과를 바꿈, 다음 한 걸음 + 보스만 보이기(StS 지도·Hades 문)
 
 ## 게임 루프·전투감
@@ -43,7 +43,7 @@ updated: 2026-10-25
 - [개발용 시나리오 진입점과 스텝 스크립트 컷씬](../concepts/dev-scenarios-and-scripted-cutscenes.md) — 시나리오 목록 → 월드 구성, JRPG식 대화창, 건너뛰기, 배우 좌표계·싸움 끝 연타 함정, 일러스트 장면(2배 밀도 한 장 그림·패닝·입자·내레이션, 홀수 배율)
 
 ## 입력·접근성
-- [컨트롤러 버튼 배치와 다시 붙이기](../concepts/controller-layout-and-remapping.md) — 오른쪽 넷 = 자주 쓰는 넷, 키보드 다이아몬드, 겹치면 맞바꿈, 메뉴 키 고정, 안내는 배치를 따라
+- [컨트롤러 버튼 배치와 다시 붙이기](../concepts/controller-layout-and-remapping.md) — 오른쪽 넷 = 자주 쓰는 넷, 키보드 다이아몬드, 겹치면 맞바꿈, 메뉴 키 고정, 안내는 배치를 따라, 격자 끝에서 옆 탭으로
 
 ## 다국어
 - [작은 게임 다국어 구조](../guides/small-game-localization.md) — 고정 키 표, 자리표시자, 폰트 커버리지 테스트, 브라우저 언어 읽기
@@ -60,7 +60,8 @@ updated: 2026-10-25
   - [글자 그리기 비용과 브라우저 프레임레이트](../reference/macroquad/text-rendering-and-browser-frame-rate.md) — 아틀라스 통째 올리기, 픽셀 폰트는 원래 크기로 굽고 정수배, 미리 굽기, WebGL 안티에일리어싱 끄기, Safari 저전력 30fps
 - 빌드·배포
   - [macroquad WASM을 GitHub Actions로 빌드해 Netlify에 배포](../guides/macroquad-wasm-netlify-github-actions.md) — 전체 절차
-  - [macroquad를 GitHub Actions에서 Android APK로](../guides/macroquad-android-apk-github-actions.md) — cargo-quad-apk git 고정, 러너 내장 SDK/NDK, gamepads 제외
+  - [macroquad를 GitHub Actions에서 Android APK로](../guides/macroquad-android-apk-github-actions.md) — cargo-quad-apk git 고정, 러너 내장 SDK/NDK, gamepads 제외, 서명 키는 Secret에
+  - [버전 올리기 = 릴리스](../reference/github-actions/release-from-version-bump.md) — 본문 파일이 스위치, CI가 태그·APK·Release
   - [WASM 빌드와 JS 번들](../reference/macroquad/wasm-build.md) — 번들 버전 계약, 에셋 로딩, 정수로 주고받는 내 플러그인(localStorage 설정 저장), 번들을 고치지 않는 로딩 화면
   - [정적 WASM 호스팅](../concepts/static-wasm-hosting.md) — 왜 번들러가 없어도 되는가
   - [0001 빌드는 CI, 호스팅은 Netlify](../decisions/0001-build-rust-wasm-in-github-actions-deploy-via-netlify-cli.md)
