@@ -4,7 +4,7 @@ type: reference
 tags: [macroquad, pixel-art, rendering, rust, gamedev]
 status: verified
 created: 2026-10-24
-updated: 2026-10-24
+updated: 2026-10-25
 verified: |
   1차 출처로 확인: macroquad 0.4.16 src/texture.rs(render_target(), Texture2D::set_filter 문서 주석
   "Use Nearest if you need integer-ratio scaling for pixel art", draw_texture_ex의 flip_y 처리), src/camera.rs(from_display_rect가
@@ -86,7 +86,8 @@ async fn main() {
 - **상하 반전 (0.4.16에서 실행 확인)**: `Camera2D::from_display_rect`는 y가 아래로 가는 좌표계를 만들려고 `zoom.y`를 **음수**로 둔다. `matrix()`는 `render_target`이 있으면 `invert_y = 1.0`, 없으면 `-1.0`을 `zoom.y`에 곱한다. 화면에 직접 그릴 때는 둘이 상쇄되지만, 렌더 타깃에 그릴 때는 월드 y=0이 클립 공간 +1(텍스처의 마지막 행)로 가고, `draw_texture_ex`는 텍스처 첫 행을 위에 그리므로 **결과가 뒤집힌다**. 해결은 둘 중 하나: (a) 올릴 때 `flip_y: true`(위 스케치), (b) `from_display_rect` 대신 `zoom: vec2(2./w, 2./h)`(양수)로 카메라를 직접 만든다. 어느 쪽도 macroquad가 `invert_y` 논리를 바꾸면 다시 뒤집히므로, 버전을 올릴 때 **표식을 그려 실행 확인**한다(아래 "확인 방법").
 - **HiDPI**: miniquad `Conf::high_dpi`는 기본 `false`. false면 `screen_width()`가 논리 픽셀을 돌려주고 OS가 확대하므로 Retina/고배율 화면에서 흐려질 수 있다. 선명함이 중요하면 `high_dpi: true`로 물리 픽셀 기준으로 배율을 계산한다.
 - **텍스처 아틀라스 bleeding**: Nearest라도 타일 경계에서 인접 픽셀이 새어 들어올 수 있다. 타일 사이 1px 패딩 또는 UV를 반 픽셀 안쪽으로.
-- **텍스트**: 내장 폰트는 내부 해상도에서 작게 렌더되면 깨진다. 픽셀 폰트를 쓰거나 UI만 바깥(실제 해상도) 패스에서 그린다.
+- **텍스트**: 내장 폰트는 내부 해상도에서 작게 렌더되면 깨지고 한글이 없다. 픽셀 TTF를 `load_ttf_font`로 읽고(`set_filter(Nearest)`), **레이아웃은 내부 해상도 단위로 계산하되 그리기는 실제 해상도 패스에서** `font_size = 격자px × 정수 배율`로 찍는다(12px 폰트, ×4면 48). `measure_text(..., font_size, 1.0).width / scale`로 논리 폭을 얻어 가운데 정렬한다(2026-10-25 실행 확인, Galmuri11 Condensed).
+- **에셋 경로**: `set_pc_assets_folder("assets")`를 부르면 데스크톱·웹에서는 `assets/…`를 앞에 붙이고 Android에서는 APK assets 루트를 그대로 쓴다. 코드는 `load_ttf_font("fonts/x.ttf")`처럼 폴더 안 경로만 적는다. 웹 배포 디렉터리에 `assets/`를 복사하고, cargo-quad-apk 메타데이터에 `assets = "assets"`.
 
 ## 확인 방법 (헤드리스 Linux)
 표식(왼쪽 위에 색 사각형 + 글자)을 월드에 그리고 캡처한다. 디스플레이가 없는 컨테이너/CI에서도 된다.
