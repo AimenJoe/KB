@@ -28,6 +28,10 @@ updated: 2026-10-25
 - [공격 타이밍 패링](../concepts/timing-parry.md) — 버튼 없이 스윙 첫 창 + 앞쪽, 회피 = 안전·패링 = 이득
 - [필살기의 임팩트](../concepts/special-move-impact.md) — 시동 정지(슈퍼 플래시), 화면 한 폭 거리, 넉백 > 속도로 끌고 가기, 소리 하나
 
+## 이야기
+- [로그라이트에서 이야기를 전하는 방법](../concepts/roguelite-narrative-delivery.md) — 죽음에 세계 안의 이유, 귀환 대사 = 조건 + 가장 구체적인 것 + 대비책 + 한 번만, 지는 사람도 이야기를 본다, 환경·허브 변화
+- [캐릭터 설정에 쓰는 실제 동물·생태 사실](../reference/nature/animal-behavior-for-character-design.md) — 두더지 독립·침의 독, 라쿤 "손 씻기"는 씻기가 아님, 땅강아지 수렴 진화, 뽕나무버섯, 균근 공생, 다람쥐 저장
+
 ## 테스트·연출
 - [개발용 시나리오 진입점과 스텝 스크립트 컷씬](../concepts/dev-scenarios-and-scripted-cutscenes.md) — 시나리오 목록 → 월드 구성, JRPG식 대화창, 건너뛰기, 배우 좌표계·싸움 끝 연타 함정
 
