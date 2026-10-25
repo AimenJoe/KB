@@ -4,12 +4,13 @@ type: concept
 tags: [gamedev, game-feel, input, rust]
 status: draft
 created: 2026-10-24
-updated: 2026-10-24
+updated: 2026-10-25
 verified: |
   1차 출처로 확인: 직접 구현·실행(nail-under-the-roots 1단계 프로토타입, macroquad 0.4.16, 2026-10-24). 누적기 루프, 입력 래치,
   보간, 히트스톱 중 로직 시계 정지, 일시정지·히트스톱 중 보간 prev 동기화를 코드로 넣고 Xvfb 캡처·헤드리스 Chromium으로 동작을 확인했다.
   2차 출처만 있음: Glenn Fiedler "Fix Your Timestep!"(누적기·보간·프레임 시간 상한의 원형. 이 세션에서는 사이트에 접속되지 않아 기억에 의존),
   Squirrel Eiserloh GDC 2016 "Math for Game Programmers: Juicing Your Cameras With Math"(trauma² 흔들림).
+  긴 프레임이 전환 연출을 건너뛰는 함정(2026-10-25, nail-under-the-roots 0068): 헤드리스 Chromium에서 장소 전환 중 한 프레임 133~150ms → 나눠 굽기 + 틱 멈춤 뒤 가장 긴 프레임 33ms로 측정.
   확인 못 함: "손맛"이 실제로 좋은지는 사람이 플레이해야 안다. 수치는 전부 가설.
 sources:
   - https://gafferongames.com/post/fix_your_timestep/
@@ -57,6 +58,9 @@ render(&world, alpha);                   // pos = prev.lerp(cur, alpha)
 
 ## 함정
 - `MAX_FRAME_DT`를 안 두면 탭 전환 뒤 수백 틱이 한 번에 돌아 적이 순간이동한다.
+- **무거운 일 한 프레임이 연출을 건너뛴다**: 장소 전환의 검정 한가운데에서 무거운 일(지도 굽기·레벨 생성)을 한 프레임에 하면, 멈춤 자체는 검정이라 안 보여도 그 시간이 누적기에 쌓여 다음 프레임에 틱이 몰아 돈다. 밝아짐(로직 시계로 도는 페이드)의 앞부분이 건너뛰어져 검정 → 반쯤 밝음으로 튄다.
+  - 고치기: 무거운 일이 끝날 때까지 **로직 틱을 멈추고 누적기를 비운다**(그동안의 눌림도 버린다). 그러면 연출이 처음부터 돈다.
+  - 일 자체는 줄 단위 등으로 **나눠 프레임마다 시간 예산만큼** 한다. 웹(WASM 한 스레드)에서는 한 프레임 수백 ms가 입력·소리까지 밀고, 느린 기기일수록 길어진다. 화면이 검정인 동안은 예산을 넉넉히 잡아도 보이지 않는다.
 - 보간을 넣고 일시정지·히트스톱에서 prev를 동기화하지 않으면 멈춘 화면이 떨린다.
 - 사운드는 틱이 아니라 **이벤트**에서 재생한다. 틱이 프레임당 여러 번이면 같은 소리가 겹칠 수 있으니 이벤트는 틱당 한 번만 모은다.
 - 웹에서 `AudioContext`는 사용자 제스처 뒤에만 시작된다(macroquad 번들이 첫 클릭에서 resume). 첫 소리가 안 나는 건 버그가 아닐 수 있다.
