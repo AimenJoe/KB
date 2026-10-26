@@ -152,6 +152,7 @@ unsafe { nail_save_write(s.as_ptr(), s.len() as u32) }; // JS가 이 범위를 �
 - **압축 전송 주의**: gzip/br이면 `Content-Length`(압축 크기)가 읽은 바이트(푼 크기)보다 작다 → `max(Content-Length, 받은 양 × 1.05)`로 나누고 95%에서 멈춘다.
 - **게임 안 준비**: 정수 플러그인(`nail_load_step(done, total)`, `nail_load_ready()`)으로 main이 폰트·그림·소리마다 알린다. `ready`는 **첫 `next_frame().await` 뒤**에 — 그 전에 덮개를 걷으면 검은 화면이 한 번 보인다.
 - 확인(2026-10-25, nail-under-the-roots): Playwright `page.route`로 응답마다 지연을 넣어 느린 회선을 흉내, 막대가 0 → 60 → 68 … 100%로 차고 덮개가 걷힘.
+- **시작 파일은 한꺼번에 받는다**(2026-10-26, nail 0092, 직접 측정): `load_texture(..).await`를 파일마다 차례로 하면 웹에서 파일 수 × 왕복 지연이 쌓인다(44개, 지연 70ms·9Mbps 흉내에서 wasm 뒤 6.1초). 각 `macroquad::file::load_file` 퓨처를 `Box::pin`해 한 `std::future::poll_fn`에서 같이 돌리면(macroquad 실행기는 프레임마다 메인 퓨처를 폴링하므로 깨우개 없이도 돈다) 동시에 요청되어 2.7초. 받은 바이트는 `Texture2D::from_file_with_format`·`Image::from_file_with_format`·`load_ttf_font_from_bytes`·`load_sound_from_bytes`로 만든다. 막대는 받은 파일마다 한 칸(단계 수를 상수로 박으면 한 단계에서 몇 초씩 멈춘다).
 - **함정 — 시트 크기를 CSS에 박지 말 것**: `background-size: 384px 384px`처럼 시트 전체 크기를 숫자로 적으면, 게임 쪽에서 시트에 칸을 더할 때(nail: 6칸 → 9칸) 로딩 그림만 가로로 찌그러지고 칸이 어긋난다. 게임 화면은 멀쩡해서 늦게 알아챈다. `background-size: auto <줄 수 × 칸 × 배율>px`처럼 **높이만 정하고 폭은 auto**로 두면 비율이 지켜진다(2026-10-26, 헤드리스로 고치기 전·후 프레임을 찍어 확인).
 
 ## 헤드리스로 웹 빌드 확인 (Playwright)
