@@ -6,6 +6,7 @@ status: draft
 created: 2026-10-24
 updated: 2026-10-26
 verified: |
+  1차 출처로 확인(2026-10-26, 타이틀 바탕: nail-under-the-roots 0083 직접 구현, 헤드리스로 타이틀·슬롯·설정 창 캡처). 키 아트·글 위계 원칙은 itch.io 데브로그·메뉴 디자인 글(2차).
   1차 출처로 확인(2026-10-26, 공격 동작 들기·치기·거두기: nail-under-the-roots 0082 직접 구현, 칸 10배 확대·게임 타이밍 GIF·웹 헤드리스 3연타 캡처). 예비 동작·따라가기는 애니메이션 12원칙의 통념(2차, 원전 확인 안 함). GIF 20ms 미만 칸을 브라우저가 늘린다는 것은 2차(기억).
   1차 출처로 확인(2026-10-26, 저장 지점 눈에 띄게: nail-under-the-roots 0076, 같은 장면을 알파 섞기·더하기 섞기로 헤드리스 캡처해 비교, macroquad 0.4.16 load_material·PipelineParams 소스 확인). "움직임이 먼저 눈에 띈다"는 일반 지각 원리로 2차(따로 출처 확인 안 함).
   1차 출처로 확인(2026-10-26, 그림·사진 → 도트: nail-under-the-roots pxl.py pixelate로 시험 그림을 바로 줄이기+디더 / 중앙값 흐림+칸 평균+팔레트 / median cut 바로 N색 / 넉넉히 뽑아 합치기 비교). 실제 사진 원본 시험은 아직(세션에서 Wikimedia 접속 거부).
@@ -41,6 +42,7 @@ sources:
   - https://itch.io/game-assets/free/tag-pixel-art
   - https://opengameart.org/
   - https://danieldiggle.itch.io/sunnyside
+  - https://itch.io/devlog/1088009/what-i-learned-designing-a-new-title-screen-image.amp
   - https://github.com/github/docs/blob/main/content/get-started/learning-about-github/githubs-plans.md
   - https://github.com/github/docs/blob/main/content/billing/concepts/product-billing/github-actions.md
   - https://www.anthropic.com/news/updates-to-our-consumer-terms
@@ -123,6 +125,12 @@ sources:
 - 플레이어 쪽 들기는 아주 짧게(약 1프레임). 길면 입력이 늦게 느껴진다. 무거운 마지막 타만 몇 프레임 준다.
 - 옆모습에서 "왼발·오른발": 가까운 발은 밝은 색에 가운데 높이, 먼 발은 그늘 색에 낮게. 발톱 자국이 펼쳐지는 방향도 번갈아 주면 리듬이 더 잘 읽힌다. 마지막 타는 두 발 + 자국 X.
 - 함정: 당긴 발(분홍·크림)을 몸 가운데(눈 밑)에 두면 입으로 읽힌다. 내리찍기로 코가 내려오면 바로 밑 줄에 발톱을 두지 않는다(이빨). 확대한 칸 줄과, 게임 타이밍대로 이은 GIF로 확인한다. GIF는 같은 칸이 이어지면 도구가 합쳐 버릴 수 있다. 그때는 칸마다 길이를 목록으로 준다(Pillow `duration=[...]`). 20ms보다 짧은 칸은 브라우저가 100ms로 늘린다.
+
+### 타이틀 바탕(키 아트)
+- 처음 보는 그림이다. 격자·선 같은 임시 바탕은 개발 화면으로 읽힌다. **제목을 그대로 그리면** 주제가 바로 선다. 예: "Under the Roots" → 땅의 단면(위 들판, 아래 뿌리·굴 방·주인공).
+- **글 자리를 먼저 비운다**: 제목·메뉴·저작권 줄의 좌표를 그림 좌표로 옮겨 적는다. 그다음 메뉴 뒤는 고르고 어둡게, 볼거리는 메뉴 양옆에, 바닥 줄 뒤는 한 단계 어둡게 그린다. 메뉴 뒤에는 옅은 어둠 네모 하나(두 겹이면 가장자리가 부드럽다).
+- **움직임은 조금만**: 반딧불 몇 마리(느린 8자 + 깜빡임), 가끔 떨어지는 잎처럼 상태 없는 시간 함수면 된다. 그림 패닝은 메뉴를 읽는 눈을 흔든다.
+- 함정: 그림을 뒤집어 이어 붙여 넓히면 이음매가 가운데(제목 뒤)에 온다. 뒤집어 붙인 그림은 왼쪽 끝 = 오른쪽 끝이라 옆으로 굴려도(`np.roll`) 이어진다. 이음매를 큰 물체 뒤로 굴린다. 빛 번짐은 방 안에만(밖으로 새면 둥근 띠가 뜬다). 이야기 단서(물든 실)는 사물에 붙여 그린다(떠 있는 짧은 선은 낙서로 읽힌다).
 
 ### 대화창 초상화: "해상도가 높아 보이는" 도트
 - **2배 밀도**: 초상화 원본 1px = 게임 픽셀 반(88×88을 44×44 칸에). 화면 배율이 정수면 도트 느낌이 남으면서 표정을 담을 만큼 섬세해진다. 배율이 홀수면 원본 1px을 `floor(배율/2)` 화면 px로 — 반 픽셀은 번져 보인다.
