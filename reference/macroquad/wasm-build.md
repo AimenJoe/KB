@@ -4,7 +4,7 @@ type: reference
 tags: [macroquad, miniquad, rust, wasm, gamedev]
 status: verified
 created: 2026-10-24
-updated: 2026-10-25
+updated: 2026-10-26
 verified: |
   1차 출처로 확인: macroquad 0.4.16 README(빌드 명령, 산출물 경로, index.html 템플릿),
   js/mq_js_bundle.js 소스(프로토콜 version=2, 플러그인 버전, 버전 체크 로직),
@@ -142,6 +142,7 @@ unsafe { nail_save_write(s.as_ptr(), s.len() as u32) }; // JS가 이 범위를 �
 - 길이는 **UTF-8 바이트 수**로 센다. JS 문자열 `.length`는 UTF-16 단위라 한글이 섞이면 어긋난다.
 - `wasm_memory.buffer`는 메모리가 자라면 새 객체가 된다. 뷰(`Uint8Array`)는 **부를 때마다 새로** 만든다(전역에 잡아 두지 않는다).
 - 확인(2026-10-25, nail-under-the-roots): 헤드리스 Chromium에서 `addInitScript`로 localStorage에 기록을 넣고 시작 → 읽힘. 게임이 쓴 기록이 `localStorage.getItem`에 그대로 나옴.
+- 저장 칸이 여럿이면(저장 슬롯) 함수마다 첫 인자로 **칸 번호**를 받는다: `nail_save_len(cell)`, `nail_save_read(cell, ptr, len)`, `nail_save_write(cell, ptr, len)`. JS가 번호를 열쇠 이름으로 바꾼다. 예전 한 칸 저장의 열쇠를 슬롯 1에 그대로 쓰면 업데이트해도 기록이 남는다. 함수 모양을 바꾸면 플러그인 `version`과 Rust의 `<이름>_crate_version()`을 함께 올린다(다르면 번들이 콘솔에 "version mismatch"를 찍는다). 확인(2026-10-26, nail-under-the-roots 0078): 헤드리스 Chromium에서 슬롯 1(옛 열쇠)·3에 기록을 넣고 슬롯 창 → 요약 표시, 슬롯 3 지우기·슬롯 2 새로 시작 → `nail.slot`=2, 슬롯 2·3 열쇠가 바뀐 것을 `localStorage`로 확인.
 
 ## 로딩 화면 (번들을 고치지 않고)
 
