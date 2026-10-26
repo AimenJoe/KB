@@ -166,7 +166,7 @@ await page.goto('http://127.0.0.1:8000/'); await page.waitForTimeout(2000);
 await page.focus('#glcanvas'); await page.keyboard.press('j');   // 입력도 들어간다
 await page.screenshot({ path: 'web.png' });
 ```
-- 기대하는 콘솔: `Plugin sapp_jsutils is present in JS bundle, but is not used`(정상), AudioContext 자동재생 경고(정상, 첫 클릭에 번들이 resume하며 "fix"를 찍음). `Version mismatch`·`version mismatch`·`Missed function`이 있으면 번들/플러그인/링크 문제.
+- 기대하는 콘솔: `Plugin sapp_jsutils is present in JS bundle, but is not used`(정상), AudioContext 자동재생 경고(정상, 첫 클릭에 번들이 resume하며 "fix"를 찍음). `ReferenceError: register_plugin is not defined`(mq_js_bundle.js 안, 2026-10-26 확인)도 원래 난다: 번들에 든 quad-net 웹소켓 플러그인이 엄격 모드에서 선언 없이 전역 `register_plugin`에 대입한다. 그 플러그인을 안 쓰면 무해하다. `Version mismatch`·`version mismatch`·`Missed function`이 있으면 번들/플러그인/링크 문제.
 
 ## 에셋 로딩
 글루의 `fs_load_file`은 페이지 기준 상대 경로로 XHR GET을 한다. 빌드 결과 디렉터리에 `assets/`를 그대로 복사하고 경로 대소문자를 맞춘다.
