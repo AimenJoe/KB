@@ -4,7 +4,7 @@ type: guide
 tags: [macroquad, miniquad, android, apk, github-actions, ci-cd, rust]
 status: verified
 created: 2026-10-24
-updated: 2026-10-25
+updated: 2026-10-26
 verified: |
   1차 출처로 확인: cargo-quad-apk git master(커밋 d411c8f, 2026-07-28) 소스 — src/config.rs(NDK_HOME 필수, ANDROID_SDK_HOME→ANDROID_HOME,
   build-tools 중 가장 높은 버전 자동 선택, android_version 기본 36, min_sdk 기본 18), src/ops/build.rs(aapt2·d8·zipalign·javac -source/-target 1.8,
@@ -17,7 +17,8 @@ verified: |
   1차 출처로 확인(2026-10-25): Android 개발자 문서 — versionCode가 지금 설치된 것보다 낮은 APK는 설치를 막는다(downgrade 방지), 업데이트는 같은 인증서로
   서명해야 한다(다른 인증서면 다른 패키지 이름이 필요). GitHub 문서 원본(github/docs dependency-caching.md) — 7일 넘게 접근하지 않은 캐시 항목은 지운다, 저장소당 기본 10GB.
   CI 로그(nail-under-the-roots v0.1.1·v0.1.2): 캐시에서 복원한 디버그 키로 서명한 APK의 인증서 SHA-256이 빌드마다 같다(83:EF:43:…), aapt2 badging의 versionCode/versionName이 Cargo.toml 값.
-  확인 못 함: 실기 설치·실행. 디버그 키 서명 APK가 Android 14+ 기기에서 사이드로드되는지.
+  1차 출처로 확인(2026-10-26): developer.android.com behavior-changes-12 원문("…doesn't have an explicitly-declared value for android:exported, your app can't be installed on a device that runs Android 12 or higher"), cargo-quad-apk d411c8f src/ops/build.rs·config.rs(MainActivity 속성에 exported 없음, activity_attributes를 그대로 붙임), 릴리스 APK를 androguard로 읽어 exported 없음 확인. 사용자 실기에서 v0.1.4 설치 거부 메시지.
+  확인 못 함: 실기 설치·실행(exported를 넣은 v0.1.5부터 확인 예정). 디버그 키 서명 APK가 Android 14+ 기기에서 사이드로드되는지.
 sources:
   - https://github.com/not-fl3/cargo-quad-apk
   - https://github.com/actions/runner-images/blob/main/images/ubuntu/Ubuntu2404-Readme.md
@@ -51,6 +52,7 @@ version_code = 1            # 배포마다 증가
 
 [package.metadata.android.activity_attributes]
 "android:screenOrientation" = "sensorLandscape"
+"android:exported" = "true"    # 꼭 넣는다: targetSdk 31+에서 없으면 Android 12+ 기기가 설치를 거부한다(함정 참고)
 ```
 
 ### 2. 워크플로
@@ -95,6 +97,11 @@ NDK 없이도 `rustup target add aarch64-linux-android && cargo check --target a
 - **커밋 고정**: 상류 master가 바뀌어 조용히 깨지는 것을 막는다. 올릴 때 CI 한 번 보고 올린다.
 
 ## 함정
+- **`android:exported`가 없으면 Android 12+ 폰에 설치되지 않는다.** 설치 화면에는 "App not installed as package appears to be invalid"만 뜬다.
+  - 원인: cargo-quad-apk(d411c8f)가 만드는 `MainActivity`에는 MAIN/LAUNCHER intent-filter가 있는데 `android:exported`가 없다. Android 문서(behavior-changes-12)에 따르면, targetSdk 31 이상에서 intent-filter가 있는 컴포넌트가 exported를 명시하지 않으면 Android 12 이상 기기에 설치할 수 없다.
+  - 해결: `activity_attributes`에 `"android:exported" = "true"`. 이 표의 키·값은 `<activity>` 속성으로 그대로 옮겨진다(`build_attribute_string`).
+  - `apksigner verify`·`aapt2 dump badging`·`zipalign -c`는 이 문제를 잡지 못한다. 확인 단계에 `aapt2 dump xmltree <apk> --file AndroidManifest.xml | grep -q android:exported`를 넣어 없으면 실패시킨다.
+  - nail-under-the-roots는 v0.1.0~v0.1.4가 모두 이 상태로 나갔고, 사용자가 처음 실기에 설치하려다 알았다.
 - `gamepads` 크레이트(0.1.7)는 Android에서 `android-winit` feature 없이 **컴파일되지 않는다**. 그 feature는 winit 전용이라 miniquad에 못 쓴다. `[target.'cfg(not(target_os = "android"))'.dependencies]`로 옮기고 코드에 `cfg`를 둔다. Android 게임패드 자체는 miniquad 백엔드 공백([gamepad-and-android-input.md](../reference/macroquad/gamepad-and-android-input.md)).
 - `NDK_HOME`을 안 넘기면 "Please set the path to the Android NDK with the $NDK_HOME environment variable". 러너 변수 이름은 `ANDROID_NDK_HOME`이다.
 - build-tools는 **가장 높은 버전 디렉터리**를 고른다. 러너에 rc 버전이 있으면 그걸 집는다.
