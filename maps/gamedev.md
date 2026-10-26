@@ -65,6 +65,7 @@ updated: 2026-10-25
 - 빌드·배포
   - [macroquad WASM을 GitHub Actions로 빌드해 Netlify에 배포](../guides/macroquad-wasm-netlify-github-actions.md) — 전체 절차
   - [macroquad를 GitHub Actions에서 Android APK로](../guides/macroquad-android-apk-github-actions.md) — cargo-quad-apk git 고정, 러너 내장 SDK/NDK, gamepads 제외, 서명 키는 Secret에
+  - [macroquad iOS 빌드](../reference/macroquad/ios-build.md) — macOS 러너로 서명 안 한 .ipa, Info.plist 최소 키, 샌드박스 저장 자리, 서명 갈림길(무료 7일 / $99 TestFlight), 패드는 gilrs에 iOS 없음
   - [버전 올리기 = 릴리스](../reference/github-actions/release-from-version-bump.md) — 본문 파일이 스위치, CI가 태그·APK·Release
   - [WASM 빌드와 JS 번들](../reference/macroquad/wasm-build.md) — 번들 버전 계약, 에셋 로딩, 정수로 주고받는 내 플러그인(localStorage 설정 저장), 번들을 고치지 않는 로딩 화면
   - [소리(quad-snd)](../reference/macroquad/audio.md) — 네이티브 wav·ogg만·통째로 f32 44.1kHz(1분 ≈ 21MB)·가까운 점 리샘플·음높이 없음, 웹 mp3/네이티브 ogg, 교차는 직접, 들을 때 읽고 놓기(네이티브는 푸는 동안 멈칫)
