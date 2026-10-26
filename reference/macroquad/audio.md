@@ -10,7 +10,13 @@ verified: |
   mixer.rs load_samples_from_file: 통째로 f32 스테레오로 풀고 44100이 아니면 nearest-neighbor 리샘플),
   macroquad 0.4.16 audio.rs(PlaySoundParams = looped·volume, set_sound_volume·stop_sound).
   직접 실행: 헤드리스 Chromium에서 mp3 시험음을 load_file → load_sound_from_bytes로 받아 오류 없음(nail-under-the-roots 0081).
-  확인 못 함: 네이티브(Android·데스크톱) ogg 실제 재생, 소리가 실제로 들리는지(컨테이너에 소리 장치 없음).
+  1차 출처로 확인(2026-10-26, v0.1.11): quad-snd mixer.rs — `MixerControl::load`가 부른 스레드에서 다 풀고 AddSound(Vec<f32>)를
+  오디오 스레드로 보낸다(오디오 스레드가 Arc<[f32]>로 한 번 복사), `MixerControl`은 Cell을 써서 다른 스레드에서 못 부른다.
+  macroquad audio.rs — Sound는 Arc 가드라 마지막 복사본을 버리면 delete. experimental/coroutines.rs — start_coroutine(Send 퓨처)·
+  is_done·retrieve(한 번 꺼내면 비운다). 직접 실행: audrey로 1분 48초 모노 ogg q4 풀기 208ms, 같은 길이 WAV 125ms(x86 릴리스).
+  헤드리스 Chromium: 곡을 코루틴으로 들을 때 읽어 고리 재생, mp3 decodeAudioData 길이 = 원본 표본 수(LAME 앞뒤 채움을 잘라 냄).
+  모노 ogg가 audrey에서 풀린다(1채널 → 스테레오로 복제).
+  확인 못 함: 네이티브(Android·데스크톱)에서 실제로 들리는지(컨테이너에 소리 장치 없음), Android에서 푸는 시간, Firefox·Safari의 mp3 고리 이음매.
   2차 출처만 있음: Safari decodeAudioData의 Ogg Vorbis 지원 — WebKit 버그·MDN PR이 버전마다 엇갈린다(Safari 18.4+ 지원 제안).
 sources:
   - https://github.com/not-fl3/quad-snd
@@ -42,6 +48,16 @@ macroquad 0.4의 `audio` feature는 quad-snd 0.2를 쓴다.
 - 음높이 변형(같은 소리를 조금씩 다르게)은 재생 인자로 못 한다 → 변형을 미리 만들어 둔다(합성음이면 시작할 때 몇 벌).
 - 같은 소리가 한 틱에 여러 번 나는 것(한 번에 여럿 맞을 때)은 소리마다 마지막 재생 시각을 두고 짧은 간격(예: 30ms) 안이면 건너뛴다.
 - 없는 파일을 `load_file`로 찾으면 웹 콘솔에 404가 남는다 → 실을 곡을 코드의 표로 두고 그것만 읽는다.
+- **들을 때 읽고, 다 내려가면 놓기**: 곡마다 상태(읽는 중 = 코루틴, 다 읽음 = Sound, 실패)를 두고, 들어야 할 곡이 다 읽히기 전에는 "곡 없음"으로 본다(옛 곡이 내려가고 다 읽으면 새 곡이 올라온다). 울리지 않는 곡(다 내려갔거나, 다 읽었을 때는 이미 다른 곳으로 간 곡)은 버려 메모리를 돌려받는다.
+  ```rust
+  let co = start_coroutine(async move {
+      let bytes = load_file(&path).await.ok()?;
+      load_sound_from_bytes(&bytes).await.ok()
+  });
+  // 프레임마다
+  if co.is_done() { slot = co.retrieve().flatten(); }
+  ```
+- **네이티브는 푸는 동안 멈칫한다**(위 측정: 1분 48초에 약 0.2초, 휴대 기기는 더 걸린다). 다른 스레드로 넘길 수 없으니, 장소가 바뀌는 검은 화면에서 읽히게 짜고, 싸움 한가운데서 갑자기 필요한 곡(보스)은 미리 읽어 쥐고 있는다.
 - 웹의 AudioContext는 사용자 제스처 뒤에야 시작한다(번들이 첫 클릭에서 resume, [고정 타임스텝 노트](../../concepts/fixed-timestep-and-hitstop.md)).
 
 ## 왜?
@@ -51,7 +67,10 @@ macroquad 0.4의 `audio` feature는 quad-snd 0.2를 쓴다.
 ## 함정
 - 22.05kHz로 줄여 용량을 아끼면 네이티브에서 리샘플이 거칠어진다. 용량은 길이로 줄인다.
 - 크기 0으로 시작한 반복 재생은 끄지 않으면 계속 섞인다(조용해도 믹서 비용). 내려간 곡은 `stop_sound`.
+- 큰 곡을 올리면 오디오 스레드가 그 표본을 한 번 더 복사한다(Vec → Arc<[f32]>). 잠깐 메모리가 두 배다.
+- 같은 크기면 WAV가 ogg보다 빨리 풀리지만 차이는 두 배가 안 된다(audrey가 표본마다 돈다). WAV로 바꿔서 멈칫을 없앨 수는 없다.
 
 ## 관련 노트
 - [WASM 빌드와 JS 번들](wasm-build.md) — `audio` feature, 링크 플래그, 번들 버전
 - [필살기의 임팩트](../../concepts/special-move-impact.md) — 소리 하나로 잇기
+- [작곡가·음향 담당 없이 게임 소리 넣기](../../guides/game-audio-without-a-composer.md) — CC0 출처, 숫자로 고르기, 변환 스크립트, 변형·메뉴 소리
