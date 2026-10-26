@@ -4,7 +4,7 @@ type: reference
 tags: [macroquad, wasm, performance, safari, fonts, gamedev]
 status: draft
 created: 2026-10-25
-updated: 2026-10-25
+updated: 2026-10-26
 verified: |
   1차 출처로 확인(2026-10-25, macroquad 0.4.16 quad_gl.rs `varying lowp vec2 uv`, text.rs `ceil(font_size × dpi)`, 헤드리스 texImage2D 세기): dpi 2.625에서 화면 크기로 구우면 4096², ceil 규칙으로 24px로 구우면 1024². Android Chrome 검은 글자가 lowp 때문이라는 것은 추정(실기기 확인 전).
   1차 출처로 확인(2026-10-25, macroquad 0.4 소스 text/atlas.rs + 헤드리스 콘솔): 그리는 도중 넘치면 텍스처를 지웠다 새로 만들어 같은 프레임 글이 지워진 ID를 본다, ASCII·두 배 크기를 함께 미리 구우면 경고가 사라진다.
@@ -48,7 +48,7 @@ macroquad는 글자를 **`font_size × dpi` 크기로 구워** 아틀라스에 �
 ## 함정
 - 헤드리스 Chromium(소프트웨어 GL)의 프레임 시간은 픽셀 수에 비례해 느려질 뿐 GPU 사정을 보여 주지 않는다. **WebGL 함수를 감싸 올린 바이트를 세는 쪽**이 원인을 가르는 데 낫다.
 - 벡터(매끈한) 폰트에 같은 방법을 쓰면 흐려진다. 픽셀 폰트일 때만.
-- dpi가 어중간하면(1.25 등) 정수배 조합이 없을 수 있다 → 예전처럼 화면 크기로 굽는다.
+- dpi가 어중간하면(1.25 등) 정수배 조합이 없을 수 있다. 처음 판은 이때 화면 크기로 구웠는데, 그러면 아래처럼 아틀라스가 커진다 → 지금 방법은 아래 마지막 두 줄(정확히 구워지는 크기 + 정수가 아닌 배).
 - **어중간한 dpi(Android 2.625·2.75·3.5)에서 정수배 조합을 못 찾아 화면 크기로 구우면 아틀라스가 4096²까지 큰다.** 큰 아틀라스에서 Android Chrome 글자가 검게 뭉개졌다(iOS dpi 3은 멀쩡).
   - 의심 원인: 기본 셰이더의 `varying lowp vec2 uv`. 폰 GPU의 낮은 정밀도로는 큰 텍스처의 글자 칸을 정확히 못 집는다. 실기기 확인 전이다.
   - macroquad는 `ceil(font_size × dpi)`로 굽는다. 그러니 `font_size = 굽는 크기 / dpi`가 정수일 필요는 없다. `ceil(k × dpi) = 12m`인 정수 k를 찾으면 된다.

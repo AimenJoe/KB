@@ -4,10 +4,11 @@ type: guide
 tags: [macroquad, rust, wasm, netlify, github-actions, gamedev, ci]
 status: verified
 created: 2026-10-24
-updated: 2026-10-24
+updated: 2026-10-26
 verified: |
   각 단계의 근거는 링크된 reference 노트의 verified 항목을 따른다.
-  이 가이드의 워크플로 YAML 자체는 실제 레포에서 아직 실행 검증하지 않았다(초안). 첫 실행 후 updated/status 갱신할 것.
+  1차(CI 실행): nail-under-the-roots의 deploy-web.yml(아래 YAML + "실제로 더한 것")이 main push마다 돈다. 124번째 실행(2026-10-26, v0.1.15)까지 "Deploy production" 단계 성공.
+  PR 미리보기 단계는 그 레포에서 PR을 거의 열지 않아 최근 실행 기록으로 확인하지 않았다.
 sources:
   - reference/macroquad/wasm-build.md
   - reference/netlify/deploy-from-ci.md
@@ -108,6 +109,12 @@ jobs:
 ```
 
 `mygame`은 크레이트 이름으로 바꾼다. 미리보기 URL은 `pr-<번호>--<site>.netlify.app`.
+
+### 실제로 쓰면서 더한 것(nail-under-the-roots)
+- **JS 플러그인을 다 복사**: `cp web/index.html web/*.js dist/`. 위처럼 `mq_js_bundle.js`만 복사하면 게임패드·저장 플러그인이 빠진다.
+- **시크릿이 없으면 배포만 건너뛰기**: job `env`에 `NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}`를 올리고 배포 단계에 `if: env.NETLIFY_SITE_ID != '' && …`. 시크릿 전에도 빌드 검증은 돈다(`secrets`는 `if:`에서 바로 못 읽는다).
+- **배포 전에 검사**: `cargo fmt --check`, `cargo clippy --target wasm32-unknown-unknown -- -D warnings`, 호스트 `cargo test`(macroquad 링크용 `libx11-dev libxi-dev libgl1-mesa-dev libasound2-dev libudev-dev`).
+- 비공개 에셋 레포를 `actions/checkout`으로 `assets/vendor`에 받기(시크릿이 없으면 건너뜀), `dist`를 아티팩트로 올리기, 라이선스 고지 파일 복사.
 
 ## 배포 후 확인
 

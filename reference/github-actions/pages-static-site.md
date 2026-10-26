@@ -4,14 +4,14 @@ type: reference
 tags: [github-actions, ci-cd, hosting, static-site, fonts]
 status: verified
 created: 2026-10-25
-updated: 2026-10-25
+updated: 2026-10-26
 verified: |
   1차 출처로 확인(2026-10-25):
   - 각 액션 레포의 태그와 action.yml(git fetch로 읽음): configure-pages v6.0.0(2026-03-24, node24, `enablement` 입력은 "GITHUB_TOKEN 말고 다른 토큰이 필요"),
     upload-pages-artifact v5.0.0(2026-04-08, composite, `path` 필수·기본 `_site/`, `include-hidden-files` 기본 false로 점 파일 제외, .git·.github는 늘 제외, 보관 1일),
     deploy-pages v5.0.1(2026-09-01, node24).
   - 직접 실행(nail-under-the-roots pages.yml): Pages를 켜기 전 첫 실행이 configure-pages에서 "Get Pages site failed … Not Found"로 실패.
-  - fontTools 4.67(subset, woff2 + brotli)로 픽셀 한글 글꼴 452KB → 9KB(페이지 글자만).
+  - fontTools 4.67(subset, woff2 + brotli)로 픽셀 한글 글꼴 452KB → 9KB(페이지 글자만, 그때 게임 서브셋 기준. 지금 게임 서브셋은 344KB).
   - 헤드리스 Chromium에서 api.github.com/repos/<repo>/releases 읽기, 요청 제한(403)일 때 적어 둔 값이 남는 것.
   2차/확인 못 함: 비인증 API 요청 제한 "IP당 시간 60회"는 기억에 의존(이 세션에서 docs.github.com 접속이 막혀 원문 미확인).
   GitHub Free에서 공개 레포 Pages가 무료라는 것은 요금 문서 원본(github/docs plans)으로 본 범위까지.

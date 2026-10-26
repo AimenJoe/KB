@@ -4,9 +4,10 @@ type: concept
 tags: [gamedev, game-design, roguelite, narrative, dialogue]
 status: draft
 created: 2026-10-25
-updated: 2026-10-25
+updated: 2026-10-26
 verified: |
-  1차 출처로 확인: 없음. 아래 설계는 nail-under-the-roots 스토리 초안(docs/story-brainstorm.md)에 적용 중이고, 아직 구현·플레이로 확인하지 않았다.
+  1차 출처로 확인(직접 구현, nail-under-the-roots 0041·src/story.rs): 귀환 대사 고르기 = 조건이 다 맞는 줄 가운데 조건이 가장 많은 줄(같으면 표 앞), `once`는 기록 `line.<id>`로 한 번만, 쓰러진 횟수도 조건.
+  다만 "대비책 줄"은 두지 않았다 — 맞는 줄이 없으면 아무 말도 안 한다(침묵이 대비책). 플레이 느낌은 사람 판정 전.
   2차 출처만 있음: Hades — 죽음을 "게임 오버"가 아니라 구조의 일부로, 끝맺음 지점을 여러 번(Kasavin 인터뷰, Tom's Guide),
   난이도 벽에 막힌 플레이어도 이야기가 나아가게(GDC Podcast ep.16 소개글). Valve 대사 규칙 DB — 세계의 사실 수백 개를
   규칙 수천 개에 맞춰 보고 "가장 구체적인 규칙"을 고르고 덜 구체적인 규칙이 대비책(Emily Short·Radiator 블로그의 GDC 2012 Ruskin 강연 요약,

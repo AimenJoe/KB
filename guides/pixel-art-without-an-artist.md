@@ -258,7 +258,7 @@ v1(타원 + 구 음영 + 몸 전체 2×2 디더)은 "자글자글"하고 형태�
 게임 엔진 내장 폰트에는 한글이 없다. 픽셀 게임에 맞는 한글 폰트는 다음 조건으로 고른다: OFL 같은 재배포 허용 라이선스, 픽셀 격자(8·10·12px)에 맞는 윤곽선 TTF, 2,350자 이상.
 
 - **Galmuri** ([quiple/galmuri](https://github.com/quiple/galmuri), OFL 1.1): Galmuri14/11/9/7. README "Legal Stuff"에 따르면 Regular 계열은 일부 글리프(라틴-1, 가나·한자, 일부 기호, 한글 2,355자)가 닌텐도 DS 폰트에서 유래하고, **Galmuri11 Bold·Condensed는 모든 글리프가 제작자의 순수 창작**이다. 걱정 없이 쓰려면 Bold나 Condensed. 320×180이면 Condensed(12px 격자)가 글자 수를 벌어 준다.
-- 용량: 원본 TTF는 2.6MB(한글 11,172자). 웹 첫 로딩을 위해 서브셋한다. `pyftsubset`(fonttools)로 KS X 1001 완성형 2,350자 + ASCII + Latin-1(ï 등) + 필요한 기호(▶◀♥♡■□…·)만 남기면 약 450KB.
+- 용량: 원본 TTF는 2.6MB(한글 11,172자). 웹 첫 로딩을 위해 서브셋한다. `pyftsubset`(fonttools)로 KS X 1001 완성형 2,350자 + ASCII + Latin-1(ï 등) + 필요한 기호(▶◀♥♡■□…·)만 남기면 수백 KB(처음 판 약 450KB. 2026-10-26 2.404 원본에서 키릴·œŒŸ까지 넣고 다시 줄인 판은 2,714자 344KB — 힌팅·옵션 차이로 보이며 원인은 따로 재지 않았다). 라틴 밖 언어를 더하면 그 문자 블록을 함께 넣는다(프랑스어 œŒŸ, 러시아어 키릴 U+0400–04FF, 독일어 „ “ ‚ ‘).
   ```sh
   pip install fonttools
   python3 -c "print(''.join(chr(c) for c in range(0xAC00,0xD7A4) if (lambda b: b and 0xB0<=b[0]<=0xC8 and 0xA1<=b[1]<=0xFE)(chr(c).encode('cp949','ignore'))), end='')" > ksx1001.txt

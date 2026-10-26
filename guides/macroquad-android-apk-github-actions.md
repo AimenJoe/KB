@@ -18,7 +18,9 @@ verified: |
   서명해야 한다(다른 인증서면 다른 패키지 이름이 필요). GitHub 문서 원본(github/docs dependency-caching.md) — 7일 넘게 접근하지 않은 캐시 항목은 지운다, 저장소당 기본 10GB.
   CI 로그(nail-under-the-roots v0.1.1·v0.1.2): 캐시에서 복원한 디버그 키로 서명한 APK의 인증서 SHA-256이 빌드마다 같다(83:EF:43:…), aapt2 badging의 versionCode/versionName이 Cargo.toml 값.
   1차 출처로 확인(2026-10-26): developer.android.com behavior-changes-12 원문("…doesn't have an explicitly-declared value for android:exported, your app can't be installed on a device that runs Android 12 or higher"), cargo-quad-apk d411c8f src/ops/build.rs·config.rs(MainActivity 속성에 exported 없음, activity_attributes를 그대로 붙임), 릴리스 APK를 androguard로 읽어 exported 없음 확인. 사용자 실기에서 v0.1.4 설치 거부 메시지.
-  확인 못 함: 실기 설치·실행(exported를 넣은 v0.1.5부터 확인 예정). 디버그 키 서명 APK가 Android 14+ 기기에서 사이드로드되는지.
+  사용자 실기(2026-10-25~26): exported를 넣은 v0.1.5부터 설치·실행·패드 버튼(0075)이 됐다. 기기 모델·Android 버전은 기록하지 않았다.
+  1차 출처로 확인(2026-10-26, nail 0087): cargo-quad-apk d411c8f의 `res`·`icon` 메타데이터로 앱 아이콘이 들어가고, CI의 `aapt2 dump badging`에 application-icon이 찍힌다. 실제 런처 모양(적응형 잘림)은 미확인.
+  확인 못 함: 디버그 키 서명 APK가 Android 14+ 기기에서 사이드로드되는지(기기 버전 기록이 없다).
 sources:
   - https://github.com/not-fl3/cargo-quad-apk
   - https://github.com/actions/runner-images/blob/main/images/ubuntu/Ubuntu2404-Readme.md
@@ -50,6 +52,9 @@ build_targets = ["aarch64-linux-android"]  # 기본은 armv7·aarch64·i686 세 
 fullscreen = true
 version_code = 1            # 배포마다 증가
 
+res = "android/res"         # 앱 아이콘(아래 "아이콘"). 없으면 런처에 기본 아이콘
+icon = "@mipmap/ic_launcher"
+
 [package.metadata.android.activity_attributes]
 "android:screenOrientation" = "sensorLandscape"
 "android:exported" = "true"    # 꼭 넣는다: targetSdk 31+에서 없으면 Android 12+ 기기가 설치를 거부한다(함정 참고)
@@ -58,7 +63,7 @@ version_code = 1            # 배포마다 증가
 ### 2. 워크플로
 ```yaml
 on:
-  push: { branches: ['**'], tags: ['v*'], paths: ['src/**', 'Cargo.toml', 'Cargo.lock', '.cargo/**', '.github/workflows/build-android.yml'] }
+  push: { branches: ['**'], tags: ['v*'], paths: ['src/**', 'assets/**', 'android/**', 'third_party/**', 'Cargo.toml', 'Cargo.lock', '.cargo/**', '.github/workflows/build-android.yml'] }   # 에셋·아이콘·패치한 크레이트만 바꿔도 APK에 들어가므로 넣는다
   workflow_dispatch:
 env:
   CARGO_QUAD_APK_REV: d411c8fe1c08339e46d7dc6b40ac04ea5e3a01b6   # 커밋 고정
@@ -88,7 +93,12 @@ jobs:
 - 태그 push에는 `paths` 필터가 적용되지 않으므로 `v*` 태그는 항상 빌드된다.
 - 산출 APK는 `~/.android/debug.keystore`(없으면 keytool로 생성)로 서명된다. `adb install`·사이드로드용. 스토어 배포는 릴리스 키로 `apksigner`를 한 번 더 돌리거나 `--nosign` 뒤 직접 서명.
 
-### 3. 커밋 전 로컬 검사
+### 3. 앱 아이콘
+- `android/res/mipmap-{mdpi,hdpi,xhdpi,xxhdpi,xxxhdpi}/ic_launcher.png`(48·72·96·144·192px)를 두고 위 `res`·`icon`을 적는다. cargo-quad-apk가 `aapt2 compile`로 묶고 매니페스트에 `android:icon`을 넣는다.
+- Android 8+ 런처는 원·둥근 네모로 자르므로 **적응형 아이콘**도 둔다: `mipmap-anydpi-v26/ic_launcher.xml`(`<adaptive-icon>`의 background·foreground), 앞·뒤 그림은 108dp 칸(xxxhdpi 432px)이고 **가운데 66dp만 늘 보인다**(그 밖은 잘릴 수 있다). 옛 기기는 위 PNG를 쓴다.
+- 그림은 손으로 만들지 않고 스크립트로(원본 한 장 → 크기마다). CI 확인 단계에 `aapt2 dump badging | grep -q application-icon`을 넣어 빠지면 실패시킨다(빌드는 아이콘 없이도 성공한다).
+
+### 4. 커밋 전 로컬 검사
 NDK 없이도 `rustup target add aarch64-linux-android && cargo check --target aarch64-linux-android`는 된다. Android에서만 깨지는 의존성을 CI 전에 잡는다.
 
 ## 왜?
@@ -102,7 +112,7 @@ NDK 없이도 `rustup target add aarch64-linux-android && cargo check --target a
   - 해결: `activity_attributes`에 `"android:exported" = "true"`. 이 표의 키·값은 `<activity>` 속성으로 그대로 옮겨진다(`build_attribute_string`).
   - `apksigner verify`·`aapt2 dump badging`·`zipalign -c`는 이 문제를 잡지 못한다. 확인 단계에 `aapt2 dump xmltree <apk> --file AndroidManifest.xml | grep -q android:exported`를 넣어 없으면 실패시킨다.
   - nail-under-the-roots는 v0.1.0~v0.1.4가 모두 이 상태로 나갔고, 사용자가 처음 실기에 설치하려다 알았다.
-- `gamepads` 크레이트(0.1.7)는 Android에서 `android-winit` feature 없이 **컴파일되지 않는다**. 그 feature는 winit 전용이라 miniquad에 못 쓴다. `[target.'cfg(not(target_os = "android"))'.dependencies]`로 옮기고 코드에 `cfg`를 둔다. Android 게임패드 자체는 miniquad 백엔드 공백([gamepad-and-android-input.md](../reference/macroquad/gamepad-and-android-input.md)).
+- `gamepads` 크레이트(0.1.7)는 Android에서 `android-winit` feature 없이 **컴파일되지 않는다**. 그 feature는 winit 전용이라 miniquad에 못 쓴다. `[target.'cfg(not(target_os = "android"))'.dependencies]`로 옮기고 코드에 `cfg`를 둔다. Android 게임패드는 miniquad 쪽에서 따로 받는다: 버튼은 miniquad 키코드 표 패치로, 축은 아직 공백([gamepad-and-android-input.md](../reference/macroquad/gamepad-and-android-input.md)).
 - `NDK_HOME`을 안 넘기면 "Please set the path to the Android NDK with the $NDK_HOME environment variable". 러너 변수 이름은 `ANDROID_NDK_HOME`이다.
 - build-tools는 **가장 높은 버전 디렉터리**를 고른다. 러너에 rc 버전이 있으면 그걸 집는다.
 - `javac -source 1.8 -target 1.8 -bootclasspath android.jar`: JDK 17에서는 경고만, JDK 21+에서도 아직 허용. 러너 기본 JDK 17.

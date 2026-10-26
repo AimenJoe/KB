@@ -24,7 +24,7 @@ verified: |
   실기 사용자가 보고 → 스틱도 첫 칸을 내게 바꾸고(히스테리시스 0.5/0.3, 큰 축 하나) 가짜 Gamepad 헤드리스 Chromium에서 플릭 1회 = 1칸 확인.
   임계값 0.5/0.3 자체는 2차 출처(포럼의 "임계 통과 시 1회, 중앙 복귀 후 재무장" 패턴) + 직접 조정이며 표준값은 찾지 못했다.
   Android 버튼 패치(2026-10-26, nail-under-the-roots 0075): miniquad 0.4.11 사본을 `[patch.crates-io]`로 쓰고 keycodes.rs에
-  0x60~0x6e → KeyCode::F13~F25 열세 줄을 넣었다. `cargo check --target aarch64-linux-android`·cargo-quad-apk 빌드 통과, 패치 표와
+  0x60~0x6e 가운데 13개(BUTTON_C 0x62·BUTTON_Z 0x65는 뺌) → KeyCode::F13~F25 열세 줄을 넣었다(게임은 F13~F24 열둘을 읽고 MODE→F25는 안 쓴다). `cargo check --target aarch64-linux-android`·cargo-quad-apk 빌드 통과, 패치 표와
   게임 쪽 매핑이 같은지는 단위 테스트로 확인. 실기 패드에서 버튼이 듣는지는 아직 확인 못 함(사용자 확인 대기).
   "패치 전에도 왼쪽 스틱은 움직였다"(실기 사용자 보고, v0.1.5) → AOSP frameworks/base ViewRootImpl.java의 SyntheticInputStage·
   SyntheticJoystickHandler를 읽고 확인: 앱이 처리하지 않은 조이스틱 MotionEvent의 AXIS_X/Y·AXIS_HAT_X/Y를 KEYCODE_DPAD_* 키
@@ -97,7 +97,7 @@ Android 게임패드 버튼 키코드(공식 문서 확인값): `BUTTON_A 96(0x6
 
 ## Android 컨트롤러를 지원하려면 (패치 범위)
 
-1. **버튼**(해 봄, 2026-10-26): `keycodes.rs`에 `0x60~0x6e` 매핑 추가. miniquad `KeyCode`에 게임패드 버튼 variant가 없으므로 데스크톱 키보드에 없는 `F13~F25`에 대응시켰다(가장 작은 패치, 열세 줄). 방법:
+1. **버튼**(해 봄, 2026-10-26): `keycodes.rs`에 `0x60~0x6e` 가운데 C·Z를 뺀 13개 매핑 추가. miniquad `KeyCode`에 게임패드 버튼 variant가 없으므로 데스크톱 키보드에 없는 `F13~F25`에 대응시켰다(가장 작은 패치, 열세 줄). 방법:
    - crates.io 원본을 레포(`third_party/miniquad`)에 복사하고 루트 `Cargo.toml`에 `[patch.crates-io] miniquad = { path = "third_party/miniquad" }`. 버전 번호가 같아야 patch가 먹는다.
    - cargo-quad-apk는 miniquad 패키지 폴더에서 `java/MainActivity.java`를 가져가므로, patch를 쓰면 사본의 Java가 들어간다(Java를 고칠 때도 같은 자리).
    - 경로 의존성은 `--cap-lints`가 안 걸려 원본의 경고가 clippy 출력에 섞인다 → 사본 `lib.rs` 맨 위 `#![allow(warnings)]`.
