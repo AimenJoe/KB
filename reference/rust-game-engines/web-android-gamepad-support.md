@@ -6,7 +6,7 @@ status: verified
 created: 2026-10-24
 updated: 2026-10-26
 verified: |
-  2026-10-26 후속(1차, nail-under-the-roots 0075): miniquad Android 버튼은 keycodes.rs 패치 13줄로 들어온다(F13~F25 키로). 축(아날로그 스틱)은 여전히 안 들어온다.
+  2026-10-26 후속(1차, nail-under-the-roots 0075): miniquad Android 버튼은 keycodes.rs 패치 13줄로 들어온다(F13~F25 키로), 실기에서 사용자 확인. 축(아날로그 스틱)은 여전히 안 들어온다(Android가 D패드 키로 바꿔 줄 뿐).
   cargo-quad-apk는 릴리스 없이 git master 커밋을 고정해 CI에서 쓴다(2026-07 커밋, 동작 확인).
   1차 출처로 확인: miniquad Android 백엔드 소스(게임패드 미지원), gamepads 크레이트 매니페스트(android는 winit 전용),
   gilrs 지원표(Android ✕), godot(gdext) docs.rs(experimental-wasm feature 설명).

@@ -25,7 +25,7 @@ verified: |
   임계값 0.5/0.3 자체는 2차 출처(포럼의 "임계 통과 시 1회, 중앙 복귀 후 재무장" 패턴) + 직접 조정이며 표준값은 찾지 못했다.
   Android 버튼 패치(2026-10-26, nail-under-the-roots 0075): miniquad 0.4.11 사본을 `[patch.crates-io]`로 쓰고 keycodes.rs에
   0x60~0x6e 가운데 13개(BUTTON_C 0x62·BUTTON_Z 0x65는 뺌) → KeyCode::F13~F25 열세 줄을 넣었다(게임은 F13~F24 열둘을 읽고 MODE→F25는 안 쓴다). `cargo check --target aarch64-linux-android`·cargo-quad-apk 빌드 통과, 패치 표와
-  게임 쪽 매핑이 같은지는 단위 테스트로 확인. 실기 패드에서 버튼이 듣는지는 아직 확인 못 함(사용자 확인 대기).
+  게임 쪽 매핑이 같은지는 단위 테스트로 확인. 실기 패드에서 버튼이 다 듣는 것을 사용자가 확인했다(2026-10-26, 기기 모델·Android 버전 기록 없음).
   "패치 전에도 왼쪽 스틱은 움직였다"(실기 사용자 보고, v0.1.5) → AOSP frameworks/base ViewRootImpl.java의 SyntheticInputStage·
   SyntheticJoystickHandler를 읽고 확인: 앱이 처리하지 않은 조이스틱 MotionEvent의 AXIS_X/Y·AXIS_HAT_X/Y를 KEYCODE_DPAD_* 키
   이벤트로 바꿔 다시 넣는다(축마다 따로라 대각선도 됨, 누르고 있으면 반복).
