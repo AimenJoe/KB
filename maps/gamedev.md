@@ -32,6 +32,7 @@ updated: 2026-10-25
 - [공격 타이밍 패링](../concepts/timing-parry.md) — 버튼 없이 스윙 첫 창 + 앞쪽, 회피 = 안전·패링 = 이득, 거울(막는 보스: 튕기고 반격, 아래·필살기로 뚫기)
 - [모든 행동에 재사용 대기](../concepts/action-reuse-gating.md) — 동작 시간·대기·게이지·쓰는 시간을 행동마다 고르기, 회복 = 먹는 시간 + 시작부터 대기, 패링 창 = 열린 순간부터 대기·성공하면 해제
 - [필살기의 임팩트](../concepts/special-move-impact.md) — 시동 정지(슈퍼 플래시), 화면 한 폭 거리, 넉백 > 속도로 끌고 가기, 소리 하나
+- [도트 액션의 손맛 효과](../concepts/game-feel-particles-and-light.md) — 입자 세 무리(타격·몸짓·분위기), 흙덩이 높이·중력, 맞은 쪽 불똥, 상태 없는 환경 입자, 더하기 빛 겹
 - [근접 주인공의 원거리 보스](../concepts/ranged-boss-for-melee-player.md) — 부채꼴 탄 + 되받아치기, 바닥 위험은 발밑 + 둘레·고리 둘(어디·언제)·파내기·무적 굴, 표시 끝 = 판정, 위험물은 적이 아니라 별도 목록
 
 ## 이야기
@@ -65,11 +66,12 @@ updated: 2026-10-25
   - [macroquad를 GitHub Actions에서 Android APK로](../guides/macroquad-android-apk-github-actions.md) — cargo-quad-apk git 고정, 러너 내장 SDK/NDK, gamepads 제외, 서명 키는 Secret에
   - [버전 올리기 = 릴리스](../reference/github-actions/release-from-version-bump.md) — 본문 파일이 스위치, CI가 태그·APK·Release
   - [WASM 빌드와 JS 번들](../reference/macroquad/wasm-build.md) — 번들 버전 계약, 에셋 로딩, 정수로 주고받는 내 플러그인(localStorage 설정 저장), 번들을 고치지 않는 로딩 화면
+  - [소리(quad-snd)](../reference/macroquad/audio.md) — 네이티브 wav·ogg만·통째로 f32 44.1kHz(1분 ≈ 21MB)·가까운 점 리샘플·음높이 없음, 웹 mp3/네이티브 ogg, 교차는 직접
   - [정적 WASM 호스팅](../concepts/static-wasm-hosting.md) — 왜 번들러가 없어도 되는가
   - [0001 빌드는 CI, 호스팅은 Netlify](../decisions/0001-build-rust-wasm-in-github-actions-deploy-via-netlify-cli.md)
 
 ## 아직 없는 것
-- 상태 관리, 사운드(에셋 파이프라인) — 노트가 생기면 추가
+- 상태 관리, 소리 출처·섞기(에셋 파이프라인) — 노트가 생기면 추가
 
 ## 다른 지도
 - [Rust](rust.md) · [CI/CD와 호스팅](ci-cd-hosting.md)
