@@ -4,7 +4,7 @@ type: reference
 tags: [macroquad, miniquad, gamepad, android, input, touch, rust]
 status: verified
 created: 2026-10-24
-updated: 2026-10-25
+updated: 2026-10-26
 verified: |
   1차 출처로 확인: miniquad master의 java/MainActivity.java(onTouch/onKey만 구현, onGenericMotionEvent 없음),
   src/native/android.rs(surfaceOnKeyDown/Up → keycodes::translate_keycode), src/native/android/keycodes.rs(109개 매핑,
@@ -23,6 +23,12 @@ verified: |
   메뉴 스틱 탐색(2026-10-25, nail-under-the-roots): "첫 칸은 키·D패드 눌림 에지, 스틱은 반복만" 구조에서 스틱 플릭이 무시되는 것을
   실기 사용자가 보고 → 스틱도 첫 칸을 내게 바꾸고(히스테리시스 0.5/0.3, 큰 축 하나) 가짜 Gamepad 헤드리스 Chromium에서 플릭 1회 = 1칸 확인.
   임계값 0.5/0.3 자체는 2차 출처(포럼의 "임계 통과 시 1회, 중앙 복귀 후 재무장" 패턴) + 직접 조정이며 표준값은 찾지 못했다.
+  Android 버튼 패치(2026-10-26, nail-under-the-roots 0075): miniquad 0.4.11 사본을 `[patch.crates-io]`로 쓰고 keycodes.rs에
+  0x60~0x6e → KeyCode::F13~F25 열세 줄을 넣었다. `cargo check --target aarch64-linux-android`·cargo-quad-apk 빌드 통과, 패치 표와
+  게임 쪽 매핑이 같은지는 단위 테스트로 확인. 실기 패드에서 버튼이 듣는지는 아직 확인 못 함(사용자 확인 대기).
+  "패치 전에도 왼쪽 스틱은 움직였다"(실기 사용자 보고, v0.1.5) → AOSP frameworks/base ViewRootImpl.java의 SyntheticInputStage·
+  SyntheticJoystickHandler를 읽고 확인: 앱이 처리하지 않은 조이스틱 MotionEvent의 AXIS_X/Y·AXIS_HAT_X/Y를 KEYCODE_DPAD_* 키
+  이벤트로 바꿔 다시 넣는다(축마다 따로라 대각선도 됨, 누르고 있으면 반복).
   확인 못 함: Android MotionEvent 축 상수(AXIS_X/Y/Z/RZ/HAT_X/HAT_Y/LTRIGGER/RTRIGGER)의 정확한 숫자값 — 패치 시 공식 문서로 확인.
 sources:
   - https://www.smashingmagazine.com/2012/02/finger-friendly-design-ideal-mobile-touchscreen-target-sizes/
@@ -34,6 +40,8 @@ sources:
   - https://github.com/fornwall/gamepads/blob/main/README.md
   - https://docs.rs/crate/gilrs/^0.10.2
   - https://developer.android.com/reference/android/view/KeyEvent
+  - https://github.com/aosp-mirror/platform_frameworks_base/blob/main/core/java/android/view/ViewRootImpl.java
+  - https://developer.android.com/training/game-controllers/controller-input
   - https://github.com/not-fl3/cargo-quad-apk
   - https://macroquad.rs/articles/android/
   - https://github.com/BunnyEncoder20/king-tongue-2/issues/2
@@ -44,7 +52,7 @@ sources:
 # macroquad 게임패드와 Android 입력 현황
 
 ## 요약
-macroquad(0.4.16)/miniquad(0.4.11)에는 게임패드 API가 없다. 데스크톱·웹은 `gamepads` 크레이트로 메꿀 수 있지만 **Android에서는 그 크레이트도 동작하지 않고, miniquad Android 백엔드는 스틱·트리거 축을 전혀 받지 않으며 게임패드 버튼 키코드도 매핑하지 않는다.** Android 컨트롤러 지원은 miniquad 포크(약 200줄)가 필요하다.
+macroquad(0.4.16)/miniquad(0.4.11)에는 게임패드 API가 없다. 데스크톱·웹은 `gamepads` 크레이트로 메꿀 수 있지만 **Android에서는 그 크레이트도 동작하지 않고, miniquad Android 백엔드는 스틱·트리거 축을 받지 않으며 게임패드 버튼 키코드도 매핑하지 않는다.** 그래서 손대지 않은 APK에서는 D패드와 (Android가 D패드 키로 바꿔 주는) 왼쪽 스틱만 움직이고 버튼은 하나도 듣지 않는다. 버튼만이라면 `keycodes.rs` 열세 줄 패치로 된다(아래). 아날로그 스틱·오른쪽 스틱·트리거 축까지는 Java를 고쳐야 한다(약 200줄).
 
 ## 플랫폼별 현황
 
@@ -52,7 +60,7 @@ macroquad(0.4.16)/miniquad(0.4.11)에는 게임패드 API가 없다. 데스크�
 |---|---|---|
 | 데스크톱 | `gamepads` 크레이트 → gilrs 0.10 | 동작. 추가 설정 없음 |
 | 웹 | `gamepads` 크레이트(`default-features = false`) → 브라우저 Gamepad API, JS 플러그인 로드 필요 | 동작. 플러그인 JS를 레포에 복사해 배포 |
-| Android | 없음 | **D-pad만 화살표 키로 들어옴.** 버튼·스틱·트리거 미지원 |
+| Android | 없음(원본) / `keycodes.rs` 패치 | 원본: **D패드 + 왼쪽 스틱(디지털, Android가 D패드 키로 바꿈)만.** 버튼 전부 버려짐. 패치: 버튼도 키로. 아날로그 축은 여전히 없음 |
 
 ## 데스크톱·웹: `gamepads` 크레이트
 
@@ -80,7 +88,8 @@ gamepads = { version = "0.1", default-features = false }  # macroquad는 wasm-bi
 
 ## Android: miniquad 백엔드가 받는 것
 
-- `MainActivity.java`는 `View.OnTouchListener`, `View.OnKeyListener`만 구현한다. `onKey`는 `ACTION_DOWN/UP`의 `keyCode`를 `QuadNative.surfaceOnKeyDown/Up(keyCode)`로 넘긴다. **`onGenericMotionEvent`가 없어 `MotionEvent`의 조이스틱 축은 어디로도 가지 않는다.**
+- `MainActivity.java`는 `View.OnTouchListener`, `View.OnKeyListener`만 구현한다. `onKey`는 `ACTION_DOWN/UP`의 `keyCode`를 `QuadNative.surfaceOnKeyDown/Up(keyCode)`로 넘기고 `true`를 돌려준다(시스템이 먹지 않는다). **`onGenericMotionEvent`가 없어 조이스틱 축 값은 앱에 오지 않는다.**
+- 대신 Android 프레임워크가 처리되지 않은 조이스틱 `MotionEvent`를 D패드 키로 바꿔 준다. `ViewRootImpl`의 `SyntheticInputStage` → `SyntheticJoystickHandler`가 `AXIS_X/Y`(왼쪽 스틱)와 `AXIS_HAT_X/Y`를 `KEYCODE_DPAD_LEFT/RIGHT/UP/DOWN` 키 이벤트로 만든다(AOSP 소스 확인). 그래서 원본 miniquad에서도 왼쪽 스틱이 화살표 키처럼 움직인다. 축마다 따로라 대각선도 되지만, 세기가 없는 디지털 8방향이다. 오른쪽 스틱(`AXIS_Z/RZ`)과 트리거 축은 바뀌지 않는다.
 - `android.rs`의 JNI 진입점은 `keycodes::translate_keycode`로 변환해 `Message::KeyDown/KeyUp`을 보낸다.
 - `keycodes.rs` 매핑(109개) 중 게임패드 관련: `0x13~0x16 DPAD_UP/DOWN/LEFT/RIGHT → KeyCode::Up/Down/Left/Right`, `0x17 DPAD_CENTER → Enter`. **`0x60~0x6e`(BUTTON_A~BUTTON_MODE)는 없음** → 미지의 키로 떨어진다.
 
@@ -88,12 +97,17 @@ Android 게임패드 버튼 키코드(공식 문서 확인값): `BUTTON_A 96(0x6
 
 ## Android 컨트롤러를 지원하려면 (패치 범위)
 
-1. **버튼**: `keycodes.rs`에 `0x60~0x6e` 매핑 추가. miniquad `KeyCode`에 게임패드 버튼 variant가 없으므로 임시로 키보드 키에 대응시키거나(가장 작은 패치) 새 variant를 추가.
+1. **버튼**(해 봄, 2026-10-26): `keycodes.rs`에 `0x60~0x6e` 매핑 추가. miniquad `KeyCode`에 게임패드 버튼 variant가 없으므로 데스크톱 키보드에 없는 `F13~F25`에 대응시켰다(가장 작은 패치, 열세 줄). 방법:
+   - crates.io 원본을 레포(`third_party/miniquad`)에 복사하고 루트 `Cargo.toml`에 `[patch.crates-io] miniquad = { path = "third_party/miniquad" }`. 버전 번호가 같아야 patch가 먹는다.
+   - cargo-quad-apk는 miniquad 패키지 폴더에서 `java/MainActivity.java`를 가져가므로, patch를 쓰면 사본의 Java가 들어간다(Java를 고칠 때도 같은 자리).
+   - 경로 의존성은 `--cap-lints`가 안 걸려 원본의 경고가 clippy 출력에 섞인다 → 사본 `lib.rs` 맨 위 `#![allow(warnings)]`.
+   - 게임 쪽은 Android에서만 `is_key_pressed(KeyCode::F13)` 등을 패드 버튼으로 읽는다. 패치 표와 게임 쪽 표가 어긋나지 않게 `include_str!`로 패치 파일을 읽는 단위 테스트를 둔다.
+   - Android에서는 화살표 키도 "패드"로 세야 화면 안내 글이 키보드 글자로 바뀌지 않는다. 기기 뒤로 키는 `KEYCODE_BACK`(0x04) → `KeyCode::Back`.
 2. **축**: `MainActivity.java`에 `onGenericMotionEvent` 추가 → `SOURCE_JOYSTICK`이면 `AXIS_X/Y`(좌 스틱), `AXIS_Z/RZ`(우 스틱), `AXIS_HAT_X/Y`(D-pad 아날로그), `AXIS_LTRIGGER/RTRIGGER`를 JNI로 전달 → `android.rs`에 진입점과 새 `Message` → `EventHandler`에 콜백.
 3. **빌드**: `cargo-quad-apk`는 crates.io 0.1.4가 4년 이상 전 릴리스지만 **git master는 2025~2026에 갱신**됐다(API 36, aapt2·d8, NDK 29). 커밋을 고정해 설치하면 GitHub 러너 내장 SDK/NDK로 바로 빌드된다 → [guides/macroquad-android-apk-github-actions.md](../../guides/macroquad-android-apk-github-actions.md).
 4. **`gamepads` 크레이트는 Android 빌드에서 빼야 한다**: 0.1.7은 `android-winit` feature 없이 `poll_android_winit` 미정의로 컴파일 실패(2026-10-24 `cargo check --target aarch64-linux-android`로 재현). non-Android 전용 의존성으로 두고 코드에 `cfg(not(target_os = "android"))`.
 
-합쳐서 Java·Rust 200줄 안팎이지만 **miniquad 포크를 유지**하게 된다. 결정 전에 "Android 스파이크"(hello world APK + 실기 컨트롤러 테스트)로 비용을 실측할 것.
+합쳐서 Java·Rust 200줄 안팎이지만 **miniquad 포크를 유지**하게 된다. 버튼(1)만 먼저 하고, 아날로그가 필요하다고 느낄 때 축(2)을 하는 순서가 싸다. 왼쪽 스틱은 프레임워크가 D패드 키로 바꿔 주므로 메뉴·이동은 버튼 패치만으로 된다.
 
 ## 터치 (웹·모바일 브라우저)
 macroquad 0.4.16의 `touches()`는 `Touch { id, phase, position }`를 돌려준다. 실제로 붙여 보고 확인한 함정 두 가지(2026-10-25, Pixel 7 프로필 헤드리스 Chromium과 실기 Android 13 브라우저):
