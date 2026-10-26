@@ -152,6 +152,7 @@ unsafe { nail_save_write(s.as_ptr(), s.len() as u32) }; // JS가 이 범위를 �
 - **압축 전송 주의**: gzip/br이면 `Content-Length`(압축 크기)가 읽은 바이트(푼 크기)보다 작다 → `max(Content-Length, 받은 양 × 1.05)`로 나누고 95%에서 멈춘다.
 - **게임 안 준비**: 정수 플러그인(`nail_load_step(done, total)`, `nail_load_ready()`)으로 main이 폰트·그림·소리마다 알린다. `ready`는 **첫 `next_frame().await` 뒤**에 — 그 전에 덮개를 걷으면 검은 화면이 한 번 보인다.
 - 확인(2026-10-25, nail-under-the-roots): Playwright `page.route`로 응답마다 지연을 넣어 느린 회선을 흉내, 막대가 0 → 60 → 68 … 100%로 차고 덮개가 걷힘.
+- **함정 — 시트 크기를 CSS에 박지 말 것**: `background-size: 384px 384px`처럼 시트 전체 크기를 숫자로 적으면, 게임 쪽에서 시트에 칸을 더할 때(nail: 6칸 → 9칸) 로딩 그림만 가로로 찌그러지고 칸이 어긋난다. 게임 화면은 멀쩡해서 늦게 알아챈다. `background-size: auto <줄 수 × 칸 × 배율>px`처럼 **높이만 정하고 폭은 auto**로 두면 비율이 지켜진다(2026-10-26, 헤드리스로 고치기 전·후 프레임을 찍어 확인).
 
 ## 헤드리스로 웹 빌드 확인 (Playwright)
 배포 전에 콘솔 에러·입력·렌더를 자동으로 본다. `python3 -m http.server --directory dist`로 띄우고:
