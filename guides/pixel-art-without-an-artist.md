@@ -6,6 +6,7 @@ status: draft
 created: 2026-10-24
 updated: 2026-10-25
 verified: |
+  1차 출처로 확인(2026-10-26, 그림·사진 → 도트: nail-under-the-roots pxl.py pixelate로 시험 그림을 바로 줄이기+디더 / 중앙값 흐림+칸 평균+팔레트 / median cut 바로 N색 / 넉넉히 뽑아 합치기 비교). 실제 사진 원본 시험은 아직(세션에서 Wikimedia 접속 거부).
   1차 출처로 확인(2026-10-25, 텍스트 격자 도트 원본·계단/외톨이 검사: nail-under-the-roots tools/pixel 직접 구현, 초상화 하나를 들여와 다듬고 검사 후보 5→2, 브라우저 편집기 헤드리스로 열기·칠하기·저장 왕복). 계단 길이 규칙 자체는 커뮤니티 튜토리얼(2차).
   1차 출처로 확인(2026-10-25, 코드 그림 v2: 같은 생성기로 v1·v2를 나란히 렌더해 비교, 무료 AI 생성 결과와도 비교). 1차 출처로 확인(2026-10-25, nail-under-the-roots 0062·0063·0068 직접 구현·단위 테스트·헤드리스·굽기 시간 측정): 네모 칸 충돌 위 둥근 지형 굽기(겹선형 + 잡음 문턱, 열 훑기 벼랑, 무리 장식, 비용 줄이기), 굴 방 모양 다듬기와 이어짐 되돌리기. dual grid가 16칸·blob이 47칸이라는 것은 2차 출처(Excalibur.js·Boris the Brave 블로그).
   1차 출처로 확인: 직접 실행(2026-10-25, nail-under-the-roots): 문자 격자 + 자동 외곽선 스프라이트 생성, 흰 실루엣 플래시,
@@ -27,6 +28,7 @@ sources:
   - https://pixeljoint.com/Forum/forum_posts.asp?TID=20478
   - https://community.aseprite.org/t/how-do-i-make-straight-curved-lines-properly/10246/4
   - https://itch.io/t/1977247/pixel-tutorial-yeti-final-fantasy-14
+  - https://pixl.cs.princeton.edu/gfx/pubs/Gerstner_2012_PIA/index.php
   - https://lospec.com/articles/pixel-art-outlines-part-2-using-color
   - https://blog.usesession.com/blog/ardouradvice/766774775809032192
   - https://www.boristhebrave.com/2023/05/31/quarter-tile-autotiling/
@@ -172,6 +174,15 @@ v1(타원 + 구 음영 + 몸 전체 2×2 디더)은 "자글자글"하고 형태�
   - **옆모습 목도리는 깃으로**: 목이 없는 둥근 몸의 옆모습에서, 띠를 몸에 가로·세로로 두르면 어깨띠나 막대로 읽혔다. 머리 둘레 중 몸과 맞닿은 쪽을 감은 고리(깃)로 그리고, 매듭은 앞발에 가리지 않는 머리 뒤 아래에 두니 목도리로 읽혔다.
   - 참고(2차 출처): 털은 암시하고 다 그리지 않는다([itch.io](https://itch.io/post/6047047)), 음영 덩어리 가장자리를 뾰족하게 = 털 뭉치([yeti 튜토리얼](https://itch.io/t/1977247/pixel-tutorial-yeti-final-fantasy-14)), 형태를 만드는 곳에만 작은 명암 대비([DeviantArt 비평](https://www.deviantart.com/bluedrgnmethy/journal/Critique-2-727677363)).
 - 참고(2차 출처): 계단 길이는 늘거나 줄게, 섞지 말 것([PixelJoint 포럼](https://pixeljoint.com/Forum/forum_posts.asp?TID=20478), [Wayline 2강](https://www.wayline.io/learn/pixel-art/1), [Aseprite 커뮤니티](https://community.aseprite.org/t/how-do-i-make-straight-curved-lines-properly/10246/4)).
+
+### 그림·사진을 도트로 바꾸기
+일러스트(배경이 큰 한 장 그림)는 도형을 코드로 쌓기보다, 그림·사진을 바탕으로 도트화한 뒤 손으로 다듬는 방법도 있다. 단, 그냥 줄이고 색을 줄이면 "도트 그림"이 아니라 "깨진 사진"이 된다(2026-10-26 nail-under-the-roots `pxl.py pixelate`로 직접 비교).
+- **바로 줄이기 + Floyd-Steinberg 디더**: 칸마다 색이 튀어 자글자글하다. 도트 그림은 덩어리와 적은 색이 핵심이라 이 방법과 맞지 않는다.
+- **순서**: 한 칸 크기에 맞춘 중앙값 흐림(잔무늬를 덩어리로) → 칸 평균(BOX)으로 줄이기 → 디더 없이 색 줄이기 → 외톨이 정리. 줄이기 전에 대비를 올리고 비슷한 색을 합치라는 조언은 여러 변환 도구가 공통으로 한다(2차).
+- **색 줄이기 함정**: median cut으로 바로 N색을 만들면 넓은 면(하늘·풀)이 색을 다 가져간다. 좁지만 중요한 색(나무 기둥, 눈)은 이웃 색에 먹힌다. 4N색을 뽑고 가까운 색끼리(redmean 거리) 합치니 남았다. 게임의 기존 그림 팔레트로 맞추면 색도 통일된다.
+- **얼굴은 자동으로 안 된다**: 눈·입은 줄이면 뭉개진다. 크기를 키우고 단순화해 다시 그려야 한다(Gerstner 외 2012도 같은 지적). 그래서 인물은 따로 그려 얹고 배경만 도트화하는 편이 낫다.
+- **원본 권리**: 직접 찍은 사진·직접 그린 그림·CC0만 쓴다. 바꿔도 원본의 2차 저작물이다.
+- 참고(2차 출처): [Gerstner et al. 2012, Pixelated Image Abstraction](https://pixl.cs.princeton.edu/gfx/pubs/Gerstner_2012_PIA/index.php), [이미지 → 도트 변환 기술 정리(DEV)](https://dev.to/howard_hua_7aaf46f9755a5b/how-to-convert-any-image-to-pixel-art-technical-deep-dive-4ak0), [Wayline 변환 도구](https://www.wayline.io/tools/image-to-pixel-art).
 
 ### 2배 밀도 한 장 그림의 띠 자국
 - 계단 그라디언트(띠)는 1px 디더 없이 깔끔하지만 경계가 선으로 보인다. 1px 바둑판은 홀수 화면 배율에서 1.5배로 늘어 얼룩진다.
