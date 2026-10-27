@@ -18,9 +18,14 @@ verified: |
   8,438줄 i18n을 언어별 파일로 나누자 그 파일을 경로로 읽던 폰트 도구가 깨졌다(`src/i18n.rs`·`src/*.rs` 하드코딩) — 쪼개기 뒤 `grep -rn '<옛 경로>' tools docs .github`.
   안 쓰는 그림 코드 3,300줄은 AST로 진입점의 도달 집합만 남기고(1,694 → 124, 1,648 → 431) 산출물 PNG 바이트 비교로 확인했다.
   브라우저 연기 시험(Playwright, 시나리오 아홉)은 첫 실행에서 상류 JS 번들의 ReferenceError를 잡았다 — "알려진 잡음" 목록이 필요했다.
+  1차(R8 뒤 측정): 앱이 월드 필드 77가지를 읽고 15가지에 씀(이야기 깃발 12곳), 월드의 타격 처리에 종 이름 16번, 보스 다섯이 10~26개 파일에 나란히 — 크기를 줄인 뒤 남는 건 깊이 문제였다(nail 0170).
 sources:
   - https://github.com/AimenJoe/nail-under-the-roots
   - https://github.com/AimenJoe/nail-under-the-roots/blob/main/docs/decisions/0169-code-health-review-and-refactoring-plan.md
+  - https://github.com/AimenJoe/nail-under-the-roots/blob/main/docs/decisions/0170-abstraction-level-review-and-next-refactoring-targets.md
+  - https://henrikwarne.com/2021/07/12/book-review-a-philosophy-of-software-design/
+  - https://www.sandordargo.com/blog/2023/01/25/deep-vs-shallow-modules
+  - https://levelup.gitconnected.com/how-to-spot-the-wrong-abstraction-2c0f1cecb07e
 ---
 
 # 1인 게임 코드의 건강 신호
@@ -54,6 +59,16 @@ sources:
 4. 파일 쪼개기(기계적).
 5. 스모크 시험을 레포에.
 각 단계는 동작을 바꾸지 않는 커밋 하나, 테스트(시나리오 통째)로 확인. 기능 작업과 섞지 않는다. 쪼갤 때는 스크립트로: 줄 번호·이름 목록으로 자르면 손으로 옮기다 고치는 일이 없다. ECS·플러그인·뷰모델 계층 같은 "다시 짜기"는 하지 않는다 — 문제는 크기와 테스트 가능성이지 아키텍처가 아니다.
+
+### 추상화 수준은 셋으로 잰다(2026-10-27, 같은 레포 R8 뒤에 잰 것)
+크기 신호가 내려간 뒤에도 "모듈이 깊은가"는 따로 봐야 한다.
+| 신호 | 재는 법 | 뜻 |
+|---|---|---|
+| 얕은 모듈(인터페이스 = 필드) | 위층이 아래층 구조체 필드에 **쓰는** 자리 수(`grep -oE "world\.[a-z_.]+ ="`) | 읽기는 괜찮다(렌더). 쓰기가 많으면 그 모듈은 제 불변식을 못 지키고, 같은 사실의 진실이 둘이 된다(기록 깃발 ↔ 월드 bool) |
+| 규칙이 남의 집에 | 로직 모듈에 **종·캐릭터 이름**이 몇 번 나오나(`Kind::`·`Behavior::`) | "콩이는 등딱지에 튕긴다"가 적이 아니라 월드의 if에 있으면 새 종의 예외 = 월드 수정 |
+| 표가 없는 나란함 | 같은 모양의 함수·열거형 변종이 이름만 바꿔 몇 벌인가(`*_beaten`·`*Intro`·`*_next`) | 셋을 넘으면 표로(Sandi Metz: 둘이면 중복이 싸다, 셋째에 모은다). 보스 다섯이 8~10개 파일에 손 배선돼 있었다 |
+| 모드 인자 | `kit ==`·`if v2`처럼 "어느 쪽인가"를 묻는 분기 수 | 둘이면 둔다. 셋째가 오면 트레이트·표로 — 모드 인자는 잘못된 추상화의 첫 신호 |
+기준의 출처(2차): Ousterhout *A Philosophy of Software Design*의 깊은 모듈(작은 인터페이스·큰 구현), Sandi Metz "duplication is cheaper than the wrong abstraction".
 
 ## 왜?
 - 1인 개발은 속도가 자산이라 표·테스트처럼 **속도를 안 줄이는 안전장치**만 살아남는다. 틱 함수 쪼개기와 소리 큐는 속도를 줄이지 않으면서 테스트 문을 연다.
