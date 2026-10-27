@@ -4,7 +4,7 @@ type: reference
 tags: [macroquad, miniquad, gamepad, android, input, touch, rust]
 status: verified
 created: 2026-10-24
-updated: 2026-10-26
+updated: 2026-10-27
 verified: |
   1차 출처로 확인: miniquad master의 java/MainActivity.java(onTouch/onKey만 구현, onGenericMotionEvent 없음),
   src/native/android.rs(surfaceOnKeyDown/Up → keycodes::translate_keycode), src/native/android/keycodes.rs(109개 매핑,
@@ -29,8 +29,16 @@ verified: |
   "패치 전에도 왼쪽 스틱은 움직였다"(실기 사용자 보고, v0.1.5) → AOSP frameworks/base ViewRootImpl.java의 SyntheticInputStage·
   SyntheticJoystickHandler를 읽고 확인: 앱이 처리하지 않은 조이스틱 MotionEvent의 AXIS_X/Y·AXIS_HAT_X/Y를 KEYCODE_DPAD_* 키
   이벤트로 바꿔 다시 넣는다(축마다 따로라 대각선도 됨, 누르고 있으면 반복).
-  확인 못 함: Android MotionEvent 축 상수(AXIS_X/Y/Z/RZ/HAT_X/HAT_Y/LTRIGGER/RTRIGGER)의 정확한 숫자값 — 패치 시 공식 문서로 확인.
+  Android 축 패치(2026-10-27, nail-under-the-roots 0143): developer.android.com "Handle controller actions"를 읽고 확인 —
+  왼쪽 AXIS_X/Y, 오른쪽 AXIS_Z/RZ, D패드 AXIS_HAT_X/Y(-1 위·왼쪽), 트리거 AXIS_LTRIGGER/RTRIGGER(0..1), getFlat()의 가운데 영역,
+  한 MotionEvent에 과거 표본이 묶여 온다, "게임이 쓰는 이벤트만 true". cargo-quad-apk(d411c8f) src/ops/build.rs를 읽고 확인 —
+  MainActivity.java와 QuadNative.java 둘 다 miniquad 패키지 폴더의 java/에서 가져간다.
+  onGenericMotionEvent → QuadNative.surfaceOnJoystick → JNI 원자값 → joystick_axes()로 붙였고 `cargo check --target aarch64-linux-android`·
+  CI APK 빌드(Java 컴파일 포함) 통과. 확인 못 함: 실기에서 아날로그 세기·오른쪽 스틱 조준·HAT D패드·스틱 메뉴 한 칸(사장 확인 대기),
+  RX/RY를 오른쪽 스틱으로 쓰는 패드가 얼마나 흔한지, 기울인 채로 패드가 끊길 때 Android가 중앙 값을 보내는지.
+  축 상수 숫자값은 Java 상수 이름으로 쓰므로 필요 없었다.
 sources:
+  - https://developer.android.com/develop/ui/views/touch-and-input/game-controllers/controller-input
   - https://www.smashingmagazine.com/2012/02/finger-friendly-design-ideal-mobile-touchscreen-target-sizes/
   - https://www.uxpin.com/studio/blog/responsive-design-touch-devices-key-considerations/
   - https://uxmovement.com/?p=5043
@@ -52,7 +60,7 @@ sources:
 # macroquad 게임패드와 Android 입력 현황
 
 ## 요약
-macroquad(0.4.16)/miniquad(0.4.11)에는 게임패드 API가 없다. 데스크톱·웹은 `gamepads` 크레이트로 메꿀 수 있지만 **Android에서는 그 크레이트도 동작하지 않고, miniquad Android 백엔드는 스틱·트리거 축을 받지 않으며 게임패드 버튼 키코드도 매핑하지 않는다.** 그래서 손대지 않은 APK에서는 D패드와 (Android가 D패드 키로 바꿔 주는) 왼쪽 스틱만 움직이고 버튼은 하나도 듣지 않는다. 버튼만이라면 `keycodes.rs` 열세 줄 패치로 된다(아래). 아날로그 스틱·오른쪽 스틱·트리거 축까지는 Java를 고쳐야 한다(약 200줄).
+macroquad(0.4.16)/miniquad(0.4.11)에는 게임패드 API가 없다. 데스크톱·웹은 `gamepads` 크레이트로 메꿀 수 있지만 **Android에서는 그 크레이트도 동작하지 않고, miniquad Android 백엔드는 스틱·트리거 축을 받지 않으며 게임패드 버튼 키코드도 매핑하지 않는다.** 그래서 손대지 않은 APK에서는 D패드와 (Android가 D패드 키로 바꿔 주는) 왼쪽 스틱만 움직이고 버튼은 하나도 듣지 않는다. 버튼만이라면 `keycodes.rs` 열세 줄 패치로 된다(아래). 아날로그 스틱·오른쪽 스틱까지는 Java `onGenericMotionEvent` + JNI 진입점 하나(Java 20줄·Rust 30줄 안팎, 아래 2).
 
 ## 플랫폼별 현황
 
@@ -60,7 +68,7 @@ macroquad(0.4.16)/miniquad(0.4.11)에는 게임패드 API가 없다. 데스크�
 |---|---|---|
 | 데스크톱 | `gamepads` 크레이트 → gilrs 0.10 | 동작. 추가 설정 없음 |
 | 웹 | `gamepads` 크레이트(`default-features = false`) → 브라우저 Gamepad API, JS 플러그인 로드 필요 | 동작. 플러그인 JS를 레포에 복사해 배포 |
-| Android | 없음(원본) / `keycodes.rs` 패치 | 원본: **D패드 + 왼쪽 스틱(디지털, Android가 D패드 키로 바꿈)만.** 버튼 전부 버려짐. 패치: 버튼도 키로. 아날로그 축은 여전히 없음 |
+| Android | 없음(원본) / `keycodes.rs` 패치 | 원본: **D패드 + 왼쪽 스틱(디지털, Android가 D패드 키로 바꿈)만.** 버튼 전부 버려짐. 패치: 버튼도 키로(+ 축 패치면 아날로그 왼쪽·오른쪽 스틱, HAT) |
 
 ## 데스크톱·웹: `gamepads` 크레이트
 
@@ -103,11 +111,16 @@ Android 게임패드 버튼 키코드(공식 문서 확인값): `BUTTON_A 96(0x6
    - 경로 의존성은 `--cap-lints`가 안 걸려 원본의 경고가 clippy 출력에 섞인다 → 사본 `lib.rs` 맨 위 `#![allow(warnings)]`.
    - 게임 쪽은 Android에서만 `is_key_pressed(KeyCode::F13)` 등을 패드 버튼으로 읽는다. 패치 표와 게임 쪽 표가 어긋나지 않게 `include_str!`로 패치 파일을 읽는 단위 테스트를 둔다.
    - Android에서는 화살표 키도 "패드"로 세야 화면 안내 글이 키보드 글자로 바뀌지 않는다. 기기 뒤로 키는 `KEYCODE_BACK`(0x04) → `KeyCode::Back`.
-2. **축**: `MainActivity.java`에 `onGenericMotionEvent` 추가 → `SOURCE_JOYSTICK`이면 `AXIS_X/Y`(좌 스틱), `AXIS_Z/RZ`(우 스틱), `AXIS_HAT_X/Y`(D-pad 아날로그), `AXIS_LTRIGGER/RTRIGGER`를 JNI로 전달 → `android.rs`에 진입점과 새 `Message` → `EventHandler`에 콜백.
+2. **축**(해 봄, 2026-10-27): `QuadSurface`(SurfaceView, 포커스를 가진 뷰라 조이스틱 이벤트가 온다)에 `onGenericMotionEvent`.
+   - `SOURCE_JOYSTICK`이고 `ACTION_MOVE`면 `AXIS_X/Y`·`AXIS_Z/RZ`·`AXIS_HAT_X/Y`를 `QuadNative`의 새 native 메서드로 넘긴다. `QuadNative.java`에 선언을 더한다(JNI 심볼이 `Java_quad_1native_QuadNative_…`라 MainActivity 쪽에 둘 수 없다. MainActivity 패키지는 앱마다 다르다).
+   - **true를 돌려준다**: false면 프레임워크가 같은 왼쪽 스틱·HAT를 D패드 키(제 반복 포함)로 또 넣어, 아날로그 축과 화살표 키가 겹친다(메뉴 두 칸·반복 박자 엇갈림). 대신 HAT도 직접 받는다(D패드가 HAT로 오는 패드). 키코드로 오는 D패드는 그대로 `onKey`.
+   - Rust: 상태라 `Message`·`EventHandler` 대신 `static [AtomicU32; 6]`(f32 비트)에 적고 `pub fn joystick_axes()`로 읽는다. Java UI 스레드가 쓰고 게임 스레드가 읽는다. 마지막 값만 필요하니 과거 표본(`getHistoricalAxisValue`)은 버린다.
+   - 게임: 데스크톱과 같은 반지름 데드존(0.2), 스틱이 서 있으면 HAT·화살표 8방향. y는 Android도 아래가 +라 뒤집지 않는다(gilrs·웹 플러그인은 위가 +).
+   - 트리거 축은 받지 않았다: L2·R2는 `BUTTON_L2/R2` 키로 이미 온다(공식 문서: 패드에 따라 축·키 둘 중 하나나 둘 다).
 3. **빌드**: `cargo-quad-apk`는 crates.io 0.1.4가 4년 이상 전 릴리스지만 **git master는 2025~2026에 갱신**됐다(API 36, aapt2·d8, NDK 29). 커밋을 고정해 설치하면 GitHub 러너 내장 SDK/NDK로 바로 빌드된다 → [guides/macroquad-android-apk-github-actions.md](../../guides/macroquad-android-apk-github-actions.md).
 4. **`gamepads` 크레이트는 Android 빌드에서 빼야 한다**: 0.1.7은 `android-winit` feature 없이 `poll_android_winit` 미정의로 컴파일 실패(2026-10-24 `cargo check --target aarch64-linux-android`로 재현). non-Android 전용 의존성으로 두고 코드에 `cfg(not(target_os = "android"))`.
 
-합쳐서 Java·Rust 200줄 안팎이지만 **miniquad 포크를 유지**하게 된다. 버튼(1)만 먼저 하고, 아날로그가 필요하다고 느낄 때 축(2)을 하는 순서가 싸다. 왼쪽 스틱은 프레임워크가 D패드 키로 바꿔 주므로 메뉴·이동은 버튼 패치만으로 된다.
+합쳐서 예상(200줄)보다 작았지만(버튼 13줄 + 축 50줄 안팎) **miniquad 포크를 유지**하게 된다(`PATCHED.md`에 고친 곳 목록, miniquad를 올리면 다시 넣는다). 버튼(1)만 먼저 하고, 아날로그가 필요하다고 느낄 때 축(2)을 하는 순서가 싸다. 왼쪽 스틱은 프레임워크가 D패드 키로 바꿔 주므로 메뉴·이동은 버튼 패치만으로 된다.
 
 ## 터치 (웹·모바일 브라우저)
 macroquad 0.4.16의 `touches()`는 `Touch { id, phase, position }`를 돌려준다. 실제로 붙여 보고 확인한 함정 두 가지(2026-10-25, Pixel 7 프로필 헤드리스 Chromium과 실기 Android 13 브라우저):
