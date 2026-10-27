@@ -4,14 +4,19 @@ type: concept
 tags: [gamedev, game-feel, combat, game-design]
 status: draft
 created: 2026-10-25
-updated: 2026-10-26
+updated: 2026-10-27
 verified: |
   1차 출처로 확인(직접 구현·실행, 2026-10-25, nail-under-the-roots): 시동 0.3초(적·투사체 정지 + 화면 어둡게) → 0.9초 가속 돌진
   (거리 ≈ 320px를 단위 테스트로), 넉백이 돌진 속도보다 크면 적이 앞으로 튕겼다가 다시 잡혀 벽까지 끌려가는 것, 벽 쿵 번쩍임, 시동~끝을 잇는
   엔진음 하나(벽에 부딪히면 끊기)를 헤드리스 Chromium 연속 캡처로 확인. 손맛(길이가 맞는지)은 사람이 아직 안 해 봤다.
+  1차(직접 구현, 2026-10-27, nail 0139): 시동 동안 콘 안의 적 쪽으로 맞추기 + 점선·모서리 표시(단위 테스트·헤드리스 캡처). 손맛은 사람이 아직 안 해 봤다.
+  2차: 겨누기 고르는 순서(Hades·Death's Door), 돌진 중 방향 바꾸기가 어색했다는 시제품 글, Halo snap-to-target.
   2차 출처만 있음: 대전 게임의 "슈퍼 플래시/슈퍼 프리즈"(필살기 시작에 게임을 멈추고 화면을 어둡게, 그동안 쓴 쪽만 입력) — KOF XIII 커뮤니티 위키,
   MUGEN SuperPause 설명. 왜 그렇게 하는지에 대한 개발자 원문은 찾지 못했다.
 sources:
+  - https://sable-sandalwood-dee.notion.site/Aim-Assist-a0347e18b3b045abb73c34fe2f674776
+  - https://portfolio.fh-salzburg.ac.at/projects/2022-dash-king
+  - https://www.halopedia.org/Snap-to-target
   - https://srk.shib.live/w/The_King_of_Fighters_XIII/Game_Elements/Super_Freeze
   - https://mugenguild.com/forum/msg.2327314/PHPSESSID.0et9t5cv5iggov4hovld72gpe2
 ---
@@ -39,6 +44,7 @@ sources:
 - 정지 중에 투사체가 그대로 날아오면 신호가 거짓말이 된다 → 투사체도 멈춘다.
 - 화면 번쩍임은 빛에 예민한 사람에게 문제다. 흔들림·번쩍임 설정(0이면 끔)을 따르게.
 - 좁은 방에서는 거리를 다 못 쓴다. 벽 쿵이 그 보상이 되게 마무리를 크게.
+- **빠르고 긴 돌진은 겨누기가 어렵다**: 돌림 반지름 = 속도 ÷ 조향(380px/s ÷ 2.2rad/s ≈ 173px)이라 빗나간 걸 알아도 못 고치고, 입력이 8방향(키보드·디지털 스틱·터치)이면 그 사이 각도의 적은 처음부터 못 겨눈다. 거리·속도를 줄이면 임팩트가 줄어드니, **정지(시동) 동안에만** 입력 둘레 콘(8방향 틈을 덮는 ±30° 남짓) 안에서 입력 방향에 가장 가까운 적 쪽으로 맞추고, 점선·표시로 어디로 나갈지 보여 준다. 돌진 중에 방향을 적 쪽으로 틀어 주면 예측이 안 돼 어색하다는 개발 경험이 있다(2차).
 
 ## 관련 노트
 - [고정 타임스텝 게임 루프와 히트스톱](fixed-timestep-and-hitstop.md)
