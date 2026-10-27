@@ -4,7 +4,7 @@ type: reference
 tags: [fonts, pixel-art, i18n, localization, licensing, cjk]
 status: draft
 created: 2026-10-25
-updated: 2026-10-26
+updated: 2026-10-27
 verified: |
   1차 출처로 확인(2026-10-25, 직접 실행):
   - 파이썬 코덱으로 일본 상용 한자 20자를 GB2312·Big5·Shift_JIS에 넣어 봄: 気楽図駅売読険歩剣闘鉄広戦·働込畑峠 17자가 GB2312·Big5 모두 없음.
@@ -23,8 +23,13 @@ verified: |
     기준선은 pixel-font-knife의 `horizontal_offset` 식(offset_y = baseline − em − bottom_space; 12×12 한자는 −1, 18px 캔버스 라틴은 −4)을 그대로.
     게임 표의 글자만 넣어 일본어 377자 77KB, 간체 406자 100KB. 실제로 없던 글자: 層(일), 奖·摇·纵(간) → 문구를 바꿈.
     macroquad 0.4.16에서 Galmuri와 같은 줄 높이(ascent 1200/descent −200)로 섞어 찍어 어긋남 없음을 헤드리스 Chromium 스크린숏으로 확인.
+  직접 빌드(2026-10-27, nail 0144): 번체(대만) 서브셋. Ark 12px develop(816fb3c) 원본 PNG에 擊 裝 沒 換 層 殼 絲 喚 鑑 蘇 등 번체 상용자가 없음을 파일로 확인.
+    fusion-pixel-font의 tools/resource/dump_service.py·assets/configs/dump.yaml(cubic-11: 크기 12, rasterize-offset (-1, +1))·fallback.yaml(12px 한자 zh_hant·zh_hk·zh_tw에 cubic-11)을 읽고
+    같은 방법으로 Cubic 11(ACh-K/Cubic-11 `4c566f7`, woff2, 이름표 버전 1.451, OFL·RFN 없음, JF Dot M+H 12·M+ BITMAP 파생 고지)을 PIL로 찍어 메움.
+    게임 표 935자 가운데 28자가 Cubic, 286KB. 확대 그림으로 획 굵기·크기가 Ark와 어울림 확인. Ark 번체 모양 표시는 zh_tw(대만)·zh_hk·zh_hant가 따로 있다(파일 이름으로 셈).
   확인 못 함: GitHub 릴리스 TTF(이 환경에서 릴리스 다운로드가 막힘), Zpix·PixelMplus·k8x12의 현재 라이선스 원문.
 sources:
+  - https://github.com/ACh-K/Cubic-11
   - https://github.com/TakWolf/ark-pixel-font
   - https://github.com/TakWolf/fusion-pixel-font
   - https://github.com/quiple/galmuri
@@ -51,7 +56,7 @@ sources:
 | **Ark Pixel 12px** (TakWolf) | OFL, RFN 없음(레포) | JIS 1수준 93.8% + 가나 전부, ja 전용 모양 | GB2312 1급 97.0%, zh_hans 전용 모양 | 원본이 PNG(언어별 파일명). 제작자 창작 |
 | Fusion Pixel 12px | OFL(판에 따라 RFN 'Fusion Pixel') | Ark + 보충 | Ark + 보충 | 여러 OFL 폰트를 꿰맨 것. 릴리스 TTF는 GitHub 릴리스에서 |
 | Galmuri11 (Regular) | OFL | JIS X 0208 한자 100% | 63% | 한글 폰트와 같은 가족이라 어울림. 단 가나·한자는 제작자 창작이 아님(README) |
-| Cubic 11 | OFL | — | — | 12px 번체(대만) 보충용 |
+| Cubic 11 (俐方體11號) | OFL, RFN 없음 | — | — | 12px 번체(대만). Ark에 없는 번체 한자 메우기용(fusion과 같은 방법, 아래) |
 
 ## 게임에 넣는 법 (서브셋 폰트 + 표)
 - 언어마다 폰트 파일 하나. 문자열 표에서 **그 언어가 실제로 쓰는 글자 + 가나 전부 + ASCII**만 뽑아 만들면 100~300KB 안팎이라 웹 첫 로딩 부담이 작다(처음 377·406자일 때 77·100KB, 2026-10-26 nail에서 일본어 589자 146KB·간체 914자 277KB. 전체 한자 폰트는 MB 단위).
@@ -68,7 +73,14 @@ sources:
 - 넣는 글자: 그 언어 문자열 표 + ASCII + 코드에 직접 쓴 UI 기호(▶ ♥ …) + (일본어) 가나 전부. 표에 없는 글자를 실수로 쓰면 커버리지 테스트가 잡는다.
 - 없는 기호는 같은 격자의 OFL 폰트(예: Galmuri Condensed)에서 윤곽을 복사해 와도 된다. 한자가 없으면 빌드를 실패시키고 문구를 바꾼다.
 
+## 번체: Ark에 없는 한자 메우기 (확인한 방법)
+- Ark 12px는 간체·일본어엔 넉넉하지만 **번체 상용자가 많이 빠졌다**(擊 裝 沒 換 層 殼 絲 喚 鑑 蘇 …). 그 폰트만으로 번역하면 번역가가 글자를 피하느라 용어가 무너진다(攻擊 → 出招, 이름까지 바꿈).
+- fusion-pixel-font(같은 제작자)가 12px 번체에 쓰는 방법: 빠진 한자만 Cubic 11을 **크기 12로 찍어**(자리 x −1, y +1, 캔버스 = ceil((ascent−descent)/upem × 12)를 짝수로 맞춤, 폭 = min(전진 폭, 12)) 위아래 빈 줄을 같은 수만큼 덜어 12줄로 만든다. PIL `ImageFont.truetype`이 woff2를 그대로 읽는다.
+- 번체 빌드에만 쓴다. 간체·일본어엔 모양이 다른 글자가 섞이니 쓰지 않는다. 대만 모양은 Ark의 `zh_tw` 표시 → `zh_hant` → 기본 순으로 고른다.
+- 라이선스: Cubic 11 OFL.txt 원문과 원 고지(JF Dot M+H 12·M+ BITMAP FONTS)를 함께 배포. 서브셋 이름은 바꾼다.
+
 ## 함정
+- 번역 전에 그 언어 폰트로 기존 용어(공격·장비·장신구·저장…)의 글자를 먼저 찍어 본다. 번역이 끝난 뒤 빠진 글자를 알면 용어를 두 번 고친다.
 - npm `@fontsource/fusion-pixel-*`는 웹용 라틴 조각만 들어 있다(CJK는 CDN 조각 로딩용이라 패키지에 없음).
 - 번체는 별개 언어다. 대만(zh-TW)과 홍콩(zh-HK)도 모양 기준이 다르다.
 - 같은 12px라도 한글 폰트(Galmuri Condensed)보다 한자 칸이 넓다(12×12). 한 줄 길이는 글자 수가 줄어 대개 비슷하지만 화면으로 확인한다.
