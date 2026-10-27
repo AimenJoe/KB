@@ -230,7 +230,7 @@ v1(타원 + 구 음영 + 몸 전체 2×2 디더)은 "자글자글"하고 형태�
 ### 무리 속에서 내 캐릭터가 보이게
 - 실패의 대부분은 **값(밝기) 실패**다: 같은 갈색·같은 밝기·같은 크기면 실루엣이 달라도 섞인다(두더지 주인공과 흙갈색 들쥐, 2026-10-25 nail-under-the-roots).
 - 고치는 순서: ① 적 팔레트를 한쪽으로 기울이기(물든 적 = 보라 쪽 28% + 밝기 82%, 외곽선도 더 어둡고 차갑게) — 종 색은 남는다 ② 주인공은 따뜻하고 밝은 쪽 그대로 ③ **색이 아닌 표시** 하나(발밑 빛 고리, 바닥에 그려 다른 그림을 가리지 않게).
-- 확인: 게임 화면을 **흑백**으로 바꿔 주인공이 가장 밝은 덩어리로 남는지. 흑백에서 사라지면 색약 플레이어에게도 사라진다(2차 출처: 게임 아트 가독성 글, Xbox 접근성 가이드라인 102 — 윤곽선·대비, 색만으로 정보를 주지 말 것).
+- 확인: 게임 화면을 **흑백**으로 바꿔 주인공이 가장 밝은 덩어리로 남는지. 흑백에서 사라지면 색약 플레이어에게도 사라진다(2차 출처: 게임 아트 가독성 글, Xbox 접근성 가이드라인 — 윤곽선·대비, 색만으로 정보를 주지 말 것. 번호는 2차 요약마다 달라 확인 못 함: 102 대비, 103 색과 모양). 두 색이 같아지는지는 흑백으로 안 보인다 → [색약 점검](color-vision-check-for-games.md).
 - 참고: [Xbox Accessibility Guideline 102](https://devdocs.xbox.com/gaming/accessibility/xbox-accessibility-guidelines/102), [Readable game art](https://bugnet.io/blog/readable-game-art-why-clarity-beats-detail), [80.lv 실루엣과 대비](https://80.lv/articles/studying-character-art-silhouette-and-contrast)
 
 ## 3/4 환경을 "깊이"로 바꾸기

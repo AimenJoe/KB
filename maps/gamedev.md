@@ -14,6 +14,7 @@ updated: 2026-10-26
 ## 설계
 - [1인 개발용 액션 로그라이트 설계 원칙](../concepts/action-roguelite-for-solo-dev.md) — 런 구조 vs 메트로배니아, 탑다운 vs 사이드뷰, 전투감 먼저, 캐릭터=반복 단위, 장기 프로젝트 단계
 - [그림 못 그려도 도트 게임 만들기](../guides/pixel-art-without-an-artist.md) — 에셋 팩 하나 중심, 라이선스 확인, 공개 레포 + 비공개 에셋 레포(토큰·비용·AI 조항), 둥근 지형 굽기, 눈에 띄어야 하는 물체(더하기 빛·움직임), 16×16 공격 동작(들기·치기·거두기, 발 번갈아), 타이틀 키 아트(글 자리 먼저, 이음매 굴리기)
+- [게임 화면 색약 점검](../guides/color-vision-check-for-games.md) — 스크린숏을 Machado 행렬(선형 RGB)로 1·2·3형 + 흑백, 알아야 하는 것은 밝기·모양으로 남긴다
 - [작곡가·음향 담당 없이 게임 소리 넣기](../guides/game-audio-without-a-composer.md) — CC0 출처(Kenney·OGA), 숫자로 거르기(길이·밝기·폭·이음매), 표 + 변환 스크립트, 변형·메뉴 소리 한 곳·덕킹
 - [무료 그림·사진 구하는 곳](../reference/assets/free-image-sources.md) — Openverse·미술관 CC0·사진 사이트, PDM과 CC0, API 요령(Met v1.1, UA)
 - [게임 그림 외주 맡기기](../guides/commissioning-game-art.md) — 임시 그림으로 먼저 판정, 사양서(안전 영역·색 약속), 계약: 저작재산권 + 2차적저작물작성권 특약(한국 제45조②), 공개 레포 커밋 허락
