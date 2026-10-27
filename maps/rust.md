@@ -24,3 +24,4 @@ updated: 2026-10-24
 
 ## 다른 지도
 - [게임 개발](gamedev.md) · [CI/CD와 호스팅](ci-cd-hosting.md)
+- [1인 게임 코드의 건강 신호](../concepts/solo-game-codebase-health-signals.md) — 부작용 핸들(`&Sfx`)을 받는 로직 함수는 테스트 밖, 소리는 큐로, 글은 구조체 필드로(언어별 파일, 실행 시간 맵은 아님)

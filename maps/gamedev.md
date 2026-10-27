@@ -49,6 +49,7 @@ updated: 2026-10-27
 - [캐릭터 설정에 쓰는 실제 동물·생태 사실](../reference/nature/animal-behavior-for-character-design.md) — 두더지 독립·침의 독, 라쿤 "손 씻기"는 씻기가 아님, 땅강아지 수렴 진화, 뽕나무버섯, 균근 공생, 다람쥐 저장
 
 ## 테스트·연출
+- [1인 게임 코드의 건강 신호](../concepts/solo-game-codebase-health-signals.md) — 표로 넓히는 축 vs 틱 함수가 깊어지는 축, 재는 신호(틱 함수 줄 수·구조체 필드 수·부작용 핸들·복붙·테스트 분포), 소리 큐가 테스트 문을 연다, 리팩터링 순서, 다시 짜기는 안 한다
 - [개발용 시나리오 진입점과 스텝 스크립트 컷씬](../concepts/dev-scenarios-and-scripted-cutscenes.md) — 시나리오 목록 → 월드 구성, JRPG식 대화창, 건너뛰기, 배우 좌표계·싸움 끝 연타 함정, 일러스트 장면(2배 밀도 한 장 그림·패닝·입자·내레이션, 홀수 배율)
 
 ## 입력·접근성
