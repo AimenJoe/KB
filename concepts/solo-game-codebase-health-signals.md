@@ -19,6 +19,9 @@ verified: |
   안 쓰는 그림 코드 3,300줄은 AST로 진입점의 도달 집합만 남기고(1,694 → 124, 1,648 → 431) 산출물 PNG 바이트 비교로 확인했다.
   브라우저 연기 시험(Playwright, 시나리오 아홉)은 첫 실행에서 상류 JS 번들의 ReferenceError를 잡았다 — "알려진 잡음" 목록이 필요했다.
   1차(R8 뒤 측정): 앱이 월드 필드 77가지를 읽고 15가지에 씀(이야기 깃발 12곳), 월드의 타격 처리에 종 이름 16번, 보스 다섯이 10~26개 파일에 나란히 — 크기를 줄인 뒤 남는 건 깊이 문제였다(nail 0170).
+  1차(같은 날, nail 0170 R9~R14 직접 구현): 구조체 필드를 비공개로 하고 seed/beat/게터를 두자 앱의 대입 12곳이 컴파일러가 막는 0곳이 됐다.
+  "맞으면 무슨 일"을 적의 메서드(receive → Miss/Deflected/Hit)로 옮기자 월드의 타격 함수가 233줄 → 120줄, 옮긴 규칙마다 적 테스트가 생겼다.
+  보스·캐릭터 표는 이벤트 변종(8 → 2)·나란한 함수(4 → 1)·비교 분기(24 → 7)를 줄였지만, 이야기 글·그림 고르기 같은 정체성 분기는 남는다 — 표가 다 삼키지 않는다.
 sources:
   - https://github.com/AimenJoe/nail-under-the-roots
   - https://github.com/AimenJoe/nail-under-the-roots/blob/main/docs/decisions/0169-code-health-review-and-refactoring-plan.md
@@ -68,6 +71,8 @@ sources:
 | 규칙이 남의 집에 | 로직 모듈에 **종·캐릭터 이름**이 몇 번 나오나(`Kind::`·`Behavior::`) | "콩이는 등딱지에 튕긴다"가 적이 아니라 월드의 if에 있으면 새 종의 예외 = 월드 수정 |
 | 표가 없는 나란함 | 같은 모양의 함수·열거형 변종이 이름만 바꿔 몇 벌인가(`*_beaten`·`*Intro`·`*_next`) | 셋을 넘으면 표로(Sandi Metz: 둘이면 중복이 싸다, 셋째에 모은다). 보스 다섯이 8~10개 파일에 손 배선돼 있었다 |
 | 모드 인자 | `kit ==`·`if v2`처럼 "어느 쪽인가"를 묻는 분기 수 | 둘이면 둔다. 셋째가 오면 트레이트·표로 — 모드 인자는 잘못된 추상화의 첫 신호 |
+
+표로 옮길 때 남겨도 되는 분기: **그 정체성에 관한 글·그림**("모모가 돌아오면 제 자리라 1인칭으로"). 표의 열로 만들면 열 이름이 글의 내용을 흉내 내게 된다. 규칙(회피 종류·기록 키·해금)은 표로, 서사는 가지로.
 기준의 출처(2차): Ousterhout *A Philosophy of Software Design*의 깊은 모듈(작은 인터페이스·큰 구현), Sandi Metz "duplication is cheaper than the wrong abstraction".
 
 ## 왜?
