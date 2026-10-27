@@ -50,4 +50,4 @@ JRPG식 "필드에서 걷다가 던전에 들어간다"를 1인 개발 규모로
 - [1인 개발용 액션 로그라이트 설계 원칙](action-roguelite-for-solo-dev.md)
 - [공격 타이밍 패링](timing-parry.md)
 - [고정 타임스텝과 히트스톱](fixed-timestep-and-hitstop.md)
-- [픽셀 퍼펙트 렌더링](../reference/macroquad/pixel-perfect-rendering.md) — 카메라 위치는 그릴 때 반올림
+- [픽셀 퍼펙트 렌더링](../reference/macroquad/pixel-perfect-rendering.md) — 카메라는 정수 부분으로 그리고 소수점은 화면에서 민다(그림 위치만 반올림)

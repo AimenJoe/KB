@@ -123,7 +123,7 @@ Rust 쪽은 `extern "C" { fn nail_pref_get(i: u32) -> u32; fn nail_pref_set(i: u
 - **0 = 없음**으로 정하고 값은 +1 해서 저장한다. 플러그인이 없을 때 번들이 끼워 넣는 스텁은 `undefined`를 돌려주는데, JS → wasm i32 변환(ToInt32)에서 0이 된다 → "저장 없음"과 같아진다.
 - 첫 칸에 **형식 표식**(예: `0x4E410001`)을 두고 다르면 통째로 무시한다(형식을 바꿀 때 올린다).
 - `localStorage`는 사생활 보호 모드·차단 정책에서 예외를 던질 수 있어 try/catch로 감싼다.
-- 확인(2026-10-25, nail-under-the-roots): 헤드리스 Chromium에서 키를 다시 붙이고 새로고침 → 그대로 복원, `localStorage`에 `nail.pref.0..17`.
+- 확인(2026-10-25, nail-under-the-roots): 헤드리스 Chromium에서 키를 다시 붙이고 새로고침 → 그대로 복원, `localStorage`에 `nail.pref.0..17`(그 뒤 0081에서 음악 칸이 붙어 0..18).
 
 ## 문자열 주고받기: wasm 메모리를 직접 (기록 저장)
 정수 칸으로 모자라는 것(런을 넘는 기록처럼 키가 늘어나는 것)은 글 한 칸으로 저장한다. 번들의 전역 `wasm_memory`(`var`로 선언돼 다른 `<script>`에서 보인다)로 Rust가 잡은 버퍼를 JS가 직접 읽고 쓴다.
