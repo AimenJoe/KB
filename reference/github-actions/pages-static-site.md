@@ -4,7 +4,7 @@ type: reference
 tags: [github-actions, ci-cd, hosting, static-site, fonts]
 status: verified
 created: 2026-10-25
-updated: 2026-10-26
+updated: 2026-10-27
 verified: |
   1차 출처로 확인(2026-10-25):
   - 각 액션 레포의 태그와 action.yml(git fetch로 읽음): configure-pages v6.0.0(2026-03-24, node24, `enablement` 입력은 "GITHUB_TOKEN 말고 다른 토큰이 필요"),
@@ -13,6 +13,8 @@ verified: |
   - 직접 실행(nail-under-the-roots pages.yml): Pages를 켜기 전 첫 실행이 configure-pages에서 "Get Pages site failed … Not Found"로 실패.
   - fontTools 4.67(subset, woff2 + brotli)로 픽셀 한글 글꼴 452KB → 9KB(페이지 글자만, 그때 게임 서브셋 기준. 지금 게임 서브셋은 344KB).
   - 헤드리스 Chromium에서 api.github.com/repos/<repo>/releases 읽기, 요청 제한(403)일 때 적어 둔 값이 남는 것.
+  직접 실행(2026-10-27): 페이지를 다시 짠 뒤 사람 브라우저에서 새 HTML + 캐시된 옛 style.css가 만나 깨져 보였다
+    (새 HTML에 옛 CSS를 붙여 헤드리스로 똑같이 재현). CSS·JS·글꼴 주소에 내용 해시(?v=sha1 8자)를 붙여 해결.
   2차/확인 못 함: 비인증 API 요청 제한 "IP당 시간 60회"는 기억에 의존(이 세션에서 docs.github.com 접속이 막혀 원문 미확인).
   GitHub Free에서 공개 레포 Pages가 무료라는 것은 요금 문서 원본(github/docs plans)으로 본 범위까지.
 sources:
@@ -74,6 +76,7 @@ jobs:
 - 정적 페이지에 빌드 단계를 두지 않으면 고칠 것이 HTML 한 곳뿐이다. 한 장짜리 소개 페이지는 템플릿 엔진이 더 많은 것을 고장 낸다.
 
 ## 함정
+- **새 HTML + 캐시된 옛 CSS.** Pages는 정적 파일에 짧은 캐시를 준다(몇 분, 정확한 값은 원문 미확인). 페이지 구조를 크게 바꾸면 그동안 새 HTML이 옛 CSS로 그려져, 숨긴 요소(본문 건너뛰기 링크·고정 장식 목록)가 드러나고 배치가 깨진다. 빌드 스크립트가 `style.css?v=<내용 해시>`처럼 CSS·JS(그리고 CSS 안의 글꼴) 주소에 해시를 붙이면, 내용이 바뀔 때 주소도 바뀐다. 글꼴 해시를 CSS에 먼저 넣고 그 CSS로 해시를 잰다.
 - 첫 실행 실패를 고장으로 보지 말 것. 켠 뒤 `workflow_dispatch`로 다시 돌린다.
 - 도트 그림은 `image-rendering: pixelated`를 주지 않으면 브라우저가 흐리게 키운다.
 - 스크린숏에 제3자 에셋 팩 그림이 들어가면, 원본 파일이 아니라도 라이선스 기록과 페이지 크레딧을 남긴다.
