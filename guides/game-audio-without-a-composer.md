@@ -4,7 +4,7 @@ type: guide
 tags: [gamedev, audio, assets, licensing, solo-dev]
 status: draft
 created: 2026-10-26
-updated: 2026-10-26
+updated: 2026-10-27
 verified: |
   1차 출처로 확인(2026-10-26, nail-under-the-roots 0081 직접 실행):
   - 라이선스: Kenney Interface Sounds·Impact Sounds·RPG Audio 팩 안 License.txt가 CC0 1.0이고 크레딧은 의무 아님.
@@ -15,6 +15,13 @@ verified: |
   - 앞뒤 5ms 줄이기 + 모노 + ogg q4/mp3 V5로 7곡 약 12MB. 헤드리스 Chromium에서 메뉴 소리·곡 고리 재생 확인
     (AudioBufferSourceNode.start를 가로채 길이·loop 기록).
   - "다른 소리가 이번 프레임에 났으면 메뉴 소리는 건너뛴다"는 한 곳 훅으로 모든 메뉴 화면에 소리가 났다.
+  1차 출처로 확인(2026-10-27, nail-under-the-roots 0154 직접 실행):
+  - OpenGameArt Prologue Theme(Cleyton Kauffman)·Lovely town(fluffclipse)·Snowfall(Kistol) 페이지 라이선스 칸이 CC0.
+  - 어쿠스틱 곡(피아노·바이올린·하프)은 옆/가운데 비가 −1~−3dB로 넓다(칩튠은 −36dB 아래).
+  - 봉우리에만 맞추면 피아노 곡이 칩튠보다 5dB 작았다(−24 대 −19dB RMS). 미리 보는 리미터로 −19dB에 맞추니
+    가장 깊게 4.9dB, 1dB 넘게 누른 시간 3.3%. 다시 풀어 잰 크기 −19.0~−19.4dB.
+  - quad-snd 0.2.8 mixer.rs가 1·2채널만 받는다(스테레오 ogg 그대로 된다).
+  - libvorbis는 같은 입력이어도 매번 조금 다른 ogg를 만든다 → 바뀌지 않은 곡은 버전 관리에서 되돌린다.
   확인 못 함: 사람 귀의 판정(Claude는 듣지 못한다), 실기 스피커.
   2차 출처만 있음: 덕킹 시작값 약 −6dB, 자주 나는 소리는 변형 3~5개, 묶음(버스)마다 크기 따로 — 게임 오디오 글들의 통념(0081 조사).
 sources:
@@ -22,6 +29,9 @@ sources:
   - https://kenney.nl/assets/impact-sounds
   - https://kenney.nl/assets/rpg-audio
   - https://opengameart.org/content/15-melodic-rpg-chiptunes
+  - https://opengameart.org/content/prologue-theme
+  - https://opengameart.org/content/lovely-town
+  - https://opengameart.org/content/snowfall
   - https://creativecommons.org/publicdomain/zero/1.0/
 ---
 
@@ -33,7 +43,9 @@ CC0 팩(효과음은 Kenney, 음악은 OpenGameArt의 CC0 곡)에서 고른다. 
 ## 본문
 ### 1. 출처
 - 효과음: Kenney의 오디오 팩(Interface·Impact·RPG). 팩마다 `License.txt`가 들어 있다. **받은 파일 안의 라이선스 글**을 읽고 기록한다(페이지 문구는 바뀔 수 있다).
-- 음악: OpenGameArt에서 라이선스를 CC0로 걸러 찾는다. 페이지의 라이선스 칸과 작가 이름을 적는다. 크레딧 의무가 없어도 남긴다.
+- 음악: OpenGameArt에서 라이선스를 CC0로 걸러 찾는다. 페이지의 라이선스 칸과 작가 이름을 적는다. 크레딧 의무가 없어도 남긴다. 받은 묶음 안의 readme가 크레딧을 부탁하면 그것도 적는다(법적 의무는 아니어도 지킨다).
+- 악기 섞기: 한 게임에 칩튠과 어쿠스틱(피아노·바이올린)을 섞을 때는 **장소의 성격으로 나눈다**(쉬는 곳 = 어쿠스틱, 싸우는 곳 = 칩튠). 장소가 바뀔 때 기분도 바뀌고, 섞임이 실수처럼 들리지 않는다.
+- 가족·지인의 연주: 직접 녹음한 곡은 저작권이 연주자에게 있어 라이선스 걱정이 없다. 공개 레포에 넣을지와 크레딧 이름만 먼저 정한다. 휴대폰 녹음도 되고(자동 음량·잡음 제거 끄기, 악기와 50cm~1m, 앞뒤 2초 조용히), 고리용은 30초~1분의 박자 일정한 곡이 이음매 맞추기 쉽다.
 - 원본 팩은 커밋하지 않는다(용량). 산출물과 **어디서 받았는지 + 어느 파일에서 만들었는지**만 남긴다(게임의 에셋 라이선스 표).
 
 ### 2. 숫자로 고르기(듣기 전에)
@@ -49,7 +61,7 @@ CC0 팩(효과음은 Kenney, 음악은 OpenGameArt의 CC0 곡)에서 고른다. 
 ### 3. 변환 스크립트(표가 원본)
 - 표: (게임 이름, 원본 파일들, 최대 길이). 같은 이름에 파일이 여럿이면 변형이다.
 - 효과음: 앞 빈 곳·조용한 꼬리 자르기 → 끝 5ms 줄이기 → 봉우리 −1dBFS → 44.1kHz 모노 16비트 WAV.
-- 음악: 모노로 줄이기(폭이 좁으면) → 앞뒤 5ms 줄이기 → RMS 맞추기(예: −15dB, 봉우리 −1dBFS 안) → 엔진이 푸는 형식으로(macroquad라면 네이티브 ogg + 웹 mp3, [소리(quad-snd)](../reference/macroquad/audio.md)).
+- 음악: 모노로 줄이기(폭이 좁으면. 어쿠스틱 곡은 넓어서 스테레오로 둔다) → 앞뒤 5ms 줄이기 → RMS 맞추기(예: −15dB, 봉우리 −1dBFS 안. 스테레오는 가운데(좌우 평균)로 잰다) → 엔진이 푸는 형식으로(macroquad라면 네이티브 ogg + 웹 mp3, [소리(quad-snd)](../reference/macroquad/audio.md)).
 - 메타데이터를 지우고(`-map_metadata -1`) 같은 입력이면 같은 출력이 나오게 한다. 다시 돌려도 diff가 없다.
 
 ### 4. 코드
@@ -70,6 +82,8 @@ CC0 팩(효과음은 Kenney, 음악은 OpenGameArt의 CC0 곡)에서 고른다. 
 - 메뉴 소리를 한 곳에서 내는 이유: 화면은 계속 늘어난다. 화면마다 달면 빠지는 곳이 생기고, 특별한 소리와 겹친다. "다른 소리가 났나"만 보면 둘 다 풀린다.
 
 ## 함정
+- 봉우리 제한으로만 크기를 맞추면 크레스트(봉우리/RMS)가 큰 곡(피아노 타건)은 작게 남는다. 칩튠 같은 납작한 곡과 섞으면 5dB까지 차이가 난다 → 목표 RMS로 올리고 넘는 봉우리만 미리 보는 리미터로 누른다(짧은 칸마다 필요한 이득, 내려갈 때 몇 ms 미리, 올라올 때 수백 ms에 걸쳐). 누른 깊이·시간을 출력해 과하면 목표를 낮춘다. RMS는 귀의 크기(LUFS의 K 가중)와 다르니 마지막은 귀로.
+- 곡 전체를 고리로 돌리면 큰 시작 화음이 고리마다 다시 터진다(조용한 끝 −21dB → 첫 화음 −7dB). 재생기가 고리 시작점을 못 받으면 고리용 판을 쓰거나 시작을 다듬는다.
 - Vorbis는 풀 때 봉우리가 원래보다 커질 수 있다(+2dB). 16비트로 쓰기 전에 봉우리를 맞춘다.
 - 곡의 첫 표본이 0이 아니면 처음 틀 때도, 고리마다도 딸깍한다. 앞뒤를 몇 ms 줄인다. 박자에 맞춰 만든 고리는 길이를 바꾸지 않는다(자르지 말고 줄이기만).
 - mp3는 인코더가 앞뒤에 빈 표본을 붙인다. Chromium은 LAME 머리 정보로 잘라내 길이가 원본과 같았다. 다른 브라우저는 따로 확인한다.
