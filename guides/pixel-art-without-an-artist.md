@@ -4,8 +4,9 @@ type: guide
 tags: [gamedev, pixel-art, assets, licensing, solo-dev]
 status: draft
 created: 2026-10-24
-updated: 2026-10-27
+updated: 2026-10-28
 verified: |
+  1차 출처로 확인(2026-10-28, AI 도트 시트 → 격자: nail-under-the-roots `pxl.py snap`·`test_snap.py` 직접 구현, 우리 16칸 그림을 블록 확대(7.7~9.3px, 정수 아님)·어긋남 0~7px·흐림·잡음·마젠타 배경으로 망가뜨려 되돌리는 왕복 시험). 실제 이미지 모델 시트로는 아직 안 돌렸다. 격자 찾기 → 블록 가운데 → 팔레트 묶기라는 큰 순서는 2차(DEV 글·Pixel Snapper 소개).
   1차 출처로 확인(2026-10-26, 앱 아이콘: nail-under-the-roots 0123 직접 구현, 시안 넷·일러스트에서 자른 것을 iOS 둥근 네모·Android 원·둥근 네모·48px 마스크로 깎아 비교).
   1차 출처로 확인(2026-10-26, 타이틀 바탕: nail-under-the-roots 0083 직접 구현, 헤드리스로 타이틀·슬롯·설정 창 캡처). 키 아트·글 위계 원칙은 itch.io 데브로그·메뉴 디자인 글(2차).
   1차 출처로 확인(2026-10-26, 공격 동작 들기·치기·거두기: nail-under-the-roots 0082 직접 구현, 칸 10배 확대·게임 타이밍 GIF·웹 헤드리스 3연타 캡처). 예비 동작·따라가기는 애니메이션 12원칙의 통념(2차, 원전 확인 안 함). GIF 20ms 미만 칸을 브라우저가 늘린다는 것은 2차(기억).
@@ -47,6 +48,8 @@ sources:
   - https://github.com/github/docs/blob/main/content/get-started/learning-about-github/githubs-plans.md
   - https://github.com/github/docs/blob/main/content/billing/concepts/product-billing/github-actions.md
   - https://www.anthropic.com/news/updates-to-our-consumer-terms
+  - https://dev.to/jenissimo/how-to-tame-your-ai-pixel-art-3pk5
+  - https://www.gigazine.net/gsc_news/en/20260516-spritefusion-pixel-snapper
 ---
 
 # 그림 못 그려도 도트 게임 만들기
@@ -221,6 +224,20 @@ v1(타원 + 구 음영 + 몸 전체 2×2 디더)은 "자글자글"하고 형태�
 - **얼굴은 자동으로 안 된다**: 눈·입은 줄이면 뭉개진다. 크기를 키우고 단순화해 다시 그려야 한다(Gerstner 외 2012도 같은 지적). 그래서 인물은 따로 그려 얹고 배경만 도트화하는 편이 낫다.
 - **원본 권리**: 직접 찍은 사진·직접 그린 그림·CC0만 쓴다. 바꿔도 원본의 2차 저작물이다.
 - 참고(2차 출처): [Gerstner et al. 2012, Pixelated Image Abstraction](https://pixl.cs.princeton.edu/gfx/pubs/Gerstner_2012_PIA/index.php), [이미지 → 도트 변환 기술 정리(DEV)](https://dev.to/howard_hua_7aaf46f9755a5b/how-to-convert-any-image-to-pixel-art-technical-deep-dive-4ak0), [Wayline 변환 도구](https://www.wayline.io/tools/image-to-pixel-art).
+
+### 이미지 모델이 그린 "도트" 시트를 진짜 격자로
+이미지 모델에 "16×16 도트, 픽셀 하나 = 8×8 블록"이라고 해도 결과는 진짜 격자가 아니다. 블록이 7.8px처럼 정수가 아니고, 그림마다 몇 px씩 밀리고, 가장자리가 번지고, 중간색이 섞인다. 그대로 줄이면 한 점씩 밀리거나 흐린 색이 남는다. 순서는 **격자 찾기 → 블록 가운데 색 → 팔레트 묶기**다(2차: DEV "How to tame your AI pixel art", Sprite Fusion Pixel Snapper). 아래는 직접 만들어 왕복 시험한 것이다(2026-10-28 nail-under-the-roots `pxl.py snap`, 0203).
+- **칸을 똑같이 나누지 말고 그림 덩어리를 찾는다.** 모델은 격자를 고르게 지키지 않는다. 배경(단색 마젠타)이 아닌 점이 이어진 덩어리를 그림 하나로 보고, 칸에는 **발바닥 줄·가운데로 다시 앉힌다**. 그러면 그림마다 밀린 자리가 저절로 맞는다. 그림끼리 붙어 있으면 한 덩어리가 되니 프롬프트에 "그림 사이 띄움"을 넣는다. 참고 그림도 띄워서 준다(16열을 다 쓰는 캐릭터는 틈 없이 붙인 띠를 주면 모델도 붙여 그린다).
+- **블록 크기는 "원 위 평균"으로 잰다.** 가장자리(밝기가 확 바뀌는 곳) 자리 x를 각도 2πx/s로 보고, 밝기 차로 무게를 주어 평균 벡터의 길이(0..1)를 본다. s가 맞으면 가장자리가 한 각도로 모여 길이가 크다. 함정 둘이 있다.
+  - s/2·s/3도 똑같이 모인다. 2s부터는 흩어진다. 그래서 "잘 모이는 것 중 가장 큰 s"를 고른다.
+  - 그림마다 어긋남이 다르면 시트 전체를 한 번에 재는 평균이 흐려진다. 블록 8px이 32px로 잡혔다. 그림마다 길이를 재서 더해야 한다.
+- **어긋남(위상)도 원 위 평균으로 잰다.** 가장 많이 걸린 자리 하나(argmax)를 고르면, 흐린 가장자리가 k-1·k·k+1로 나뉠 때 잡음이 하나를 고른다. 그러면 0이 7로 잡혀 그림 전체가 한 블록 밀린다(1024점 중 199점 틀림). 각도 평균은 가운데를 잡는다. 블록 끝 반 px 안이면 앞으로 조금 당긴 것으로 접는다. 넓은 범위로 접으면 진짜 5px 밀림이 −3px가 되어 다시 한 블록 밀린다.
+- **잴 때 점을 건너뛰지 않는다.** 2px씩 건너뛰면 짝수 자리 가장자리만 빠져 위상이 쏠린다.
+- **블록 가운데 반쪽의 "밝기 가운데 값"을 찍는다.** 평균을 내면 번진 가장자리 색이 섞이고, 튀는 점 하나에도 끌린다. 블록의 반 넘게 배경이면 투명이다.
+- **색은 기존 그림 팔레트의 가장 가까운 색으로.** 시트끼리 색이 통일된다. 팔레트가 없으면 시트 전체를 redmean으로 합쳐 N색.
+- **남는 오류는 1px 눈이다.** 왕복 시험(2048점)에서 남은 2~12점은 거의 다 눈동자 한 점이었다. 번짐에 섞여 아주 가까운 외곽선 색으로 간다. 그래서 외톨이 정리를 자동으로 하지 않는다. 16칸의 눈은 원래 외톨이 한 점이다. 얼굴은 손질에서 손으로 고친다.
+- **동작 줄 검사**: 같은 동작의 칸끼리 발바닥 줄(걷기 들썩임 ±1)과 몸 키가 같아야 한다. 칸마다 다르면 모델이 크기를 바꾼 것이니 다시 뽑는다.
+- 이미지 모델 앱의 ✦ 로고는 덩어리 하나로 잡힌다. 먼저 지운다([이미지 모델 노트](image-model-for-game-illustrations.md)).
 
 ### 2배 밀도 한 장 그림의 띠 자국
 - 계단 그라디언트(띠)는 1px 디더 없이 깔끔하지만 경계가 선으로 보인다. 1px 바둑판은 홀수 화면 배율에서 1.5배로 늘어 얼룩진다.
