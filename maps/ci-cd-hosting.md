@@ -4,7 +4,7 @@ type: map
 tags: [ci, deploy, hosting, github-actions, netlify]
 status: verified
 created: 2026-10-24
-updated: 2026-10-26
+updated: 2026-10-28
 ---
 
 # 지도: CI/CD와 호스팅
@@ -24,6 +24,7 @@ updated: 2026-10-26
 - [정적 WASM 호스팅](../concepts/static-wasm-hosting.md) — 정적 호스트가 제공해야 하는 것
 
 ## 엮은 절차
+- [운영판과 개발판을 갈라 내보내기](../guides/dev-and-release-flavors.md) — 마일스톤 갈래, 운영판 `--no-default-features`, Netlify 별칭 + build.txt 확인, Android `.dev` 패키지·기록 폴더, 미리 보기 Release 갈아 끼우기
 - [macroquad WASM → GitHub Actions → Netlify](../guides/macroquad-wasm-netlify-github-actions.md)
 - [0001 빌드는 CI에서, 호스팅은 CLI 업로드로](../decisions/0001-build-rust-wasm-in-github-actions-deploy-via-netlify-cli.md)
 
