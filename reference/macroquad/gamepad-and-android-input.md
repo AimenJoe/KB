@@ -4,7 +4,7 @@ type: reference
 tags: [macroquad, miniquad, gamepad, android, input, touch, rust]
 status: verified
 created: 2026-10-24
-updated: 2026-10-27
+updated: 2026-10-28
 verified: |
   1차 출처로 확인: miniquad master의 java/MainActivity.java(onTouch/onKey만 구현, onGenericMotionEvent 없음),
   src/native/android.rs(surfaceOnKeyDown/Up → keycodes::translate_keycode), src/native/android/keycodes.rs(109개 매핑,
@@ -18,6 +18,8 @@ verified: |
   터치(2026-10-25): macroquad src/window.rs·src/input.rs·src/lib.rs(touches()는 물리 픽셀, screen_width()·mouse_position()은 DPI로 나눔,
   프레임 끝 위상 정리)를 읽고, Pixel 7 프로필(DPR 2.625) 헤드리스 Chromium에서 버튼 판정 실패를 재현한 뒤 DPI 나눗셈으로 해결 확인.
   실기 Android 13 브라우저에서 사용자가 같은 증상을 보고했고, DPI 나눗셈·비표준 매핑 허용 뒤 터치와 패드 모두 동작함을 확인(2026-10-25).
+  메뉴 끌기(2026-10-28): macroquad 0.4.16 src/lib.rs `touch_event`(simulate_mouse_with_touch면 Started → 마우스 눌림)·src/input.rs
+  `simulate_mouse_with_touch(bool)`·`mouse_wheel()`을 읽고, 헤드리스 Chromium 터치(CDP)로 끌기·뗄 때 탭이 도는 것을 확인(nail 0199).
   2차 출처만 있음: macroquad 문서의 "gamepads soon" 문구, cargo-quad-apk 유지보수 상태(crates.io 0.1.4가 4년 이상 전,
   커뮤니티 이슈의 NDK/minSdk 패치 메모).
   메뉴 스틱 탐색(2026-10-25, nail-under-the-roots): "첫 칸은 키·D패드 눌림 에지, 스틱은 반복만" 구조에서 스틱 플릭이 무시되는 것을
@@ -127,6 +129,7 @@ macroquad 0.4.16의 `touches()`는 `Touch { id, phase, position }`를 돌려준�
 - **좌표 단위 불일치**: `screen_width()`·`mouse_position()`은 `miniquad::window::dpi_scale()`로 나눈 논리 픽셀을 주지만, `touches()`의 `position`은 **물리 픽셀 그대로**다(src/window.rs, src/input.rs 확인). `high_dpi: true`인 고해상도 폰(DPR 2~3)에서는 터치 좌표가 화면 크기의 2~3배로 들어와 버튼 판정이 전부 빗나간다. `t.position / screen_dpi_scale()`로 맞춘다. DPR 1인 데스크톱·헤드리스에서는 재현되지 않으므로 테스트할 때 `deviceScaleFactor`를 올려야 한다.
 - **위상(phase)에 기대지 말 것**: macroquad는 터치를 id별로 하나만 보관하고 프레임 끝에 Started/Moved→Stationary, Ended→삭제로 정리한다. 실제 손가락은 touchstart 직후 같은 프레임에 touchmove가 와서 Started가 Moved로 덮이고, 짧은 탭은 start·end가 한 프레임에 들어와 Ended만 보인다. "눌림"은 **지난 프레임까지 본 id 목록에 없는 새 id**로 판정하고, 새 id가 Ended여도 눌림으로 센다.
 - 웹 글루는 `touchstart/move/end/cancel`을 `canvas`에 걸고 `e.changedTouches`의 `identifier`를 id로 넘긴다. `simulate_mouse_with_touch`(기본 true)라 마우스 이벤트도 같이 생긴다.
+- **메뉴의 끌어 굴리기를 넣을 때 함정**: `simulate_mouse_with_touch`는 macroquad 자체(src/lib.rs `touch_event`)가 모든 플랫폼에서 켜 둔다 — 손가락을 짚는 순간(`Started`) 왼쪽 마우스 눌림이 된다. 클릭을 탭으로 쓰는 메뉴에 끌기를 더하면 끌기를 시작한 줄이 눌린다. `macroquad::input::simulate_mouse_with_touch(false)`로 끄고 터치 탭은 직접 "움직이지 않고 뗐을 때"로 정한다(끌기 판정 거리는 화면 높이의 3%로 시작, 표준값은 못 찾음). 휠은 `mouse_wheel()`(웹 글루가 `wheel`을 넘긴다) — 기기마다 값 크기가 달라 부호만 칸으로 쓰면 안전하다. 목록 창은 커서에서 계산하지 말고 "보이는 첫 줄"을 저장해야 끌기로 커서와 따로 굴릴 수 있다. 헤드리스 확인은 Playwright `hasTouch` + CDP `Input.dispatchTouchEvent`(touchStart/touchMove/touchEnd).
 - **버튼 크기**: 플랫폼 최소 터치 크기(Apple 44pt, Material 48dp)는 바닥일 뿐이다. 게임은 엄지로 누르고(성인 엄지 폭 약 1인치), 가장 자주 누르는 버튼(공격)은 다른 버튼보다 확실히 크게 — 짧은 변 기준 비율로 정하면 기기마다 맞는다(예: 공격 지름 ≈ 짧은 변의 27%, 가로 폰에서 약 100pt). 나머지는 엄지가 쉬는 오른쪽 아래 둘레 호에. 배치는 순수 함수(폭, 높이) → 버튼 목록으로 빼서 "겹치지 않음·화면 안·공격이 가장 큼"을 여러 화면 크기로 테스트한다. 엄지 크기 출처는 2차(UX 글), 게임 버튼 크기 표준 문서는 못 찾았다.
 - `index.html`에 `touch-action: none; overscroll-behavior: none; user-select: none`과 `user-scalable=no` viewport를 두지 않으면 스크롤·확대·길게 누르기 메뉴가 끼어든다.
 
