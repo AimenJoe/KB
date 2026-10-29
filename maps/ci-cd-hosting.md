@@ -13,6 +13,7 @@ updated: 2026-10-28
 - [Rust → wasm32 빌드 워크플로](../reference/github-actions/rust-wasm-build.md) — 툴체인 액션 비교, 캐시, concurrency
 - [GitHub Pages에 정적 페이지](../reference/github-actions/pages-static-site.md) — Actions 배포, 처음 한 번 사람이 켜기(GITHUB_TOKEN 불가), 릴리스 API로 버전·소식 채우기, 글꼴 줄이기
 - [버전 올리기 = 릴리스](../reference/github-actions/release-from-version-bump.md) — CI가 태그를 만들고(GITHUB_TOKEN 태그는 다른 워크플로를 안 깨움) 빌드를 `workflow_call`로 부르기, 앱에 버전·커밋 찍기
+- [공개 레포를 비공개로 바꿀 때](../reference/github-actions/public-to-private-repo.md) — Actions가 돈이 된다(Free 월 $12어치, macOS ≈10배)·Pages 자동 내림·Release 익명 404, 바꾸기 전 실행 양 재기·줄이기·홈페이지 먼저 옮기기
 - [Android APK 빌드](../guides/macroquad-android-apk-github-actions.md) — 덮어 설치 = 같은 키 + 큰 versionCode, 키를 캐시에만 두면 7일 뒤 사라짐
 - [공개 레포 + 비공개 에셋 레포](../guides/pixel-art-without-an-artist.md#공개-레포에서-유료-팩-다루기) — 두 번째 checkout, fine-grained 토큰, Actions 비용은 도는 레포 기준
 
