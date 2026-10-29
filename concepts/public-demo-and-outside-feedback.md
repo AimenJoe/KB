@@ -4,11 +4,11 @@ type: concept
 tags: [gamedev, playtest, demo, itch-io, solo-dev, roguelite]
 status: draft
 created: 2026-10-28
-updated: 2026-10-28
+updated: 2026-10-29
 verified: |
   1차 출처로 확인: itch.io HTML5 올리기 형식(ZIP 맨 위 index.html, 필요한 파일 모두, 이름 대소문자, 한 장짜리 html은 ZIP 없이)은 공식 문서 https://itch.io/docs/creators/html5 (검색 요약으로 읽음, 페이지 원문은 세션 네트워크 사정으로 직접 열지 못함).
   2차 출처(블로그·포럼·3자 정리)만 있음: 무엇을 시험하는지 먼저 정하기, 한 번에 한두 가지, 기술 문제(멈춤·깨짐)가 메커닉을 가린다, 척도 + 고르기 + 자유 글 설문(Wayline 글 여럿). 설문 응답이 적고 버전이 어긋난 사례(itch.io 데브로그 한 편). 로그라이트 데모는 한 바퀴를 온전히·깊이는 잠가서, 20~40분, 완주율 40% 아래면 길다(Zukowski 자료를 옮긴 3자 글 — 원문 howtomarketagame.com은 못 열어 숫자 미확인). 데모는 행사 전에 미리 내기(Zukowski, Unity 블로그 인터뷰).
-  직접 해 보지 않음: 설문·완주율 기준을 실제 데모에 적용한 결과는 아직 없다(nail-under-the-roots 0223, 2026-10-28 계획 단계).
+  직접 해 보지 않음: 설문·완주율 기준을 실제 데모에 적용한 결과는 아직 없다(nail-under-the-roots 0223 — 2026-10-28 계획했다가 다음 판에 오래 걸리는 큰 기능을 넣기로 해 보류, 0227).
 sources:
   - https://itch.io/docs/creators/html5
   - https://itch.io/blog/560526/acquiring-tester-feedback

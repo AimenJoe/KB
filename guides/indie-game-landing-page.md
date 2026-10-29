@@ -4,7 +4,7 @@ type: guide
 tags: [gamedev, marketing, static-site, pixel-art, css]
 status: draft
 created: 2026-10-27
-updated: 2026-10-28
+updated: 2026-10-29
 verified: |
   1차 출처로 확인(2026-10-27, nail-under-the-roots 0155 직접 실행, 헤드리스 Chromium):
   - 16px 칸 가로 띠 + CSS 변수(--n 칸 수, --s 칸 크기)로 background-size·steps(var(--n))·keyframes의
@@ -18,6 +18,9 @@ verified: |
     (12초 1.6 MB, crf 12 = 2.1 MB, crf 20 = 1.1 MB).
   - 브라우저 셋을 동시에 돌리면 칸당 4초 넘게 느려지고 게임 메뉴 키를 놓쳤다. 하나씩이면 480칸에 약 1분.
   - video[data-src] + IntersectionObserver로 화면 가까이 와서야 src를 넣고 재생하면 첫 화면 무게가 그대로다(헤드리스에서 src 없음 → 스크롤 뒤 재생 확인).
+  1차 출처로 확인(2026-10-29, nail-under-the-roots 0228 덧붙임): 정해 둔 키를 시간대로만 누른 대본은 적을 못 봐 허공을 치고 벽으로 달려 "너무 못한다"는 판정을 받았다.
+    찍기 전용 빌드에만 월드를 보고 입력을 만드는 자동 조종(가까운 적에게 다가가 박자 콤보·예고가 차면 회피·게이지 차면 필살기)을 넣자
+    같은 길이에 쓰러뜨린 적 수(떨어진 씨앗)가 2 → 44로 늘었다. 도망치는 원거리 캐릭터는 벽 구석에 박혔다 → 물러날 때 방 가운데 쪽으로.
   - 가로 넘침 검사(scrollWidth = innerWidth, 화면 밖으로 나간 요소 목록)를 1440·390·320px, 한국어·영어로.
   2차 출처만 있음: 페이지에 실을 것(첫 화면: 무슨 게임·한 줄 소개·어디서 하나, 트레일러를 크게, 기능 목록,
   UI·메뉴가 아닌 좋은 순간의 스크린숏, 팩트시트·로고·연락처, 낡지 않게 고치기) — 프레스킷 도구 회사·마케팅 블로그 글.
@@ -60,7 +63,7 @@ sources:
   `<span class="sprite" style="--sp: url(img/sp_mole.png); --n: 4">`. 걷기는 위 칸 넘기기 + `left`를 옮기는 둘째 애니메이션.
 - **이야기를 스크롤로**: 층(section)마다 바탕을 짙게 하고, 층 사이에 계단 가장자리를 둔다. 고정 눈금에 주인공이 스크롤 비율만큼 내려가고, 화면 가운데 층 이름이 밝아진다(`scroll` + `requestAnimationFrame` 한 번).
 - **반딧불·먼지 같은 분위기 입자**: 스크립트로 몇 개만 뿌리고(자리·주기·지연을 하나씩 다르게) CSS로 떠다니게 한다.
-- **가짜 시계로 찍는 게임 클립**: 실시간 녹화는 도트를 뭉개거나 칸 간격이 고르지 않다. 브라우저 게임이면 Playwright `page.clock.install()`로 시계를 멈추고 `clock.runFor(1000/30)` → 스크린숏을 되풀이해 고른 무손실 칸을 얻는다(requestAnimationFrame·Date를 쓰는 엔진이면 그대로 따라온다). 대본대로 누르는 손은 적을 못 보니 찍기 전용 빌드에서 피해를 끄고, 페이지에 그렇다고 적는다. 묶기는 H.264 `-tune animation -crf 16`, 소리 없이 `muted loop playsinline`, 화면 가까이 와서야 받는다(IntersectionObserver), 움직임 줄이기면 재생 단추만.
+- **가짜 시계로 찍는 게임 클립**: 실시간 녹화는 도트를 뭉개거나 칸 간격이 고르지 않다. 브라우저 게임이면 Playwright `page.clock.install()`로 시계를 멈추고 `clock.runFor(1000/30)` → 스크린숏을 되풀이해 고른 무손실 칸을 얻는다(requestAnimationFrame·Date를 쓰는 엔진이면 그대로 따라온다). 입력은 시간표 대본이 아니라 **월드를 읽는 자동 조종**으로 준다(시간표 대본은 허공을 치고 벽으로 달려 못해 보인다). 찍기 전용 빌드에만 넣고, 피해를 껐다면 페이지에 그렇다고 적는다. 묶기는 H.264 `-tune animation -crf 16`, 소리 없이 `muted loop playsinline`, 화면 가까이 와서야 받는다(IntersectionObserver), 움직임 줄이기면 재생 단추만.
 - **움직임 줄이기**: `prefers-reduced-motion: reduce`면 반복 애니메이션을 끄고 제자리에 세운다.
 
 ## 왜?

@@ -4,7 +4,7 @@ type: guide
 tags: [ci, deploy, github-actions, netlify, android, rust, gamedev]
 status: draft
 created: 2026-10-28
-updated: 2026-10-28
+updated: 2026-10-29
 verified: |
   1차 출처로 확인:
     - 직접 실행(nail-under-the-roots 0193, 2026-10-28): release/v0.5 push에서 Netlify `--alias=dev` 배포 뒤 별칭 주소의 build.txt가 그 커밋 SHA였다(deploy-web 157·159 성공). 같은 push의 build-android가 패키지 `io.github.aimenjoe.nail.dev`, 이름 "Naïl dev"인 APK를 지어(aapt2 badging) 미리 보기 Release `dev`에 올렸다(351). main은 `--no-default-features`로 지었고 APK가 개발 판보다 작았다(17 968 002 vs 17 984 386 바이트).
@@ -29,6 +29,7 @@ sources:
 ### 갈래
 - `main` = 운영판, 패치만. `release/vX.Y` = 마일스톤 모음. 작업 브랜치는 release로 합친다.
 - 패치는 main에 넣고 release로도 합친다(main → release). 거꾸로(release → main)는 마일스톤을 닫을 때 한 번.
+- 마일스톤 범위가 바뀌어 release에 쌓인 것이 고침·그림뿐이면, 닫지 않고 **release → main을 패치 버전으로** 내도 된다(nail-under-the-roots 0227: v0.6을 오래 걸리는 큰 기능 하나로 바꾸며 개발판 고침을 v0.5.1·v0.5.2로 냈다 — 두 갈래가 같아지고, 다음 큰 것은 release에서 시작). 이때도 버전 규칙(마이너 = 마일스톤)은 그대로라 버전은 패치만 올린다.
 
 ### 빌드 기능(Cargo feature)
 - 개발 메뉴·검사 도구를 `dev` 기능 뒤에 두고, 로컬 편의를 위해 `default = ["dev"]`로 두되 **운영 빌드는 CI가 `--no-default-features`**로 짓는다. 갈래는 워크플로 한 단계에서 `GITHUB_REF`로 정해 `$GITHUB_ENV`에 `FEATURES`를 적는다.
