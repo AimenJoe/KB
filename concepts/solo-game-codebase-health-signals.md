@@ -29,6 +29,12 @@ verified: |
   1차(같은 날, R15~R18 구현): 흐름 깃발 넷 → 줄 + 문, 런 갈림길 → 순수 함수로 앱 시험 0 → 11. 장애물 치우기를 한 곳에 모으자 시험 하나가 들어가는 길마다 달랐던
   치우기(지뢰가 쉼터로 따라옴)를 잡았다. 긴 함수는 `git log -L`로 지난 한 주 고친 커밋 수를 재서(33·9) 바로 쪼갰다.
   잰 값의 교차 확인: grep 수치 둘이 틀렸다(캐릭터 분기 33은 테스트 포함 — 실제 15·대부분 값 표, 앱 쓰기는 두 함수에 모여 있었다) → 제안 하나를 뺐다.
+  1차(2026-10-29, nail 0248, v0.6.8 — 60,556줄, +12%): 200줄 넘는 함수 8 → 9 → (R27~R30 뒤) 7. 새로 생긴 약점은 크기가 아니라 "한 곳에 모으기"의 빈틈:
+  위험물 치우기를 한 곳에 모은 뒤(0230) 새로 생긴 **플레이어 쪽 물건**(던진 탄·묻은 것·깐 덤불)이 그 밖에 따로 살아 쓰러짐·꿈·장소 바꾸기에서 안 치워졌다
+  — 치우기 함수를 위험물 구조체가 아니라 월드에 두고 "싸움이 남긴 것 전부"로 정의해야 새 종류가 들어와도 따라온다. 시험에 새 종류를 하나 넣고 옛 코드로 돌려 실패를 확인.
+  안 쓰는 글 키 11개(열한 언어 × 11)는 화면을 고칠 때마다 생긴다 → "키 이름이 소스 어딘가에 낱말로 나오나" 시험 하나(매크로 인자도 센다)로 막았다.
+  그리기 코드 안에 들어간 계산(재주 나무의 길·합계·목표)은 앱을 못 띄워 시험 0 → 기록만 받는 순수한 뷰 구조체로 빼자 시험이 바로 붙었다(functional core).
+  자주 고친 긴 match(`build` 325줄, 0230 뒤 7번)는 갈래를 함수로, 탭 match 둘은 (이름·입력·그림) 표로 — 새 갈래 = 표 한 줄.
   2차: Gary Bernhardt "Functional Core, Imperative Shell"(화면 강의 요약 글).
 sources:
   - https://github.com/AimenJoe/nail-under-the-roots
@@ -39,6 +45,7 @@ sources:
   - https://levelup.gitconnected.com/how-to-spot-the-wrong-abstraction-2c0f1cecb07e
   - https://github.com/AimenJoe/nail-under-the-roots/blob/main/docs/decisions/0230-refactoring-review-before-v0.6.md
   - https://www.destroyallsoftware.com/screencasts/catalog/functional-core-imperative-shell
+  - https://github.com/AimenJoe/nail-under-the-roots/blob/main/docs/decisions/0248-refactoring-review-after-v0.6.8.md
   - https://blogs.perl.org/users/mascip/2014/06/functional-core-imperative-shell-oo-design-and-isolated-tests-without-mocks.html
 ---
 
