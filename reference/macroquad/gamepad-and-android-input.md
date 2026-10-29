@@ -4,7 +4,7 @@ type: reference
 tags: [macroquad, miniquad, gamepad, android, input, touch, rust]
 status: verified
 created: 2026-10-24
-updated: 2026-10-28
+updated: 2026-10-29
 verified: |
   1차 출처로 확인: miniquad master의 java/MainActivity.java(onTouch/onKey만 구현, onGenericMotionEvent 없음),
   src/native/android.rs(surfaceOnKeyDown/Up → keycodes::translate_keycode), src/native/android/keycodes.rs(109개 매핑,
@@ -131,6 +131,7 @@ macroquad 0.4.16의 `touches()`는 `Touch { id, phase, position }`를 돌려준�
 - 웹 글루는 `touchstart/move/end/cancel`을 `canvas`에 걸고 `e.changedTouches`의 `identifier`를 id로 넘긴다. `simulate_mouse_with_touch`(기본 true)라 마우스 이벤트도 같이 생긴다.
 - **메뉴의 끌어 굴리기를 넣을 때 함정**: `simulate_mouse_with_touch`는 macroquad 자체(src/lib.rs `touch_event`)가 모든 플랫폼에서 켜 둔다 — 손가락을 짚는 순간(`Started`) 왼쪽 마우스 눌림이 된다. 클릭을 탭으로 쓰는 메뉴에 끌기를 더하면 끌기를 시작한 줄이 눌린다. `macroquad::input::simulate_mouse_with_touch(false)`로 끄고 터치 탭은 직접 "움직이지 않고 뗐을 때"로 정한다(끌기 판정 거리는 화면 높이의 3%로 시작, 표준값은 못 찾음). 휠은 `mouse_wheel()`(웹 글루가 `wheel`을 넘긴다) — 기기마다 값 크기가 달라 부호만 칸으로 쓰면 안전하다. 목록 창은 커서에서 계산하지 말고 "보이는 첫 줄"을 저장해야 끌기로 커서와 따로 굴릴 수 있다. 헤드리스 확인은 Playwright `hasTouch` + CDP `Input.dispatchTouchEvent`(touchStart/touchMove/touchEnd).
 - **버튼 크기**: 플랫폼 최소 터치 크기(Apple 44pt, Material 48dp)는 바닥일 뿐이다. 게임은 엄지로 누르고(성인 엄지 폭 약 1인치), 가장 자주 누르는 버튼(공격)은 다른 버튼보다 확실히 크게 — 짧은 변 기준 비율로 정하면 기기마다 맞는다(예: 공격 지름 ≈ 짧은 변의 27%, 가로 폰에서 약 100pt). 나머지는 엄지가 쉬는 오른쪽 아래 둘레 호에. 배치는 순수 함수(폭, 높이) → 버튼 목록으로 빼서 "겹치지 않음·화면 안·공격이 가장 큼"을 여러 화면 크기로 테스트한다. 엄지 크기 출처는 2차(UX 글), 게임 버튼 크기 표준 문서는 못 찾았다.
+- **버튼 픽토그램은 점 그림으로**: 선·원 함수(`draw_line`·`draw_circle_lines`)로 그린 작은 아이콘은 버튼 크기마다 안티에일리어싱으로 뭉개져 "다듬지 않은 것"처럼 보였다(사장 판정, nail-under-the-roots 2026-10-29). 12×12 문자 마스크(`#`)를 정수 배율 `floor(r·1.15/12)`로 사각형만 찍고, 흰 채움 + 어두운 1점 외곽선(외곽선을 먼저 3×3으로 넓혀 찍고 위에 채움)을 두면 어느 화면에서도 또렷하다. 마스크 크기는 단위 시험으로(12줄 × 12칸) 지킨다. 직접 구현·헤드리스 폰 화면으로 확인.
 - `index.html`에 `touch-action: none; overscroll-behavior: none; user-select: none`과 `user-scalable=no` viewport를 두지 않으면 스크롤·확대·길게 누르기 메뉴가 끼어든다.
 
 ## 메뉴 탐색: 스틱을 한 칸 눌림으로
