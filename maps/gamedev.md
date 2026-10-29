@@ -4,7 +4,7 @@ type: map
 tags: [gamedev, macroquad, rust, game-design, pixel-art, game-feel]
 status: verified
 created: 2026-10-24
-updated: 2026-10-27
+updated: 2026-10-29
 ---
 
 # 지도: 게임 개발
@@ -56,6 +56,9 @@ updated: 2026-10-27
 ## 입력·접근성
 - [작은 픽셀 HUD 읽히게 하기](../concepts/hud-readability-and-quick-slots.md) — 바탕판·테두리 글자, 게이지 굵게·가득 신호, 퀵 슬롯 자리 고정·저절로 바꾸기 + 깜빡임, 창 밑 HUD 숨기기
 - [컨트롤러 버튼 배치와 다시 붙이기](../concepts/controller-layout-and-remapping.md) — 오른쪽 넷 = 자주 쓰는 넷, 키보드 다이아몬드, 겹치면 맞바꿈, 메뉴 키 고정, 안내는 배치를 따라, 격자 끝에서 옆 탭으로
+
+## 판매·비즈니스
+- [인디 게임을 팔 때의 규칙과 숫자](../reference/game-business/selling-an-indie-game-rules-and-numbers.md) — Steam Direct·Coming Soon 2주·Next Fest 게임당 한 번·AI 공개(Pre/Live-Generated)·원천징수(한국 저작권 10%), 위시리스트 전환·AI 표시 게임의 성과, Play(한국 15%)·Android 개발자 확인·Apple·itch, Gemini 약관, 한국 비영리 등급 면제
 
 ## 다국어
 - [작은 게임 다국어 구조](../guides/small-game-localization.md) — 고정 키 표, 자리표시자, 폰트 커버리지 테스트, 브라우저 언어 읽기
