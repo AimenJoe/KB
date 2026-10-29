@@ -4,7 +4,7 @@ type: concept
 tags: [gamedev, rust, architecture, testing, game-design]
 status: draft
 created: 2026-10-27
-updated: 2026-10-27
+updated: 2026-10-29
 verified: |
   1차 출처: nail-under-the-roots v0.3.8(2026-10-27)을 wc·grep·awk로 잰 것 — Rust 45,469줄, World::step 1,226줄(여덟 단계 번호 주석),
   World 공개 필드 118개, sfx.play 직접 호출 51곳 vs 소리 큐 19곳, 적 쓰러짐 처리 복붙 6곳, 월드 테스트 8개(플레이어 19·적 16),
@@ -22,6 +22,11 @@ verified: |
   1차(같은 날, nail 0170 R9~R14 직접 구현): 구조체 필드를 비공개로 하고 seed/beat/게터를 두자 앱의 대입 12곳이 컴파일러가 막는 0곳이 됐다.
   "맞으면 무슨 일"을 적의 메서드(receive → Miss/Deflected/Hit)로 옮기자 월드의 타격 함수가 233줄 → 120줄, 옮긴 규칙마다 적 테스트가 생겼다.
   보스·캐릭터 표는 이벤트 변종(8 → 2)·나란한 함수(4 → 1)·비교 분기(24 → 7)를 줄였지만, 이야기 글·그림 고르기 같은 정체성 분기는 남는다 — 표가 다 삼키지 않는다.
+  1차(2026-10-29, nail 0230, v0.5.3을 잼 — 53,998줄, 0170 뒤 +17%): 200줄 넘는 함수는 9 → 8로 오히려 줄었다(표·receive·보스 표가 기능을 받아냄).
+  남은 약점은 시험 0개인 앱 흐름("페이드 끝나면 할 일" 깃발 넷, 순서가 서로의 if 조건에 숨음) — 최근 고친 버그가 모인 곳과 같았다.
+  그림 변환기 9개를 다시 돌려 픽셀 비교하자 8개는 같고 1개는 8픽셀 달랐다(손질이 스크립트에 안 남음, 아무도 몰랐다).
+  잰 값의 교차 확인: grep 수치 둘이 틀렸다(캐릭터 분기 33은 테스트 포함 — 실제 15·대부분 값 표, 앱 쓰기는 두 함수에 모여 있었다) → 제안 하나를 뺐다.
+  2차: Gary Bernhardt "Functional Core, Imperative Shell"(화면 강의 요약 글).
 sources:
   - https://github.com/AimenJoe/nail-under-the-roots
   - https://github.com/AimenJoe/nail-under-the-roots/blob/main/docs/decisions/0169-code-health-review-and-refactoring-plan.md
@@ -29,6 +34,9 @@ sources:
   - https://henrikwarne.com/2021/07/12/book-review-a-philosophy-of-software-design/
   - https://www.sandordargo.com/blog/2023/01/25/deep-vs-shallow-modules
   - https://levelup.gitconnected.com/how-to-spot-the-wrong-abstraction-2c0f1cecb07e
+  - https://github.com/AimenJoe/nail-under-the-roots/blob/main/docs/decisions/0230-refactoring-review-before-v0.6.md
+  - https://www.destroyallsoftware.com/screencasts/catalog/functional-core-imperative-shell
+  - https://blogs.perl.org/users/mascip/2014/06/functional-core-imperative-shell-oo-design-and-isolated-tests-without-mocks.html
 ---
 
 # 1인 게임 코드의 건강 신호
@@ -75,9 +83,22 @@ sources:
 표로 옮길 때 남겨도 되는 분기: **그 정체성에 관한 글·그림**("모모가 돌아오면 제 자리라 1인칭으로"). 표의 열로 만들면 열 이름이 글의 내용을 흉내 내게 된다. 규칙(회피 종류·기록 키·해금)은 표로, 서사는 가지로.
 기준의 출처(2차): Ousterhout *A Philosophy of Software Design*의 깊은 모듈(작은 인터페이스·큰 구현), Sandi Metz "duplication is cheaper than the wrong abstraction".
 
+### 크기를 줄인 뒤의 셋째 점검: "곧 바뀔 곳"을 본다(2026-10-29, 같은 레포 0230)
+리팩터링 두 번 뒤에는 대개 "급한 것은 없다"가 맞는 판정이다. 그때 볼 것은 길이가 아니라 **다음 기능이 지날 곳**이다.
+| 신호 | 재는 법 | 뜻 |
+|---|---|---|
+| 시험 0개 + 최근 버그 | 파일별 `#[test]` 수 × `git log --since` 의 고침 커밋이 닿은 파일 | 둘이 겹치는 곳(대개 장면·메뉴 흐름)이 다음 리팩터링 1순위 |
+| "나중에 할 일" 깃발 | `pending_*` 같은 bool·Option이 몇 개고, 서로의 `if` 조건에 남의 이름이 나오나 | 숨은 줄(queue)이다. `VecDeque<Beat>` + 문 하나(언제 비울 수 있나)로 바꾸면 순서가 데이터가 되고 시험이 된다 |
+| 흐름의 결정이 껍데기에 | 소리·그림 핸들을 가진 구조체(App)가 "다음 장면"도 정하나 | 결정은 순수 함수 `next(state, event) -> Vec<Command>`, 껍데기는 명령만 실행(functional core, imperative shell) |
+| 에셋 재현성 | 생성 스크립트를 다 돌려 커밋된 산출물과 픽셀 비교 | 다르면 손질이 스크립트 밖에 있다. 다음에 원본을 다시 돌리는 날 조용히 바뀐다 |
+| 숫자 관례 | 렌더의 칸 번호 리터럴, `frames >= 12` 같은 길이 판정 | 칸의 뜻을 표(이름 → 칸)로. 길이로 판정하면 다른 기능이 같은 칸을 쓰는 순간 겹친다 |
+
+grep 수치는 **판정 전에 한 번 더 본다**: 테스트 모듈을 빼지 않은 수, 이미 한 함수에 모인 쓰기를 "흩어짐"으로 센 수가 그럴듯한 제안을 만든다. 잰 값마다 실제 자리 몇 개를 열어 본다.
+
 ## 왜?
 - 1인 개발은 속도가 자산이라 표·테스트처럼 **속도를 안 줄이는 안전장치**만 살아남는다. 틱 함수 쪼개기와 소리 큐는 속도를 줄이지 않으면서 테스트 문을 연다.
 - 부작용 핸들 하나가 테스트 분포를 통째로 비튼다(월드 8 vs 부품 51). 설계가 아니라 **인자 하나**의 문제라 고치기 싸다.
+- 리팩터링의 값은 곧 바뀔 곳에서 난다. 안 바뀔 긴 함수는 길이만으로 비용이 아니다 — 고칠 일이 생길 때 쪼갠다.
 
 ## 함정
 - 리팩터링을 마일스톤 직전에 하면 판정 결과와 코드 변화가 섞인다. 사람 판정 뒤로.
