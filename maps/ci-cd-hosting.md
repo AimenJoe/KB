@@ -4,7 +4,7 @@ type: map
 tags: [ci, deploy, hosting, github-actions, netlify]
 status: verified
 created: 2026-10-24
-updated: 2026-10-28
+updated: 2026-11-02
 ---
 
 # 지도: CI/CD와 호스팅
@@ -23,6 +23,9 @@ updated: 2026-10-28
 ## Netlify
 - [CI에서 netlify-cli로 배포](../reference/netlify/deploy-from-ci.md) — Git CD vs CLI 업로드, 섞으면 덮어쓰기, 헤더/캐시
 - [정적 WASM 호스팅](../concepts/static-wasm-hosting.md) — 정적 호스트가 제공해야 하는 것
+
+## 웹 앱(PWA)
+- [웹 게임을 PWA로](../reference/web/pwa-install-fullscreen-orientation.md) — 매니페스트·빌드 SHA 캐시 서비스 워커(skipWaiting 없음)·no-cache 헤더, 전체 화면·가로 잠금은 Android/데스크톱만, iPhone 홈 화면 앱은 저장소가 따로
 
 ## 엮은 절차
 - [운영판과 개발판을 갈라 내보내기](../guides/dev-and-release-flavors.md) — 마일스톤 갈래, 운영판 `--no-default-features`, Netlify 별칭 + build.txt 확인, Android `.dev` 패키지·기록 폴더, 미리 보기 Release 갈아 끼우기
