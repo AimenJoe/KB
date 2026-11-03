@@ -4,7 +4,7 @@ type: map
 tags: [gamedev, macroquad, rust, game-design, pixel-art, game-feel]
 status: verified
 created: 2026-10-24
-updated: 2026-11-02
+updated: 2026-11-03
 ---
 
 # 지도: 게임 개발
@@ -30,7 +30,7 @@ updated: 2026-11-02
 - [저장 슬롯·이어하기·런 중단 저장](../concepts/roguelite-save-slots-and-continue.md) — 기록과 런을 나누기, 슬롯은 기록 단위·설정은 밖, 시작하기/이어하기 → 슬롯 고르기, 옛 저장 = 슬롯 1, 두 번 눌러 지우기, 런 저장은 죽음이 런을 끝내나로 고르기(한 번 쓰는 중단 저장 vs 마지막 체크포인트), 저장 빈도 세 겹(사건·경계 이벤트·끄기 전 — 짧은 주기는 싸움 중을 적어 뺐다)과 같은 글이면 안 쓰기, 쓰기 실패를 알기(되읽기·한 번 알림), 끄는 순간(PC 창 닫기·웹 visibilitychange·fsync)
 
 ## 월드 구조
-- [탑다운 모험 구조](../concepts/adventure-field-and-procedural-dungeon.md) — 격자 하나, 카메라 경계 사각형(연속 스크롤 = 큰 경계, 방 밀기 = 경계 바뀜), 방 그래프 던전·잠금, 저장 지점 부활, 보스 뒤 출구는 쓰러진 자리에서 멀리·밟을 때만
+- [탑다운 모험 구조](../concepts/adventure-field-and-procedural-dungeon.md) — 격자 하나, 카메라 경계 사각형(연속 스크롤 = 큰 경계, 방 밀기 = 경계 바뀜), 방 그래프 던전·잠금, 저장 지점 부활, 보스 뒤 출구는 쓰러진 자리에서 멀리, 장소를 바꾸는 칸은 밟기보다 곁에서 확인 버튼
 - [선형 진행을 갈래 길로 느끼게 하는 지도](../concepts/branching-route-map.md) — 층 + 이어진 구간(엇갈림 없음·합류), 칸 종류가 결과를 바꿈, 다음 한 걸음 + 보스만 보이기(StS 지도·Hades 문)
 - [로그라이트 방이 반복되게 느껴질 때](../concepts/roguelite-room-variety.md) — 모양보다 방마다의 판단: 무리 표·세기 곡선·싸움 종류(물결·매복·버티기)·등장·곁방 보상 표지·손으로 짠 틀(시험이 규칙을 본다)
 - ["깊이 내려간다"를 보이게 하기](../concepts/conveying-descent.md) — 검은 전환 대신 지층 단면(로딩 시간 활용), 깊이 숫자 표, 지역 이름 카드, 지도 기울이기, 방 안의 위(빛줄기·떨어지는 흙·물방울)
@@ -57,7 +57,7 @@ updated: 2026-11-02
 
 ## 입력·접근성
 - [작은 픽셀 HUD 읽히게 하기](../concepts/hud-readability-and-quick-slots.md) — 바탕판·테두리 글자, 게이지 굵게·가득 신호, 퀵 슬롯 자리 고정·저절로 바꾸기 + 깜빡임, 창 밑 HUD 숨기기
-- [컨트롤러 버튼 배치와 다시 붙이기](../concepts/controller-layout-and-remapping.md) — 오른쪽 넷 = 자주 쓰는 넷, 키보드 다이아몬드, 겹치면 맞바꿈, 메뉴 키 고정, 안내는 배치를 따라, 격자 끝에서 옆 탭으로
+- [컨트롤러 버튼 배치와 다시 붙이기](../concepts/controller-layout-and-remapping.md) — 오른쪽 넷 = 자주 쓰는 넷, 키보드 다이아몬드, 겹치면 맞바꿈, 메뉴 키 고정, 안내는 배치를 따라, 격자 끝에서 옆 탭으로, 되돌릴 수 없는 메뉴 항목은 묻는 창(단추 = 하는 일 이름, 커서는 취소에서)
 
 ## 판매·비즈니스
 - [인디 게임을 팔 때의 규칙과 숫자](../reference/game-business/selling-an-indie-game-rules-and-numbers.md) — Steam Direct·Coming Soon 2주·Next Fest 게임당 한 번·AI 공개(Pre/Live-Generated)·원천징수(한국 저작권 10%), 위시리스트 전환·AI 표시 게임의 성과, Play(한국 15%)·Android 개발자 확인·Apple·itch, Gemini 약관, 한국 비영리 등급 면제
