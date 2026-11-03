@@ -4,12 +4,14 @@ type: concept
 tags: [gamedev, game-design, roguelite, narrative, solo-dev]
 status: draft
 created: 2026-10-25
-updated: 2026-10-26
+updated: 2026-11-03
 verified: |
   1차 출처로 확인: 기록 형식(깃발 + 수, 문자열 키, 모르는 키 보존)과 도움 모드 피해 분산(소수 누적)을 직접 구현·단위 테스트(nail-under-the-roots 0041, 2026-10-25).
   난이도 축(실뜨기 1~10, 0043·0053)을 구현했다: 매듭은 이미 있는 수치만 바꾸고, 회복을 줄이는 매듭은 화면 글("가득 찼다")과 어긋나 뺐다.
   열 줄 목록은 작은 화면에 안 들어가 고른 단계 쪽(1~5 / 6~10)만 보이게 했다. 단계별 실제 난이도는 사람 판정 전이다.
   2026-10-26 후속(직접 구현): 다양성 축의 두 번째 캐릭터(모모, nail 0056 — 기록·실뜨기 캐릭터마다), 보스 다시 싸우기(실의 꿈 0055 — 이긴 보스만·기록만·이어 꾸기), 일일 시드(오늘의 굴 0044). 재미는 사람 판정 전.
+  2026-11-03 후속(직접, nail 0272): 순위표 없는 일일 시드와 주인공 하나에만 듣는 털빛(작은 스프라이트 색 바꾸기)을 뺐다 — 사장 판단 "임팩트가 없다".
+  일일 도전의 가치가 "같은 시드 + 한 번 + 비교(순위표)"에서 나온다는 것은 2차 출처만 있음(Game Developer 기사, Spelunky·Slay the Spire 공지 기사). 플레이어 선호를 잰 자료는 찾지 못했다.
   2차 출처만 있음(공략·리뷰·팬 위키·포럼·영상 자막): Hades Pact of Punishment(첫 탈출 뒤 열림, 조건 15개, 열기 = 보상과 묶임,
   Bastion·Transistor 조건 시스템의 후계), Hades 에필로그(여러 번 깬 뒤, 출처마다 횟수가 다름), Hades God Mode(피해 저항 20% 시작,
   쓰러질 때마다 +2%, 최대 80%), Slay the Spire Ascension(캐릭터별 1~20 하나씩, 져도 안 내려감), Dead Cells Boss Cells(깰 때마다 하나,
@@ -23,6 +25,9 @@ sources:
   - https://deadcells.wiki.gg/wiki/BSC
   - https://amara.org/subtitles/7doGHxwrhRpX/en/1/download/Roguelikes%20Persistency%20and%20Progression%20%20Game%20Makers%20Toolkit.en.txt
   - https://bugnet.io/blog/how-to-design-a-roguelite-meta-progression
+  - https://www.gamedeveloper.com/design/the-24-hour-ticket-examining-daily-runs-
+  - https://www.shacknews.com/article/80294/spelunky-pc-introduces-daily-challenges
+  - https://www.pcgamer.com/au/slay-the-spire-deals-super-hard-daily-challenge-mode-in-latest-patch
 ---
 
 # 로그라이트 다회차의 세 축
@@ -44,7 +49,7 @@ sources:
 | 다양성 | 무기 결·기술 변형 | Hades Aspect | 수치표 한 줄씩 |
 | 궁금함 | 엔딩 뒤 이야기 | Hades(첫 클리어 뒤에도 계속, 에필로그는 여러 번 뒤) | 귀환 대사 표에 조건만 더한다 |
 | 궁금함 | 도감·앨범·허브 꾸미기 | — | "본 것" 표시 + 화면 하나 |
-| 변주 | 일일 시드 | — | 같은 시드 = 같은 던전이면 날짜를 시드로. 서버 없이 혼자 보는 기록부터 |
+| 변주 | 일일 시드 | Spelunky·Isaac·StS 일일 도전(모두 같은 시드, 한 번, 순위표) | 같은 시드 = 같은 던전이면 날짜를 시드로. **비교할 곳(순위표·친구) 없이 혼자 보는 기록뿐이면 "날짜가 붙은 보통 런"이 된다** — 함정 참조 |
 | 변주 | 보스 다시 싸우기 | Hollow Knight Godhome | 방 하나 + 보스 목록 |
 | 접근성 | 쓰러질수록 단단해지는 도움 모드 | Hades God Mode(20% + 2%/죽음, 최대 80%) | 받는 피해 배율 하나 + 누적 저장 |
 
@@ -70,6 +75,9 @@ sources:
 - 난이도 단계를 고를 때 **이미 있는 화면 글과 어긋나는 것**은 빼거나 글을 함께 바꾼다. "쉼터·샘이 체력을 반만 채운다"는 "체력이 가득 찼다" 알림과 어긋났다 → 패링 창·굴파기 대기처럼 글이 없는 수치를 골랐다(nail-under-the-roots 0053).
 - 단계가 10개면 작은 화면(핸드헬드 320×180)의 목록에 다 안 들어간다. 고른 단계가 있는 다섯 줄 쪽만 보인다(N단계는 1~N이 다 걸리니 앞쪽은 "다 걸림"으로 읽힌다).
 - 개발 시나리오(시험 방)는 이야기 기록을 남기지 않게 막는다. 시험하다 "쓰러진 수"가 쌓여 도움 모드·대사가 엉킨다.
+
+- **일일 시드는 비교가 있어야 산다.** 일일 도전의 재미는 "모두가 같은 굴을 한 번 돌고 순위를 본다"에서 나온다(2차 출처). 서버·순위표가 없으면 보통 런과 같은데, 타이틀 메뉴 한 칸·런 흐름 갈래(끝·쓰러짐)·저널 목표·안내·사이트 글을 계속 같이 고쳐야 한다. 서버를 붙일 계획이 없으면 넣지 않거나 뺀다(nail 0272에서 뺐다: 날짜 기록 키는 읽을 때 지우고, 저널 목표 아이디는 다시 쓰지 않는다).
+- **꾸미기 보상은 보이는 크기와 적용 범위를 먼저 본다.** 21px 주인공의 털 색 바꾸기는 거의 티가 안 났고, 플레이어 캐릭터가 셋이 된 뒤에는 하나에만 들었다. 보상에서 빼면 그 목표에 줄 것이 필요하다 — 같은 단계 목표와 같은 크기의 재화로 바꾸고, 이미 받은 기록에는 새 보상을 한 번 돌려준다(받았다는 표시가 남아 있으면 그것으로 가린다).
 
 ## 관련 노트
 - [1인 개발용 액션 로그라이트 설계 원칙](action-roguelite-for-solo-dev.md) — 반복 단위 = 캐릭터
