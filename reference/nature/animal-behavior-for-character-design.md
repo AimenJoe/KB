@@ -4,7 +4,7 @@ type: reference
 tags: [nature, animals, ecology, game-design, narrative]
 status: draft
 created: 2026-10-25
-updated: 2026-10-27
+updated: 2026-11-03
 verified: |
   1차 출처로 확인: 없음(논문 원문을 읽지 않았다).
   2차 출처만 있음(박물관·자연보호 단체·주 정부 야생동물 기관·과학 매체·Wikipedia): 두더지 독립 시기와 침의 독·지렁이 창고,
@@ -18,6 +18,9 @@ verified: |
   박쥐가 거꾸로 매달리는 이유(땅에서 못 날아오름·힘 안 드는 힘줄 잠금), 말불버섯 포자 뿜기(건드림·빗방울)도 2차 출처로 확인.
   개구리·두꺼비 혀: 2017 J. R. Soc. Interface 논문(무른 혀 + 비뉴턴 침)은 PMC 원문 요약·대학 보도로 확인. 실험은 주로 개구리이고
   두꺼비(*Bufo*)만 따로 잰 자료는 못 찾았다.
+  가재 꼬리 치기 탈출(거대 신경세포 LG·MG가 일으키는 곧은 뒤 튀기)·소금쟁이 물결 신호(Wilcox 1970년대 *Rhagadotarsus*):
+  2026-11-03 검색 요약으로만 봤다(Frontiers in Physiology 2022 리뷰·PMC 논문·대학 자연 학습 자료 제목과 요약, 원문은 안 읽음).
+  물결 신호의 주파수(구애 3Hz 등)는 종·출처마다 달라 쓰지 않는다.
   확인 못 함: "다람쥐가 묻은 열매의 60~80%를 잊는다" 수치(1차 연구 못 찾음), 뽕나무버섯 균사가 빛난다(foxfire)는 것,
   땃쥐 독이 생쥐 몇 마리를 죽일 수 있다는 수치(출처마다 다름), 두꺼비가 비 오는 밤에 주로 나온다는 것(일반 서술만 봤다).
 sources:
@@ -52,6 +55,10 @@ sources:
   - https://mentalfloss.com/article/574568/why-do-bats-hang-upside-down
   - https://wildlifetrusts.org/wildlife-explorer/fungi/common-puffball
   - https://archive.bio.ed.ac.uk/jdeacon/FungalBiology/puffball.htm
+  - https://www.frontiersin.org/journals/physiology/articles/10.3389/fphys.2022.1052354
+  - https://pmc.ncbi.nlm.nih.gov/articles/PMC3148688
+  - https://asknature.org/strategy/legs-detect-small-vibrations-for-communication/
+  - https://uwm.edu/field-station/bug-of-the-week/water-strider-revisited/
 ---
 
 # 캐릭터 설정에 쓰는 실제 동물·생태 사실
@@ -74,6 +81,8 @@ sources:
 | 개구리·두꺼비 혀 | 혀가 아주 무르고, 침은 **비뉴턴 유체**라 부딪힐 때 묽어져 먹이를 덮고 당길 때 끈끈해진다. 삼킬 때 다시 묽어져 떨어진다(Noel 등 2017). 수수두꺼비는 혀째 삼켜 설골에서 먹이를 긁어낸다 | 2차(PMC 원문 요약·조지아공대 보도). 실험은 주로 개구리 | 멀리서 혀로 끌어당기는 적 |
 | 박쥐 | 새처럼 땅에서 날아오르지 못해(날개 양력이 모자람) **높은 곳에 거꾸로 매달려 쉬다가 떨어지며** 난다. 쉬는 동안 힘줄이 발톱을 잠가 힘이 거의 들지 않는다. 거꾸로 매달리지 않는 종도 몇 있다 | 2차(굴벤키안 재단 정원 자료·Mental Floss, 연구자 인용). 해충 업체 블로그는 빼고 봤다 | 천장에서 떨어지듯 내리꽂는 적 |
 | 말불버섯류(*Lycoperdon*) | 다 익으면 머리 위에 구멍이 열리고, **건드리거나 빗방울이 치면** 풀무처럼 포자 구름을 뿜는다(1mm 넘는 빗방울로도 된다는 고속 촬영 연구) | 2차(Wildlife Trusts·에든버러대 균학 자료) | 다가가면 포자를 뿜는 버섯(갓 버섯 그림에 빌려도 습성은 말불버섯) |
+| 가재(민물가재) | 위협을 받으면 배(꼬리)를 접어 차는 **꼬리 치기로 곧게 뒤로 튄다**. 가장 빠른 두 가지는 배 신경줄의 거대 신경세포(외측·내측 거대 섬유)가 한 번 발화하면 정해진 꼴로 나간다 — 앞에서 센 자극이나 빠르게 다가오는 그림자면 곧은 뒤 튀기, 뒤에서 건드리면 자극에서 멀어지는 쪽. 같은 자극이 되풀이되면 무뎌진다(습관화) | 2차(신경생물학 리뷰·논문의 검색 요약) | 맞으면 뒤로 튀는 적 — 벽 쪽으로 몰면 튀다가 박힌다 |
+| 소금쟁이(*Gerridae*) | 물 위에 떠서 다리로 수면을 두드려 **물결로 신호를 보낸다**(짝 찾기·쫓아내기·먹이 찾기). 다른 소금쟁이는 다리의 감각기로 물결을 읽는다. 1970년대 Wilcox가 *Rhagadotarsus*로 처음 보였다 | 2차(대학 자연 학습 자료·AskNature 요약). 주파수 수치는 출처마다 다름 | 물 위에서 빠르고, 물결 고리를 퍼뜨리는 적 |
 | 다람쥐·청설모 | 열매를 여기저기 묻고(분산 저장), 다 찾지 못한 열매가 싹터 숲을 다시 만든다 | 2차(자연 단체). **"60~80%를 잊는다"는 출처 없는 수치**라 쓰지 않는다 | 잊음이 심음이 되는 사연 |
 
 ## 왜?
