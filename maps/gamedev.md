@@ -72,6 +72,7 @@ updated: 2026-11-03
 ## 다국어
 - [작은 게임 다국어 구조](../guides/small-game-localization.md) — 고정 키 표, 자리표시자, 폰트 커버리지 테스트, 브라우저 언어 읽기
 - [중국어·일본어 픽셀 폰트](../reference/fonts/cjk-pixel-fonts.md) — 중국어 폰트 ≠ 일본어 폰트, Ark Pixel·Fusion·Galmuri 범위와 라이선스
+- [게임 UI용 한글 명조](../reference/fonts/korean-serif-ui-fonts.md) — 고운바탕(11,172자·정적 굵기) vs 함렛(2,788자·가변 — fontdue는 축을 못 고름), 표 글자 서브셋 크기
 
 ## 엔진·플랫폼 선택
 - [Rust 게임 엔진 비교: 웹 + Android 핸드헬드 + 컨트롤러](../reference/rust-game-engines/web-android-gamepad-support.md) — macroquad / Bevy / Godot, Android 게임패드가 공통 공백(macroquad는 버튼만 패치로 해결)
