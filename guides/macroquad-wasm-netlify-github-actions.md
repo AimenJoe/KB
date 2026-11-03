@@ -4,7 +4,7 @@ type: guide
 tags: [macroquad, rust, wasm, netlify, github-actions, gamedev, ci]
 status: verified
 created: 2026-10-24
-updated: 2026-10-26
+updated: 2026-11-03
 verified: |
   각 단계의 근거는 링크된 reference 노트의 verified 항목을 따른다.
   1차(CI 실행): nail-under-the-roots의 deploy-web.yml(아래 YAML + "실제로 더한 것")이 main push마다 돈다. 124번째 실행(2026-10-26, v0.1.15)까지 "Deploy production" 단계 성공.
@@ -73,7 +73,7 @@ jobs:
   build-deploy:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - uses: dtolnay/rust-toolchain@stable
         with:
@@ -89,9 +89,9 @@ jobs:
           cp target/wasm32-unknown-unknown/release/mygame.wasm dist/
           [ -d assets ] && cp -r assets dist/assets
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
-          node-version: 22
+          node-version: 26   # 최신 LTS로(2026-11 기준 26)
 
       - name: Deploy production
         if: github.event_name == 'push'
@@ -148,3 +148,5 @@ curl -sI https://<site>.netlify.app/mygame.wasm | grep -i content-type   # appli
 - [reference/macroquad/wasm-build.md](../reference/macroquad/wasm-build.md)
 - [reference/netlify/deploy-from-ci.md](../reference/netlify/deploy-from-ci.md)
 - [reference/github-actions/rust-wasm-build.md](../reference/github-actions/rust-wasm-build.md)
+
+- 액션 판(Node 20 폐기, 2026-11-03에 node24 메이저로 올림): [node24 액션 런타임](../reference/github-actions/node24-action-runtime.md)

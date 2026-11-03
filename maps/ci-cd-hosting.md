@@ -4,7 +4,7 @@ type: map
 tags: [ci, deploy, hosting, github-actions, netlify]
 status: verified
 created: 2026-10-24
-updated: 2026-10-28
+updated: 2026-11-03
 ---
 
 # 지도: CI/CD와 호스팅
@@ -14,6 +14,7 @@ updated: 2026-10-28
 - [GitHub Pages에 정적 페이지](../reference/github-actions/pages-static-site.md) — Actions 배포, 처음 한 번 사람이 켜기(GITHUB_TOKEN 불가), 릴리스 API로 버전·소식 채우기, 글꼴 줄이기
 - [버전 올리기 = 릴리스](../reference/github-actions/release-from-version-bump.md) — CI가 태그를 만들고(GITHUB_TOKEN 태그는 다른 워크플로를 안 깨움) 빌드를 `workflow_call`로 부르기, 앱에 버전·커밋 찍기
 - [공개 레포를 비공개로 바꿀 때](../reference/github-actions/public-to-private-repo.md) — Actions가 돈이 된다(Free 월 $12어치, macOS ≈10배)·Pages 자동 내림·Release 익명 404, 바꾸기 전 실행 양 재기·줄이기·홈페이지 먼저 옮기기
+- [Node 20 폐기 — 액션을 node24 판으로](../reference/github-actions/node24-action-runtime.md) — `runs.using`이 정한다(`node-version`과 무관), 액션마다 node24 메이저·올릴 때 깨지는 것(checkout v6 자격 증명 파일, setup-node 자동 캐시, upload-artifact는 v6부터)
 - [Android APK 빌드](../guides/macroquad-android-apk-github-actions.md) — 덮어 설치 = 같은 키 + 큰 versionCode, 키를 캐시에만 두면 7일 뒤 사라짐
 - [공개 레포 + 비공개 에셋 레포](../guides/pixel-art-without-an-artist.md#공개-레포에서-유료-팩-다루기) — 두 번째 checkout, fine-grained 토큰, Actions 비용은 도는 레포 기준
 
@@ -23,6 +24,9 @@ updated: 2026-10-28
 ## Netlify
 - [CI에서 netlify-cli로 배포](../reference/netlify/deploy-from-ci.md) — Git CD vs CLI 업로드, 섞으면 덮어쓰기, 헤더/캐시
 - [정적 WASM 호스팅](../concepts/static-wasm-hosting.md) — 정적 호스트가 제공해야 하는 것
+
+## 웹 앱(PWA)
+- [웹 게임을 PWA로](../reference/web/pwa-install-fullscreen-orientation.md) — 매니페스트·빌드 SHA 캐시 서비스 워커(skipWaiting 없음)·no-cache 헤더, 전체 화면·가로 잠금은 Android/데스크톱만, iPhone 홈 화면 앱은 저장소가 따로
 
 ## 엮은 절차
 - [운영판과 개발판을 갈라 내보내기](../guides/dev-and-release-flavors.md) — 마일스톤 갈래, 운영판 `--no-default-features`, Netlify 별칭 + build.txt 확인, Android `.dev` 패키지·기록 폴더, 미리 보기 Release 갈아 끼우기

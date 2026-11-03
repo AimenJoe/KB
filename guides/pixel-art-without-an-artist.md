@@ -4,7 +4,7 @@ type: guide
 tags: [gamedev, pixel-art, assets, licensing, solo-dev]
 status: draft
 created: 2026-10-24
-updated: 2026-10-29
+updated: 2026-11-03
 verified: |
   1차(2026-10-29, nail 0230 R17): 변환기 9개·시트 24장 재현 검사 스크립트, 색표 접기 순서가 도토 8점을 바꾼 것과 고친 뒤 24장 모두 같음을 직접 확인.
   1차 출처로 확인(2026-10-29, 동작을 따로 더 받기: nail-under-the-roots 0229 직접 구현 — 이웃·보스·플레이어블 여섯의 걷기·깡충 네 칸을 한 줄 시트로 따로 받아 원래 시트 끝에 붙이고, 확대 미리보기·헤드리스 게임 화면·공식 페이지 띠로 확인. 이미 만든 다섯 시트를 다시 만들어 같음 확인).
@@ -101,7 +101,7 @@ sources:
   ```yaml
   - name: Fetch vendor assets (private repo)
     if: env.ASSETS_REPO != ''          # job env: ASSETS_REPO: ${{ secrets.ASSETS_REPO }}
-    uses: actions/checkout@v4
+    uses: actions/checkout@v7
     with: { repository: ${{ secrets.ASSETS_REPO }}, token: ${{ secrets.ASSETS_TOKEN }}, path: assets/vendor }
   ```
   `secrets`는 `if:`에서 직접 못 쓰므로 job `env`로 옮겨 검사한다.

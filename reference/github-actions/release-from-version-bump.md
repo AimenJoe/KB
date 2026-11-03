@@ -4,7 +4,7 @@ type: reference
 tags: [github-actions, ci-cd, release, android, rust]
 status: verified
 created: 2026-10-25
-updated: 2026-10-25
+updated: 2026-11-03
 verified: |
   1차 출처로 확인(GitHub 문서 원본 github/docs 레포 main, 2026-10-25 — docs.github.com은 세션 프록시가 막아 raw.githubusercontent.com으로 읽음):
   GITHUB_TOKEN이 일으킨 이벤트는 workflow_dispatch·repository_dispatch 말고는 새 워크플로를 만들지 않는다(재귀 방지, data/reusables/actions/actions-do-not-trigger-workflows.md).
@@ -53,7 +53,7 @@ concurrency:
   group: android-${{ inputs.release_tag || github.ref }}   # 호출한 쪽과 다른 그룹
 ...
 - if: startsWith(github.ref, 'refs/tags/v') || inputs.release_tag != ''
-  uses: softprops/action-gh-release@v2
+  uses: softprops/action-gh-release@v3
   with:
     tag_name:  ${{ inputs.release_tag || github.ref_name }}
     body_path: docs/releases/${{ inputs.release_tag || github.ref_name }}.md

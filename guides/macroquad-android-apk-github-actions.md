@@ -4,7 +4,7 @@ type: guide
 tags: [macroquad, miniquad, android, apk, github-actions, ci-cd, rust]
 status: verified
 created: 2026-10-24
-updated: 2026-10-26
+updated: 2026-11-03
 verified: |
   1차 출처로 확인: cargo-quad-apk git master(커밋 d411c8f, 2026-07-28) 소스 — src/config.rs(NDK_HOME 필수, ANDROID_SDK_HOME→ANDROID_HOME,
   build-tools 중 가장 높은 버전 자동 선택, android_version 기본 36, min_sdk 기본 18), src/ops/build.rs(aapt2·d8·zipalign·javac -source/-target 1.8,
@@ -72,11 +72,11 @@ jobs:
     runs-on: ubuntu-latest
     permissions: { contents: write }      # 태그 Release용
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: dtolnay/rust-toolchain@stable
         with: { targets: aarch64-linux-android }
       - uses: Swatinem/rust-cache@v2
-      - uses: actions/cache@v4             # cargo 크레이트를 컴파일하므로 첫 설치가 몇 분. 바이너리를 커밋 해시로 캐시
+      - uses: actions/cache@v6             # cargo 크레이트를 컴파일하므로 첫 설치가 몇 분. 바이너리를 커밋 해시로 캐시
         id: cqa
         with: { path: ~/.cargo/bin/cargo-quad-apk, key: cargo-quad-apk-${{ runner.os }}-${{ env.CARGO_QUAD_APK_REV }} }
       - if: steps.cqa.outputs.cache-hit != 'true'
@@ -84,10 +84,10 @@ jobs:
       - run: |
           export NDK_HOME="$ANDROID_NDK_HOME"      # cargo-quad-apk는 NDK_HOME만 본다. ANDROID_HOME은 러너가 이미 설정
           cargo quad-apk build --release
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with: { name: apk, path: target/android-artifacts/release/apk/*.apk, if-no-files-found: error }
       - if: startsWith(github.ref, 'refs/tags/v')
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with: { files: target/android-artifacts/release/apk/*.apk }
 ```
 - 태그 push에는 `paths` 필터가 적용되지 않으므로 `v*` 태그는 항상 빌드된다.
@@ -132,3 +132,5 @@ NDK 없이도 `rustup target add aarch64-linux-android && cargo check --target a
 - [guides/macroquad-wasm-netlify-github-actions.md](macroquad-wasm-netlify-github-actions.md)
 - [reference/github-actions/rust-wasm-build.md](../reference/github-actions/rust-wasm-build.md)
 - [버전 올리기 = 릴리스](../reference/github-actions/release-from-version-bump.md) — CI가 태그를 만들고 이 빌드를 `workflow_call`로 부름
+
+- 액션 판(Node 20 폐기, 2026-11-03에 node24 메이저로 올림): [node24 액션 런타임](../reference/github-actions/node24-action-runtime.md)

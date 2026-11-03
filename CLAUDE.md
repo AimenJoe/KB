@@ -28,3 +28,5 @@
 - 프로젝트별 TODO, 로그, 회의 메모를 여기에 쓰지 않는다.
 - README 인덱스를 손으로 고치지 않는다 (`tools/kb.py index`가 생성).
 - `verified` 없는 guide/reference/concept/decision 노트를 만들지 않는다.
+- 커밋 메시지·PR 본문에 `Co-Authored-By: …`·`Claude-Session: …` 같은 Claude 표시 줄을 붙이지 않는다(2026-11-03, `.claude/settings.json`의 `attribution`도 끔).
+- 커밋은 세션의 기본 git 계정(Claude `noreply@anthropic.com`)으로 한다 — 서명 키가 그 계정 것이라, 작성자를 다른 사람으로 바꾸면(`--author`·`-c user.*`) GitHub에 "잘못된 서명"으로 뜬다(사장 2026-11-03, `ef7456a`가 그랬다).
