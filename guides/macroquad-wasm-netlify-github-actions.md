@@ -91,7 +91,7 @@ jobs:
 
       - uses: actions/setup-node@v7
         with:
-          node-version: 22
+          node-version: 26   # 최신 LTS로(2026-11 기준 26)
 
       - name: Deploy production
         if: github.event_name == 'push'

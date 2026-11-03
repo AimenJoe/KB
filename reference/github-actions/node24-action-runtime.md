@@ -60,13 +60,14 @@ git ls-remote --tags --refs https://github.com/actions/checkout | awk -F/ '{prin
 ### 직접 해 본 것 (nail-under-the-roots, 2026-11-03)
 워크플로 여섯의 checkout v4→v7, setup-node v4→v7, upload-artifact v4→v7, cache v4→v6, action-gh-release v2→v3을 한 커밋으로 올렸다. 걸리는 변경은 없었다.
 - `package.json`이 없으니 setup-node 자동 캐시가 켜지지 않는다.
+- 스크립트용 Node는 22 → 26(최신 LTS: nodejs/Release `schedule.json`에서 v26 Lithium이 2026-10-28 LTS, v24는 2026-10-20부터 Maintenance). `lts/*`는 다음 LTS로 조용히 넘어가므로 숫자를 박았다. 쓰는 npm 도구의 `engines`(netlify-cli@23 `>=20.12.2`, playwright@1.63 `>=20`)에 위쪽 제한이 없는 것을 먼저 봤다.
 - `pull_request_target`을 쓰지 않는다.
 - 뒤 단계의 `git push`(태그)는 v6 뒤에도 그대로 된다.
 
 ## 왜?
 액션은 러너가 가진 Node 바이너리로 돈다. 그래서 러너가 어떤 Node를 지원하는지가 액션 판의 수명을 정한다. GitHub은 Node가 지원 종료(EOL)에 가까워지면 러너에서 그 Node를 걷어 낸다. Node 20의 EOL은 2026-04다(verified 참고). 액션 쪽은 `using`을 바꾼 새 **메이저**를 낸다. 런타임이 바뀌면 필요한 최소 러너 판이 오르므로, 이는 깨지는 변경으로 친다. 떠 있는 `v4` 태그는 옛 런타임에 머물고, 같은 메이저 안에서 런타임을 올려 주지 않는다. 예외는 Swatinem/rust-cache v2처럼 메이저 안에서 올린 경우다. 그래서 워크플로를 고치지 않으면 경고는 사라지지 않는다.
 
-`setup-node`의 `node-version: 22`는 **내 스크립트**가 쓰는 Node다. **액션 자신**이 도는 Node와는 별개다. 경고가 나는데 `node-version`만 올리면 아무것도 바뀌지 않는다.
+`setup-node`의 `node-version`(예: `26`)은 **내 스크립트**가 쓰는 Node다. **액션 자신**이 도는 Node와는 별개다. 경고가 나는데 `node-version`만 올리면 아무것도 바뀌지 않는다.
 
 ## 함정
 - `upload-artifact`는 v5.0.0까지 node20이다. 다른 액션처럼 v5에서 node24가 되지 않으니 v6 이상으로 올린다.
