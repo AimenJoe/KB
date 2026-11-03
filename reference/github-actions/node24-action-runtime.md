@@ -13,7 +13,7 @@ verified: |
     configure-pages v6·deploy-pages v5. upload-pages-artifact v5는 composite이고 안에서 upload-artifact v7.0.0을 부른다.
     dtolnay/rust-toolchain@stable은 composite(Node를 안 씀).
   - 메이저마다 바뀐 것: 아래 표의 글은 각 README의 What's new / Breaking changes와 action-gh-release CHANGELOG에서.
-  - 직접 실행(nail-under-the-roots, 2026-11-03): 워크플로 여섯의 액션을 위 최신 메이저로 올리고 release/** push로 CI를 돌림 — 결과는 아래 "직접 해 본 것".
+  - 직접 실행(nail-under-the-roots, 2026-11-03): 워크플로 여섯의 액션을 위 최신 메이저로 올리고 CI를 돌림 — release/v0.9에서 build-android(dev Release 갱신 + `git push -f` 태그)·build-ios·build-desktop·deploy-web·smoke-web(Node 26) 모두 성공, main에서도 pages·release·build-android 성공.
   2차 출처만 있음(GitHub changelog 글은 이 세션에서 github.blog이 막혀 검색 요약으로만 봄):
   - 러너가 2026-06-16부터 node24를 기본으로 쓰고, Node 20은 2026-09-23에 러너에서 지운다(처음 발표는 2025-09-19, 날짜는 편집자 주로 몇 번 바뀜).
   - `FORCE_JAVASCRIPT_ACTIONS_TO_NODE24=true`로 미리 시험, `ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true`로 node20에 되돌리기는 지우기 전까지만.
@@ -62,7 +62,7 @@ git ls-remote --tags --refs https://github.com/actions/checkout | awk -F/ '{prin
 - `package.json`이 없으니 setup-node 자동 캐시가 켜지지 않는다.
 - 스크립트용 Node는 22 → 26(최신 LTS: nodejs/Release `schedule.json`에서 v26 Lithium이 2026-10-28 LTS, v24는 2026-10-20부터 Maintenance). `lts/*`는 다음 LTS로 조용히 넘어가므로 숫자를 박았다. 쓰는 npm 도구의 `engines`(netlify-cli@23 `>=20.12.2`, playwright@1.63 `>=20`)에 위쪽 제한이 없는 것을 먼저 봤다.
 - `pull_request_target`을 쓰지 않는다.
-- 뒤 단계의 `git push`(태그)는 v6 뒤에도 그대로 된다.
+- 뒤 단계의 `git push`(태그)는 v6 뒤에도 그대로 된다(build-android의 `git push -f origin refs/tags/dev`가 checkout v7 + action-gh-release v3으로 성공).
 
 ## 왜?
 액션은 러너가 가진 Node 바이너리로 돈다. 그래서 러너가 어떤 Node를 지원하는지가 액션 판의 수명을 정한다. GitHub은 Node가 지원 종료(EOL)에 가까워지면 러너에서 그 Node를 걷어 낸다. Node 20의 EOL은 2026-04다(verified 참고). 액션 쪽은 `using`을 바꾼 새 **메이저**를 낸다. 런타임이 바뀌면 필요한 최소 러너 판이 오르므로, 이는 깨지는 변경으로 친다. 떠 있는 `v4` 태그는 옛 런타임에 머물고, 같은 메이저 안에서 런타임을 올려 주지 않는다. 예외는 Swatinem/rust-cache v2처럼 메이저 안에서 올린 경우다. 그래서 워크플로를 고치지 않으면 경고는 사라지지 않는다.
