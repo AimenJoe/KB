@@ -4,7 +4,7 @@ type: reference
 tags: [github-actions, rust, wasm, ci]
 status: verified
 created: 2026-10-24
-updated: 2026-10-24
+updated: 2026-11-03
 verified: |
   1차 출처로 확인: dtolnay/rust-toolchain의 `targets` 입력, actions-rust-lang/setup-rust-toolchain의 `target` 입력과 rust-cache 기본 내장,
   macroquad 자체 CI의 wasm32 매트릭스.
@@ -24,7 +24,7 @@ sources:
 ## 최소 단계
 
 ```yaml
-- uses: actions/checkout@v4
+- uses: actions/checkout@v7
 - uses: dtolnay/rust-toolchain@stable
   with:
     targets: wasm32-unknown-unknown        # 쉼표로 여러 개 가능
@@ -71,3 +71,5 @@ concurrency:
 ## 관련 노트
 - [reference/macroquad/wasm-build.md](../macroquad/wasm-build.md)
 - [reference/netlify/deploy-from-ci.md](../netlify/deploy-from-ci.md)
+
+- 액션 판(Node 20 폐기, 2026-11-03에 node24 메이저로 올림): [node24 액션 런타임](node24-action-runtime.md)

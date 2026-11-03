@@ -4,7 +4,7 @@ type: reference
 tags: [github-actions, ci-cd, hosting, static-site, fonts]
 status: verified
 created: 2026-10-25
-updated: 2026-10-28
+updated: 2026-11-03
 verified: |
   1차 출처로 확인(2026-10-25):
   - 각 액션 레포의 태그와 action.yml(git fetch로 읽음): configure-pages v6.0.0(2026-03-24, node24, `enablement` 입력은 "GITHUB_TOKEN 말고 다른 토큰이 필요"),
@@ -46,7 +46,7 @@ jobs:
     runs-on: ubuntu-latest
     environment: { name: github-pages, url: ${{ steps.deploy.outputs.page_url }} }
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: actions/configure-pages@v6
       - uses: actions/upload-pages-artifact@v5
         with: { path: site }
