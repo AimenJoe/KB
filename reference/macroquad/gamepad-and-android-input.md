@@ -4,7 +4,7 @@ type: reference
 tags: [macroquad, miniquad, gamepad, android, input, touch, rust]
 status: verified
 created: 2026-10-24
-updated: 2026-10-29
+updated: 2026-11-03
 verified: |
   1차 출처로 확인: miniquad master의 java/MainActivity.java(onTouch/onKey만 구현, onGenericMotionEvent 없음),
   src/native/android.rs(surfaceOnKeyDown/Up → keycodes::translate_keycode), src/native/android/keycodes.rs(109개 매핑,
@@ -119,10 +119,11 @@ Android 게임패드 버튼 키코드(공식 문서 확인값): `BUTTON_A 96(0x6
    - Rust: 상태라 `Message`·`EventHandler` 대신 `static [AtomicU32; 6]`(f32 비트)에 적고 `pub fn joystick_axes()`로 읽는다. Java UI 스레드가 쓰고 게임 스레드가 읽는다. 마지막 값만 필요하니 과거 표본(`getHistoricalAxisValue`)은 버린다.
    - 게임: 데스크톱과 같은 반지름 데드존(0.2), 스틱이 서 있으면 HAT·화살표 8방향. y는 Android도 아래가 +라 뒤집지 않는다(gilrs·웹 플러그인은 위가 +).
    - 트리거 축은 받지 않았다: L2·R2는 `BUTTON_L2/R2` 키로 이미 온다(공식 문서: 패드에 따라 축·키 둘 중 하나나 둘 다).
-3. **빌드**: `cargo-quad-apk`는 crates.io 0.1.4가 4년 이상 전 릴리스지만 **git master는 2025~2026에 갱신**됐다(API 36, aapt2·d8, NDK 29). 커밋을 고정해 설치하면 GitHub 러너 내장 SDK/NDK로 바로 빌드된다 → [guides/macroquad-android-apk-github-actions.md](../../guides/macroquad-android-apk-github-actions.md).
-4. **`gamepads` 크레이트는 Android 빌드에서 빼야 한다**: 0.1.7은 `android-winit` feature 없이 `poll_android_winit` 미정의로 컴파일 실패(2026-10-24 `cargo check --target aarch64-linux-android`로 재현). non-Android 전용 의존성으로 두고 코드에 `cfg(not(target_os = "android"))`.
+3. **키 반복**(해 봄, nail 0171): Android는 버튼을 누르고 있는 동안 반복 `ACTION_DOWN`(`getRepeatCount() > 0`)을 보낸다. 원본 miniquad는 이것을 전부 새 누름으로 넘겨 `is_key_pressed`가 계속 참이 되고, 누르고 있다 떼는 동작(모으기·강타)이 안 된다. `MainActivity.onKey`가 `surfaceOnKeyDown(keyCode, repeat)`로 플래그를 넘기고 `QuadNative.java`·`src/native/android.rs`(`Message::KeyDown { repeat }`)가 `key_down_event`까지 전한다 — 웹(`event.repeat`)·데스크톱과 같아진다. 패치 표 시험처럼 `include_str!`로 Java·Rust 양쪽에 플래그가 있는지 본다.
+4. **빌드**: `cargo-quad-apk`는 crates.io 0.1.4가 4년 이상 전 릴리스지만 **git master는 2025~2026에 갱신**됐다(API 36, aapt2·d8, NDK 29). 커밋을 고정해 설치하면 GitHub 러너 내장 SDK/NDK로 바로 빌드된다 → [guides/macroquad-android-apk-github-actions.md](../../guides/macroquad-android-apk-github-actions.md).
+5. **`gamepads` 크레이트는 Android 빌드에서 빼야 한다**: 0.1.7은 `android-winit` feature 없이 `poll_android_winit` 미정의로 컴파일 실패(2026-10-24 `cargo check --target aarch64-linux-android`로 재현). non-Android 전용 의존성으로 두고 코드에 `cfg(not(target_os = "android"))`.
 
-합쳐서 예상(200줄)보다 작았지만(버튼 13줄 + 축 50줄 안팎) **miniquad 포크를 유지**하게 된다(`PATCHED.md`에 고친 곳 목록, miniquad를 올리면 다시 넣는다). 버튼(1)만 먼저 하고, 아날로그가 필요하다고 느낄 때 축(2)을 하는 순서가 싸다. 왼쪽 스틱은 프레임워크가 D패드 키로 바꿔 주므로 메뉴·이동은 버튼 패치만으로 된다.
+합쳐서 예상(200줄)보다 작았지만(버튼 13줄 + 축 50줄 안팎 + 키 반복 몇 줄) **miniquad 포크를 유지**하게 된다(`PATCHED.md`에 고친 곳 목록, miniquad를 올리면 다시 넣는다). 버튼(1)만 먼저 하고, 아날로그가 필요하다고 느낄 때 축(2)을 하는 순서가 싸다. 왼쪽 스틱은 프레임워크가 D패드 키로 바꿔 주므로 메뉴·이동은 버튼 패치만으로 된다.
 
 ## 터치 (웹·모바일 브라우저)
 macroquad 0.4.16의 `touches()`는 `Touch { id, phase, position }`를 돌려준다. 실제로 붙여 보고 확인한 함정 두 가지(2026-10-25, Pixel 7 프로필 헤드리스 Chromium과 실기 Android 13 브라우저):

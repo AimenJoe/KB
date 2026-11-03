@@ -4,7 +4,7 @@ type: guide
 tags: [ci, deploy, github-actions, netlify, android, rust, gamedev]
 status: draft
 created: 2026-10-28
-updated: 2026-10-29
+updated: 2026-11-03
 verified: |
   1차 출처로 확인:
     - 직접 실행(nail-under-the-roots 0227, 2026-10-28): release/v0.6에 쌓인 고침·그림을 main에 합쳐 v0.5.1로 냈다(release·deploy-web·build-android·pages·build-ios·smoke-web 모두 성공, Release에 APK).
@@ -28,7 +28,7 @@ sources:
 
 ## 본문
 ### 갈래
-- `main` = 운영판, 패치만. `release/vX.Y` = 마일스톤 모음. 작업 브랜치는 release로 합친다.
+- `main` = 운영판, 패치만. `release/vX.Y` = 마일스톤 모음이자 작업 갈래(nail은 2026-11-02부터 따로 작업 브랜치를 두지 않고 release에 바로 커밋 — 혼자 하는 개발이면 합치는 단계가 없어 싸다. 여럿이면 작업 브랜치 → release).
 - 패치는 main에 넣고 release로도 합친다(main → release). 거꾸로(release → main)는 마일스톤을 닫을 때 한 번.
 - 마일스톤 범위가 바뀌어 release에 쌓인 것이 고침·그림뿐이면, 닫지 않고 **release → main을 패치 버전으로** 내도 된다(nail-under-the-roots 0227: v0.6을 오래 걸리는 큰 기능 하나로 바꾸며 개발판 고침을 v0.5.1·v0.5.2로 냈다 — 두 갈래가 같아지고, 다음 큰 것은 release에서 시작). 이때도 버전 규칙(마이너 = 마일스톤)은 그대로라 버전은 패치만 올린다.
 

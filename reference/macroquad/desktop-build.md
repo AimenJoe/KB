@@ -4,7 +4,7 @@ type: reference
 tags: [macroquad, rust, github-actions, release, windows, macos, linux, steam]
 status: draft
 created: 2026-10-29
-updated: 2026-10-29
+updated: 2026-11-03
 verified: |
   1차 출처로 확인(2026-10-29, nail-under-the-roots 0240):
   - miniquad 소스 `fs.rs` `load_file_desktop`: 데스크톱은 `File::open(path)` — 경로가 상대면 "지금 작업 폴더" 기준이다.
@@ -50,8 +50,9 @@ macroquad(miniquad)는 Windows·macOS·Linux를 원래 지원해 코드 변경�
 
 ## PC에서만 필요한 것
 - 타이틀 "끝내기"(`miniquad::window::order_quit`), 전체 화면 토글(`set_fullscreen`, F11) — 웹·모바일 빌드에서는 숨긴다(`cfg!(not(any(wasm32, android, ios)))`).
+- 창 ✕로 닫을 때 저장: `prevent_quit()`로 닫기를 붙잡고 `is_quit_requested()`가 오면 런을 적은 뒤 `order_quit()`(nail 0264). 안 하면 ✕가 저장 없이 끝낸다.
 
 ## 비용·서명
-- macOS 러너는 분당 리눅스의 약 10배 → main push마다가 아니라 릴리스·손으로만([공개 레포를 비공개로](../github-actions/public-to-private-repo.md)).
+- macOS 러너는 분당 리눅스의 약 10배 → main push마다가 아니라 개발 갈래(`release/**`) push·릴리스·손으로만([공개 레포를 비공개로](../github-actions/public-to-private-repo.md)).
 - macOS 공증: Apple Developer($99/년) → Developer ID 인증서 + `notarytool`(App Store Connect API 키)를 CI 시크릿으로.
 - iOS는 [macroquad iOS 빌드](ios-build.md), Android는 [게임패드·Android 입력](gamepad-and-android-input.md).
