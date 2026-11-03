@@ -28,3 +28,4 @@
 - 프로젝트별 TODO, 로그, 회의 메모를 여기에 쓰지 않는다.
 - README 인덱스를 손으로 고치지 않는다 (`tools/kb.py index`가 생성).
 - `verified` 없는 guide/reference/concept/decision 노트를 만들지 않는다.
+- 커밋 메시지·PR 본문에 `Co-Authored-By: …`·`Claude-Session: …` 같은 Claude 표시 줄을 붙이지 않는다(2026-11-03, `.claude/settings.json`의 `attribution`도 끔).
