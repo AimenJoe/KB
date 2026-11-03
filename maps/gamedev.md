@@ -81,6 +81,7 @@ updated: 2026-11-03
   - [게임패드와 Android 입력 현황](../reference/macroquad/gamepad-and-android-input.md) — `gamepads` 크레이트, miniquad Android 백엔드의 공백과 패치 범위, 메뉴 스틱 탐색(히스테리시스)
 - 렌더링
   - [픽셀 퍼펙트 렌더링](../reference/macroquad/pixel-perfect-rendering.md) — 내부 해상도 320×180, render target, Nearest, 정수 배율
+  - [오래 켜면 죽을 때: GPU 메모리가 자라는 원인과 재는 법](../reference/macroquad/gpu-memory-growth.md) — `telemetry::capture_frame`이 텍스처를 흘림, 호출 칸 버퍼는 최댓값을 쥠, WebGL 탐침, Rust 힙 도구
   - [글자 그리기 비용과 브라우저 프레임레이트](../reference/macroquad/text-rendering-and-browser-frame-rate.md) — 아틀라스 통째 올리기, 픽셀 폰트는 원래 크기로 굽고 정수배, 미리 굽기, WebGL 안티에일리어싱 끄기, Safari 저전력 30fps
 - 빌드·배포
   - [macroquad WASM을 GitHub Actions로 빌드해 Netlify에 배포](../guides/macroquad-wasm-netlify-github-actions.md) — 전체 절차
