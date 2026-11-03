@@ -1,7 +1,7 @@
 ---
 title: 레트로 3D 모델 파이프라인 — Blockbench 상자 모델 → glTF(부위 강체 애니메이션) → 직접 로더
 type: reference
-tags: [assets, 3d, blockbench, gltf, animation, gamedev, pixel-art]
+tags: [assets, 3d, blockbench, blender, gltf, animation, gamedev, pixel-art]
 status: draft
 created: 2026-11-03
 updated: 2026-11-03
@@ -12,6 +12,10 @@ verified: |
   - Blockbench 위키 "bbmodel": "완전한 JSON 사양은 아직 없다", 5.0에서 `groups`와 `outliner`(트리만, 노드는 `uuid`·`isOpen`·`children`)를 분리, 5.0 전에는 위치 X·회전 X/Y 키프레임이 **반대 부호**였다.
   - `gltf` 크레이트 docs.rs: 최신 1.4.1, `animation` 모듈(채널·타깃·샘플러), `scene`(노드 트리), `skin`, `gltf::import`(.gltf + 버퍼 + 이미지).
   2차 출처만 있음(Defold 포럼 가이드, 2024): Blockbench `File > Export > glTF Model`에 **Export Animations**·**Groups As Armatures**(그룹을 본으로)·Model Scale(기본 16)·Embed textures 옵션이 있고, 그룹을 피벗으로 쓰는 "변형만 하는" 애니메이션을 그대로 내보낼 수 있다. 공식 Blockbench 문서에서는 이 옵션 이름을 확인하지 못했다.
+  1차(직접 실행, 2026-11-03, knellroot): **Blender 4.0.2(apt, 헤드리스) + bpy 스크립트**로 상자 둘(몸·팔) + 아마추어(본 둘) + 메시를 본의 자식으로(가중치 없음 = 강체) + 16px 텍스처(Closest) + 팔 본 회전 키프레임 → `export_scene.gltf(export_format="GLB", export_animations=True)` → Rust `gltf` 1.4.1 로더로 읽음:
+  - 축은 내보내기가 Z-up → Y-up으로 바꿔 준다. 본은 노드가 되고 메시 노드는 본 노드의 자식 — `skins`는 1개 생기지만 메시에 가중치가 없어 노드 TRS만 읽어도 강체로 맞게 움직인다(팔 무게중심이 ±40°에 앞뒤 ±0.141m, 계산과 같음).
+  - 애니메이션은 **프레임마다 구워 나온다**(1초 24fps → 회전 키 25개, LINEAR). 안 움직이는 채널은 STEP 키 2개. 본의 쉬는 자세(아래로 향한 본 = X 180°)가 채널 값에 들어 있다.
+  - 텍스처는 glb 안에 PNG로(bufferView). 헤드리스 apt Blender는 glTF 내보내기에 `python3-numpy`가 따로 필요했다. 미리보기는 Workbench 렌더(GPU 없이, EGL 경고만)로 찍힌다.
   확인 못 함: 내보낸 glTF에서 그룹이 노드 TRS 애니메이션으로 가는지 아니면 스킨(joints)으로 가는지(가이드는 Defold에서 "skeleton"에 붙이는 것으로 보아 스킨일 수 있다 — 그러면 부위가 강체여도 조인트 하나 = 가중치 1.0이라 CPU 변형이 행렬 하나로 끝난다), 회전 단위(도)와 축 방향, 실제 파일을 열어 본 적 없음.
 sources:
   - https://github.com/JannisX11/blockbench/blob/master/js/formats/bbmodel.js
@@ -25,6 +29,10 @@ sources:
 
 ## 요약
 "마인크래프트보다 조금만 정교한" 로우폴리 캐릭터는 **상자 몇 개를 부위 트리로 묶고 부위마다 회전 키프레임**을 주면 된다(스키닝 없음). Blockbench(무료, 브라우저/데스크톱)가 바로 그 도구이고, glTF로 내보내면 Rust `gltf` 크레이트가 노드 트리와 애니메이션 채널을 읽어 준다. 로더가 없는 엔진(macroquad)에서는 이 조합이 가장 짧은 길이다. 단, 내보내기 옵션과 축·단위는 **실제 파일 하나로 먼저 확인**해야 한다(2차 출처뿐).
+
+## Blender를 쓸 때(1차, 위 verified)
+- 부위 강체는 "메시를 본의 자식으로"(Bone parent) — 가중치를 주지 않으면 로더가 스키닝 없이 노드 트리만으로 움직인다.
+- 모델 원본을 **bpy 스크립트**로 두면 사람이 아니라 코드(에이전트)가 만들고, 헤드리스로 glb와 미리보기 렌더까지 한 번에 뽑는다. 그림 원본이 코드라 diff·재생성이 된다(첫 게임의 "그림은 스크립트를 고쳐 다시 만든다"와 같은 규칙).
 
 ## 본문
 

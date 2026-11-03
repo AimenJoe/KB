@@ -159,6 +159,7 @@ _`python3 tools/kb.py index` 로 생성. 손으로 고치지 말 것._
 - `assets`: [게임 그림 외주 맡기기 — 사양서와 계약 체크리스트(한국 저작권법 기준)](guides/commissioning-game-art.md), [작곡가·음향 담당 없이 게임 소리 넣기 (CC0 출처·숫자로 고르기·섞기)](guides/game-audio-without-a-composer.md), [그림 못 그려도 도트 게임 만들기 (에셋 전략)](guides/pixel-art-without-an-artist.md), [무료(CC0·퍼블릭 도메인) 그림·사진 구하는 곳과 API 요령](reference/assets/free-image-sources.md), [레트로 3D 모델 파이프라인 — Blockbench 상자 모델 → glTF(부위 강체 애니메이션) → 직접 로더](reference/assets/retro-3d-models-blockbench-gltf.md)
 - `audio`: [작곡가·음향 담당 없이 게임 소리 넣기 (CC0 출처·숫자로 고르기·섞기)](guides/game-audio-without-a-composer.md), [macroquad 소리(quad-snd) — 형식·메모리·음악 재생의 제약](reference/macroquad/audio.md)
 - `bevy`: [Rust 게임 엔진 비교 — 웹 + Android 핸드헬드 + 컨트롤러 요구사항 기준](reference/rust-game-engines/web-android-gamepad-support.md)
+- `blender`: [레트로 3D 모델 파이프라인 — Blockbench 상자 모델 → glTF(부위 강체 애니메이션) → 직접 로더](reference/assets/retro-3d-models-blockbench-gltf.md)
 - `blockbench`: [레트로 3D 모델 파이프라인 — Blockbench 상자 모델 → glTF(부위 강체 애니메이션) → 직접 로더](reference/assets/retro-3d-models-blockbench-gltf.md)
 - `boss`: [근접 주인공의 원거리 보스 — 되받아치는 탄, 비키거나 파내는 바닥 위험](concepts/ranged-boss-for-melee-player.md), [다시 만나는 보스 — 만날 때마다 한 수, 지면 길을 비킨다](concepts/recurring-boss.md)
 - `business`: [인디 게임을 팔 때의 규칙과 숫자 — Steam·Play·Apple·itch, AI 공개, 위시리스트, 한국 세금·등급](reference/game-business/selling-an-indie-game-rules-and-numbers.md)
