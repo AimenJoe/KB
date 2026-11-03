@@ -4,7 +4,7 @@ type: map
 tags: [gamedev, macroquad, rust, game-design, pixel-art, game-feel]
 status: verified
 created: 2026-10-24
-updated: 2026-10-29
+updated: 2026-11-03
 ---
 
 # 지도: 게임 개발
@@ -14,6 +14,8 @@ updated: 2026-10-29
 ## 설계
 - [1인 개발용 액션 로그라이트 설계 원칙](../concepts/action-roguelite-for-solo-dev.md) — 런 구조 vs 메트로배니아, 탑다운 vs 사이드뷰, 전투감 먼저, 캐릭터=반복 단위, 장기 프로젝트 단계
 - [그림 못 그려도 도트 게임 만들기](../guides/pixel-art-without-an-artist.md) — 에셋 팩 하나 중심, 라이선스 확인, 공개 레포 + 비공개 에셋 레포(토큰·비용·AI 조항), 둥근 지형 굽기, 눈에 띄어야 하는 물체(더하기 빛·움직임), 16×16 공격 동작(들기·치기·거두기, 발 번갈아), 타이틀 키 아트(글 자리 먼저, 이음매 굴리기)
+- [두 번째 게임 프로젝트의 첫날](../guides/second-game-project-day-one.md) — 첫 게임에서 늦게 깔아 비쌌던 규칙 15개를 첫 커밋에(입력 Actions·고정 틱·수치 한 곳·소리 큐·틱 단계·표+테스트·언어별 글·개발 시나리오·흐름 순수 함수·결정 기록·CI·라이선스·안내·이벤트 저장·KB 경계), 가져올 코드와 두고 올 코드
+- [PoC와 Lab](../guides/poc-and-lab-before-content.md) — PoC = 질문·통과 기준·시간 상한·대안, Lab = 게임 안 슬라이더(커서 없이) → 프리셋 A/B → `tuning.rs`로 내보내기, 랩마다 시나리오, Hecker의 튜닝 사다리
 - [게임 화면 색약 점검](../guides/color-vision-check-for-games.md) — 스크린숏을 Machado 행렬(선형 RGB)로 1·2·3형 + 흑백, 알아야 하는 것은 밝기·모양으로 남긴다
 - [작곡가·음향 담당 없이 게임 소리 넣기](../guides/game-audio-without-a-composer.md) — CC0 출처(Kenney·OGA), 숫자로 거르기(길이·밝기·폭·이음매), 표 + 변환 스크립트, 변형·메뉴 소리 한 곳·덕킹, 사람이 고르는 듣기 페이지, 옛 곡·새 곡 둘 다(상황으로 가르기·런마다 번갈아), 환경음 층
 - [인디 게임 공식 페이지](../guides/indie-game-landing-page.md)
@@ -21,6 +23,11 @@ updated: 2026-10-29
 - [무료 그림·사진 구하는 곳](../reference/assets/free-image-sources.md) — Openverse·미술관 CC0·사진 사이트, PDM과 CC0, API 요령(Met v1.1, UA)
 - [게임 그림 외주 맡기기](../guides/commissioning-game-art.md) — 임시 그림으로 먼저 판정, 사양서(안전 영역·색 약속), 계약: 저작재산권 + 2차적저작물작성권 특약(한국 제45조②), 공개 레포 커밋 허락
 - [이미지 생성 모델로 게임 일러스트 그리기](../guides/image-model-for-game-illustrations.md) — 나노바나나: 직접 그린 참고 그림 + 생김새 글, 목적·세계 규칙·캐릭터·장면 덩어리, 장면마다 새 대화·스타일 덩어리 매번, 비율은 글로(구도 그림은 베낀다), 캐릭터 시트 먼저, 지울 때 대신 그릴 것, 칸마다 가장 흔한 색·작은 캐릭터 자리, ✦ 되돌리기
+
+## 3D·카메라
+- [시점 전환(쿼터뷰 ↔ 숄더뷰)과 락온 카메라](../concepts/camera-mode-switch-and-lock-on.md) — 게임 규칙 하나 + 리그 둘 + 입력 기준 둘, 기준은 즉시·카메라만 보간, 둘 다 Perspective·FOV 격차 줄이기, 어깨 너머 1/3 구도, 가림은 당기기 → 페이드, Nesky 50 실수
+- [macroquad 3D 렌더링](../reference/macroquad/3d-rendering.md) — Camera3D(기본 z-up·fovy 라디안·깊이 켜짐), Mesh u16·매 프레임 재업로드·조용히 잘림, 드로콜 갈리는 조건, 기본 셰이더는 normal을 안 읽음, 로더 없음
+- [레트로 3D 모델 파이프라인 — Blockbench → glTF](../reference/assets/retro-3d-models-blockbench-gltf.md) — 상자 + 부위 강체 애니메이션(스키닝 없음), `gltf` 크레이트, 단위 16·y-up·5.0 부호, 상자 둘짜리 파일로 로더부터
 
 ## 보상·경제
 - [회복과 화폐 드롭](../concepts/roguelite-healing-and-currency.md) — 깎인 만큼 확률 + 불운 보정, 자석·줍기 지연·오르는 소리, 메타 화폐 맡기기(쉼터 자동)·둘 중 하나 영구 기술·살 수 있을 때 쓰는 곳이 빛나기
