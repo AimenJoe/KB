@@ -26,6 +26,8 @@ verified: |
   1차(같은 날, knellroot 0010 — 사장 "쿼터뷰로 돌아갈 때는 좀 다른 느낌"):
   - 들어갈 때·나올 때 카메라 움직임은 같았고, 다른 것은 조작이었다. 입력 기준을 즉시 바꾸면 해제 순간 쥔 스틱이 화면(아직 숄더뷰)과 최대 172° 어긋난다. 들어갈 때는 "앞 = 대상"이 의도라 괜찮았다.
   - 고침: 풀 때 쥐고 있던 스틱은 풀던 순간 기준 그대로(놓거나 0.6초까지), 해제 전환은 들어갈 때의 0.7배. 0.5배는 해제 회전이 464°/s로 올라 멀미 쪽이었다(0.6 → 387, 0.7 → 332, 0.8 → 290°/s).
+  2차(같은 날, 다른 게임 사례 조사): 쿼터뷰 소울라이크는 대개 락온해도 카메라 고정(Tunic Z타깃 — 리뷰마다 카메라 서술 엇갈림, Death's Door 한 각도). Achilles: Legends Untold는 "쿼터뷰 + 락온 결합"에 개발 첫 해를 썼다지만 리뷰가 가장 많이 지적한 것이 락온. NieR: Automata의 시점 전환은 연출 구간 고정. 플레이어가 버튼으로 쿼터뷰 ↔ 숄더뷰를 오가는 본보기는 못 찾았다.
+  1차(같은 날, knellroot 0011): 해제 때 쿼터뷰 방위를 고정(35°)으로 되돌리지 않고 락온 방향 쪽으로 두면 해제 최대 332 → 228°/s(따라감)·244°/s(90° 단위), 해제 시간 0.77 → 0.30~0.35초, 다시 락온할 때 260 → 160~174°/s. 대가는 지도 방향이 바뀌는 것 — 90° 단위면 방향은 넷뿐.
   2차 출처:
   - John Nesky(thatgamecompany) GDC 2014 "50 Camera Mistakes" 1~25(Habr 번역): 카메라 위치는 캐릭터 상대 좌표·방향은 오일러로(3), 시야를 가리면 레이캐스트로 미리 감지해 돌아가기 — 갑작스런 컷은 30도 규칙(5), 플레이어 입력이 이기게 — 벽에 밀리면 캐릭터 쪽으로 당기기(6), 카메라에 구 충돌체(7·10), 얇은 기둥은 잠깐 가려도 됨(9), 피치·거리·FOV는 묶어서(14~16), 하드 컷 때 조작 기준이 바뀌는 문제(18), 180도 규칙(20), 요는 스틱이 아니라 실제 속도를 따라가기(23). 26~50(락온 포함)은 못 읽었다.
   - Nesky의 핵심 문장 "Cameras are most noticeable when they fail"(Game Developer 요약).
@@ -36,6 +38,10 @@ verified: |
   - "The Poor Man's 3D Camera"(Game Developer): 가림 컬링 모양은 필요한 만큼만(원기둥 → 원뿔 → 포물면), 카메라 지연 값 맞추는 데 1~2주, 옛 제약은 다시 시험.
   확인 못 함: 전환 시간 수치의 근거 실험, 락온 구도 수치(1/3 법칙)가 패드 조작에서 실제로 낫다는 측정, 멀미 관련 연구.
 sources:
+  - https://techraptor.net/gaming/previews/achilles-legends-untold-is-interesting-souls-like-in-need-of-more-time
+  - https://gamingbolt.com/achilles-legends-untold-post-launch-interview-development-early-access-learnings-potential-ports-and-more
+  - https://www.superjumpmagazine.com/tunic-condenses-the-best-of-the-90s-into-one-adventure/
+  - https://www.gameinformer.com/afterwords/2021/09/22/afterwords-deaths-door
   - https://habr.com/en/post/272401
   - https://gdcvault.com/play/1020460/50-Camera
   - https://www.gamedeveloper.com/design/video-50-common-game-camera-mistakes----and-how-to-fix-them
@@ -98,6 +104,7 @@ sources:
 - **전환을 위치 직선 보간으로 하지 않는다.** 대상이 뒤에 있으면 카메라가 머리 위를 가로질러 시선이 뒤집힌다. 플레이어 둘레 궤도로, 도는 각만큼 길게.
 - 대상을 화면 중앙에 고정하면 플레이어가 구석으로 밀린다.
 - 전환이 끝난 뒤에 입력 기준을 바꾸면 0.3초 동안 캐릭터가 갈팡질팡한다.
+- 쿼터뷰 방위를 늘 고정으로 되돌리는 것이 해제 회전의 대부분이다. 락온 방향 쪽으로 남기거나 90° 단위로 맞추면 해제가 고개 들기만 남는다.
 - 반대로 **해제** 때 기준을 즉시 바꾸면 쥔 스틱이 화면과 거의 반대가 된다. 해제는 "쥔 스틱은 그대로, 놓으면 새 기준"(Nesky 18).
 - 쿼터뷰를 Orthographic으로 두면 투영 자체가 바뀌어 보간이 안 된다. 둘 다 Perspective.
 - 카메라 요를 스틱 입력이 아니라 **실제 속도**로 따라가게(23) — 벽에 대고 밀 때 벽만 보는 일을 막는다.
