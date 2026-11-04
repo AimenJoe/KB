@@ -4,7 +4,7 @@ type: map
 tags: [gamedev, macroquad, rust, game-design, pixel-art, game-feel]
 status: verified
 created: 2026-10-24
-updated: 2026-11-03
+updated: 2026-11-04
 ---
 
 # 지도: 게임 개발
@@ -69,6 +69,7 @@ updated: 2026-11-03
 ## 입력·접근성
 - [작은 픽셀 HUD 읽히게 하기](../concepts/hud-readability-and-quick-slots.md) — 바탕판·테두리 글자, 게이지 굵게·가득 신호, 퀵 슬롯 자리 고정·저절로 바꾸기 + 깜빡임, 창 밑 HUD 숨기기
 - [컨트롤러 버튼 배치와 다시 붙이기](../concepts/controller-layout-and-remapping.md) — 오른쪽 넷 = 자주 쓰는 넷, 키보드 다이아몬드, 겹치면 맞바꿈, 메뉴 키 고정, 안내는 배치를 따라, 격자 끝에서 옆 탭으로, 되돌릴 수 없는 메뉴 항목은 묻는 창(단추 = 하는 일 이름, 커서는 취소에서)
+- [액션 게임 터치 배치](../concepts/touch-action-layout.md) — 공격 둘레 호(자주 쓰는 넷), 상황 버튼은 제 자리에만(쓸 수 없으면 숨김), 합칠 수 있으면 합치기(점프 = 상호작용), 짝 버튼은 캡슐, 배치는 순수 함수 + 시험
 
 ## 판매·비즈니스
 - [Rust 게임을 Steam에 붙이기](../guides/steam-release-for-rust-games.md) — Cargo 기능 하나로 PC만·연결 없으면 그냥 켜기, SDK 재배포 파일은 크레이트가 복사(커밋 안 함), 업적 = 목표 목록에서 고른 표(API 이름 고정·숨김·등록표는 시험이 만든다·아이콘은 있는 그림에서), Auto-Cloud, 빌더 계정 + config.vdf + beta까지만 자동, macOS 공증은 필수 아님(2차), 가격 바닥 $0.99, Deck 글자 9px·패드 글자만
