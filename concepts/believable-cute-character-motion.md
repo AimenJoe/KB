@@ -1,0 +1,78 @@
+---
+title: 실감나게 귀여운 캐릭터 동작 — 애니메이션 원칙을 게임 반응성과 작은 화면에 맞추기
+type: concept
+tags: [animation, game-feel, cute, procedural, gamedev, 3d]
+status: draft
+created: 2026-11-04
+updated: 2026-11-04
+verified: |
+  1차 출처로 확인(2026-11-04):
+  - Lasseter 1987(SIGGRAPH Education HyperGraph의 원칙 페이지들 — 논문 PDF 사본은 이번 세션에서 못 열었다): 찌그러짐·늘어남은 "모양을 바꿔 단단함·질량을 정의", **부피는 쉴 때·찌그러질 때·늘어날 때 같게**, 3D에선 한 축으로 늘이면 다른 두 축을 줄이고 늘이는 방향은 움직임 방향. 동작은 세 부분(예비·동작·끝맺음). 따라가기 = 끝맺음, 겹치기 = 앞 동작이 끝나기 전에 다음을 시작, "무거운 부분일수록 더 늦고 더 천천히 멈춘다". 타이밍 = 포즈가 아니라 포즈 사이 프레임 수로 무게·성격(고개 돌리기 사이 그림 0장 = 세게 맞음 … 4장 = 또렷한 명령 … 6장 = 반가운 것을 봄 … 9~10장 = 생각·기지개), "큰 것은 작은 것보다 느리고 관성이 크다".
+  - Cooper "Game Anim"(발췌, Game Developer 2019-05-13): 플레이어 동작의 예비는 짧게(길면 둔함, 없으면 가벼움), 적의 예비(예고)는 길게, 큰 기술일수록 긴 예비 = 위험 대 보상. 따라가기는 길어도 되지만 **조작이 돌아오는 프레임**을 표시해 입력이 없으면 끝까지 보이게. 천·머리카락은 엔진 물리로. 바로 최고 속도면 무게가 없어 보인다 — 반동·천천히 멈춤. 너무 매끈하면 둥둥 뜬다, 주먹 뒤 머리가 늦거나 튕기게. 2차 동작은 1차를 흐리면 안 된다. 과장 = "현실은 충분히 현실처럼 안 보인다", 게임 카메라 거리에서 읽히게, 프로젝트 전체에서 과장 정도를 같게. 엔진이 뼈 크기를 지원하지 않으면 자세로 찌그러짐을 흉내.
+  - Saerbeck & Bartneck, HRI 2010(저자 페이지 요약): 로봇 두 몸(iCat·Roomba)에서 가속도·곡률이 느끼는 감정에 크게 영향, 몸 꼴은 영향 없음. 가속도 → 각성(본문), 곡률 → 정서·각성. 정서 회귀는 약함(R² 0.10). **표의 각성 방향이 본문과 반대로 보인다**는 요약 쪽 지적이 있어 방향은 원문 확인 필요.
+  - Allen Chou "Precise Control over Numeric Springing"(2015 블로그, 식 그대로): 암시적 오일러 감쇠 스프링 — Δ = 1 + 2hζω + h²ω², x' = ((1+2hζω)x + hv + h²ω²x_t)/Δ, v' = (v + hω²(x_t − x))/Δ, ω = 2πf, ζ = ln(p_d)/(−ω t_d). Δ ≥ 1이라 dt가 커도 터지지 않는다(식에서 내가 본 것).
+  1차(직접 실행, 2026-11-04, knellroot 0039 — macroquad, 부위 강체 glTF): 덧붙이는 층을 "덩어리(뼈 아래 메시 정점 가운데)를 스프링으로 따라가는 점의 늦음 → 그 쪽으로 도는 회전(`from_rotation_arc`)"으로 짜면 꼬리·머리·몸 기울기가 한 꼴로 된다. 시험으로 확인: 앞으로 달리기 시작 6틱 뒤 꼬리·머리 덩어리가 뒤로, 몸 덩어리가 앞으로. 멈추면 꼬리가 앞으로 넘었다 1mm 안으로 선다(ζ 0.3, 2.4Hz). 요를 바꿔도 캐릭터 기준으로 같다. 점프(±6.5m/s)에 늘어나고 착지 충격(세로 속도 × 1.4)으로 0.85 아래로 찌그러졌다 1을 넘어 튀고 선다, 세 배율의 곱은 늘 1. 프레임 1초에도 암시적 식은 안 터진다.
+  같은 실행에서 겪은 것: 동작 점검 그림을 칸마다 경계 상자에 맞춰 찍으면 찌그러짐·내려앉음이 그림에서 지워진다 → 화면을 고정해 찍는다. 쿼터뷰(캐릭터 약 20px, 위에서)에서는 차이가 작고 락온(약 50px)에서 보인다.
+  2차 출처만 있음: Normoyle & Jörg, MIG 2014 "Trade-offs between responsiveness and naturalness for player characters"(초록 조각만 — 가장 덜 반응하는 조작이 성과·조작감을 해쳤고, 플레이어는 가장 자연스러운 조작의 동작 품질을 더 높게 보지 않았지만 구경꾼은 더 자연스럽다고 봄). 2차 동작 스프링의 감쇠비 0.5~0.8 권장, "절차 층은 키프레임 위에, 바꾸지 말고"(튜토리얼·실무 글). Rosen GDC 2014 "An Indie Approach to Procedural Animation"(키 포즈 몇 개 + 절차 — 강연 자체는 못 봄). Guilty Gear Xrd의 제한 애니메이션(GDC 2015, 요약 영상만).
+  확인 못 함: "귀여운 움직임"만 따로 잰 지각 연구(찾지 못함 — 귀여움 연구는 대부분 정지 그림).
+sources:
+  - https://education.siggraph.org/static/HyperGraph/animation/character_animation/principles/prin_trad_anim.htm
+  - https://education.siggraph.org/static/HyperGraph/animation/character_animation/principles/timing.htm
+  - https://education.siggraph.org/static/HyperGraph/animation/character_animation/principles/squash_and_stretch.htm
+  - https://education.siggraph.org/static/HyperGraph/animation/character_animation/principles/follow_through.htm
+  - https://education.siggraph.org/static/HyperGraph/animation/character_animation/principles/anticipation.htm
+  - https://gamedeveloper.com/production/the-12-principles-of-animation-in-video-games
+  - https://repository.upenn.edu/hms/141
+  - https://www.bartneck.de/publications/2010/perceptionAffectElicitedRobotMotion/index.html
+  - https://allenchou.net/2015/04/game-math-precise-control-over-numeric-springing/
+  - https://gdcvault.com/play/1020049/Animation-Bootcamp-An-Indie-Approach
+  - https://gdcvault.com/play/1022031/GuiltyGearXrd-s-Art-Style-The
+---
+
+# 실감나게 귀여운 캐릭터 동작
+
+## 요약
+**실감**은 무게에서 온다: 포즈 사이 프레임 수(타이밍), 천천히 들어가고 나오기, 끝맺음, 그리고 부드러운 부위가 늦게 따라오기(겹치기·2차 동작). **귀여움**은 그 무게가 *작고 가벼운 몸*의 것일 때다: 빠르고 짧은 타이밍, 통통 튀는 찌그러짐·늘어남(부피 그대로), 둥근 궤적, 늦게 따라와 흔들리는 꼬리·귀·머리. **게임**에서는 이것이 반응을 늦추면 안 된다 — 플레이어 입력 앞의 예비 동작은 최소로, 실감은 *뒤*(끝맺음)와 *위*(키프레임 위에 덧붙이는 절차 층)에 둔다.
+
+## 본문
+### 원칙 → 게임에서 둘 자리
+| 원칙 | 어디에 | 어떻게 |
+|---|---|---|
+| 예비 동작 | 적 = 길게(예고), 플레이어 = 게임 규칙의 선딜 안에서만 | 큰 기술일수록 길게(위험 대 보상). 플레이어 동작에 더 넣고 싶으면 입력 순간 몸이 *먼저 반응*하게(짧은 움찔) |
+| 끝맺음·자세 유지 | 플레이어 동작의 뒤 | 조작이 돌아오는 시점을 따로 두고, 입력이 없으면 끝까지 보인다. 센 포즈는 잠깐 멈춰 읽히게 |
+| 겹치기·늦게 따라오기 | 꼬리·귀·머리·천 | 손으로 키를 늦게 박거나, **감쇠 스프링**을 키프레임 위에 얹는다(무거운 부분이 더 늦고 더 천천히 멈춤) |
+| 찌그러짐·늘어남 | 점프(늘어남)·착지(찌그러짐)·맞음·강타 | 부피 그대로: 세로 k면 가로 1/√k. 늘이는 방향 = 움직임 방향. 뼈 크기를 못 쓰면 자세(웅크림)로 |
+| 천천히 들어가고 나오기 | 거의 모든 키 사이 | 베지어 기본. 빠른 타의 순간만 직선 |
+| 궤적 | 팔·칼·머리 | 너무 매끈하면 둥둥 — 타격 직후 머리가 늦거나 튕기게 |
+| 타이밍 | 모든 동작 | 작고 가벼우면 빠르게. 같은 포즈라도 사이 프레임 수로 성격이 바뀐다 |
+| 과장 | 작은 화면 | 화면에서 20~50px인 캐릭터는 몇 도 기울기가 안 보인다 → 몸 기울기·튐·꼬리 진폭을 키우고 프로젝트 전체에서 같은 정도로 |
+| 2차 동작 | 쉬기·걷기 | 숨쉬기·고개 갸웃·꼬리 흔들기 — 1차 동작을 흐리지 않게 작게 |
+
+### 절차 층(덧붙이는 스프링)
+- 몸의 가속도·회전 속도·착지 같은 **사건**을 목표로 주고, 부위(꼬리·머리·몸 기울기·전체 찌그러짐)를 감쇠 스프링으로 따라가게 한다. 키프레임 동작은 그대로 두고 그 위에 더한다.
+- 암시적 오일러(위 verified 식)는 프레임 시간이 들쭉날쭉해도 안정하다. 꼬리는 출렁이게(ζ 낮게), 머리·몸은 덜(ζ 높게).
+- 비용은 부위 몇 개라 작다. 다만 모든 적에 붙이지 말고 화면에 오래 보이는 것(주인공)부터.
+
+### 귀여움 쪽 손잡이
+- 큰 머리 + 짧은 다리: 걸음은 짧고 잦게, 뒤뚱(내딛는 발 쪽 기울기)·통통(지날 때 오름).
+- 둥근 궤적·부드러운 가감속이 거친 가속보다 순하게 읽힌다는 쪽의 근거는 약하다(로봇 연구, 정서 효과 작음) — 원칙(궤적·천천히 들어가고 나오기)과 같은 방향이라 쓰되 근거로 내세우지 않는다.
+
+## 왜?
+- 사람은 움직임에서 질량·힘을 읽는다: 같은 포즈라도 사이 시간과 늦게 따라오는 부위가 "무엇이 얼마나 무거운가"를 말한다. 그래서 실감은 포즈보다 타이밍·겹침에서 나온다.
+- 게임은 플레이어가 조종한다: 구경꾼에게 자연스러운 것과 조종하는 사람에게 좋은 것이 다르다(Normoyle & Jörg). 그래서 반응 시간은 게임 규칙이 정하고, 동작은 그 시간 *밖*(뒤·위)에서 실감을 더한다.
+- 작은 화면에서는 작은 차이가 안 보인다 — 과장은 꾸밈이 아니라 읽히게 하는 일이다.
+
+## 함정
+- 플레이어 입력 앞에 예비 동작을 늘리면 "눌렀는데 안 나감"이 된다 — 선딜은 게임 수치가 정한다.
+- 부피를 안 지킨 찌그러짐은 몸이 작아지거나 커져 보인다.
+- 부모 뼈에 비균등 크기를 주면 회전한 자식이 비틀린다(전단) — 찌그러짐은 발 밑 뿌리 뼈에, 짧게.
+- 스프링을 프레임 dt로 명시적 오일러로 돌리면 프레임이 튈 때 터진다 → 암시적 식.
+- 2차 동작이 크면 1차(공격 방향·예고)를 흐린다.
+
+## 관련 노트
+- [근접 평타·모으기 공격의 손맛](melee-light-and-charged-attack-feel.md)
+- [고정 타임스텝과 히트스톱](fixed-timestep-and-hitstop.md)
+- [작게 보이는 로우폴리 모델을 읽히게](readable-low-poly-models.md)
+- [AI 3D 메시를 강체 부위 모델로](../guides/ai-mesh-to-rigid-part-model.md)
+- 적용 예: knellroot `docs/decisions/0039-believable-cute-motion.md`, `src/secondary.rs`
+- [화가 없이 픽셀 아트](../guides/pixel-art-without-an-artist.md)
