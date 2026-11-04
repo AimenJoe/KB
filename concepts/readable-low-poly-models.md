@@ -14,6 +14,7 @@ verified: |
   - 쿼터뷰 픽셀 밀도(tuning 기본값으로 셈): 1m ≈ 17.6px, 키 1.8m 캐릭터 ≈ 30px — 2~3cm 베벨은 1px 미만.
   2차 출처만 있음: hull 외곽선이 후처리(깊이·법선 가장자리)보다 싸고 안쪽 선이 없다는 비교(MS MixedReality MeshOutlines 문서 성격), 모바일에서 깊이 텍스처 후처리가 비싸다(포럼).
   AI 3D 생성 약관(서브에이전트 조사, 2026-11-04): Meshy 무료 = CC BY 4.0·유료 = 소유(도움말 1차), Hunyuan3D 2.x 라이선스는 한국·EU·영국 제외(라이선스 원문 미러 1차),
+  Meshy 요금 페이지(1차, 2026-11-04 확인): 무료 = 월 100 크레딧·**다운로드 월 10개, Meshy 6 Lite 모델만**(Meshy 6 정식으로 만든 것은 못 받는다)·CC BY 4.0(상업 사용 가능, 출처 표기), Pro 월 $20 = 다운로드 무제한·"Private & Customer owned". 형식은 fbx·obj·usdz·glb·stl·blend(FAQ). 요금·한도는 자주 바뀐다.
   TRELLIS.2 = MIT(모델 카드 1차), Tripo 무료 출력은 Tripo 권리(도움말 요약만 — 원문 403), Rodin 약관은 확인 못 함. Synty는 공개 레포 재배포 불가(EULA 1차), Kenney·Quaternius CC0(2차 포함).
   확인 못 함: 외곽선의 실제 폰·WebGL 비용, Blockbench glTF 내보내기 옵션 이름, AI 생성 저폴리 품질(판매사 자료뿐).
 sources:
@@ -23,6 +24,7 @@ sources:
   - https://www.blockbench.net/wiki/docs/bbmodel
   - https://raw.githubusercontent.com/jasonjgardner/blockbench-mcp-plugin/HEAD/headless/README.md
   - https://help.meshy.ai/en/articles/9992001-can-i-use-my-generated-assets-for-commercial-projects
+  - https://www.meshy.ai/pricing
   - https://huggingface.co/tencent/Hunyuan3D-2/blob/main/LICENSE
   - https://huggingface.co/microsoft/TRELLIS.2-4B
   - https://syntystore.com/pages/one-time-purchase-licence
