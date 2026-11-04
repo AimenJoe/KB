@@ -6,6 +6,7 @@ status: draft
 created: 2026-10-29
 updated: 2026-11-04
 verified: |
+  2026-11-04 더함(둘째): "Steam에서는 Steam판만 알린다"(Steamworks FAQ 인용)와 상점 설명 글의 바깥 링크 금지(2024-09)는 보도(PC Gamer·GamesRadar)로만 봤다 — 원문 직접 못 읽음. 무료판 + Steam 유료판의 예(Mindustry)와 사는 까닭은 GamingOnLinux 기사·itch 댓글(2차, 2019~2022).
   2026-11-04 더함: 가격 바닥($0.99 등급)은 Steamworks 가격 문서의 검색 요약과 보도(Game World Observer·PC Gamer)로만 봤다(partner 사이트가 작업 환경에서 막힘). macOS 공증은 2차(공지 댓글·개발자 블로그).
   1차 출처로 확인(2026-10-29, 원문을 직접 받아 읽음): Steamworks 문서(Content Survey의 AI 절, Steam Direct, Coming Soon, Next Fest와 2027-02판, 오픈소스 배포, 세금 FAQ),
   IRS 조세조약 표 1(2023-05판, 한국 줄), Google Play Console 도움말(서비스 수수료·12명 시험), Android Developers(target SDK·개발자 확인)·Developer Console 도움말,
@@ -33,6 +34,9 @@ sources:
   - https://ai.google.dev/gemini-api/terms
   - https://www.mcst.go.kr/site/s_notice/press/pressView.jsp?pSeq=17434
   - https://gamalytic.com/blog/exploring-steam-wishlist-sale-ratio
+  - https://www.pcgamer.com/valve-clarifies-rule-against-using-steam-to-promote-games-on-other-storefronts
+  - https://www.pcgamer.com/games/valve-issues-new-rules-outlawing-links-in-steam-page-descriptions-hopefully-bringing-an-end-to-the-plague-of-demos-pretending-theyre-prologue-games
+  - https://www.gamingonlinux.com/2019/09/mindustry-the-factorio-like-tower-defense-game-is-now-on-steam/
   - https://newsletter.gamediscover.co/p/what-happened-to-early-access-graduates
   - https://fragwyz.substack.com/p/three-years-of-ai-on-steam
 ---
@@ -53,6 +57,8 @@ sources:
 | AI 공개 | Content Survey의 생성형 AI 절. **Pre-Generated**(개발 중 AI로 만들어 게임과 함께 나가 플레이어가 보는 것: 그림·소리·서사·현지화)와 **Live-Generated**(실행 중 생성, 불법 생성물 가드레일 설명 추가). 효율을 위한 개발 도구(코드 도우미 등)는 대상이 아니라고 문서가 밝힌다. 마케팅 자료가 대상인지는 문서에 없다 |
 | 오픈소스 | Steamworks SDK는 카피레프트(GPL)와 문제가 된다. MIT·BSD·Apache 2.0은 괜찮다 |
 | 가격 바닥 | 기본 가격은 **$0.99 등급**이 바닥(다른 통화는 2023-08부터 그 등급에 맞춘 값), 할인은 그 절반(약 $0.49)까지 [Steamworks 가격 문서 검색 요약 + 보도 — 원문 직접 못 읽음] |
+| 다른 곳 알리기 | Steam으로 내는 게임과 Steam의 소통(상점 글·소식)에서는 **Steam판과 Steam에서 받을 수 있음만** 알린다(Steamworks FAQ 인용). 상점 설명 글에는 바깥 링크를 못 단다(2024-09 — 공식 사이트·SNS는 상점 편집기의 링크 칸으로). 자기 사이트·SNS에서 모든 판을 알리는 것은 된다 [보도로만 봄] |
+| 무료판 + 유료 Steam판 | 오픈소스·무료판을 두고 Steam에서만 값을 받는 모양이 있다(예: Mindustry — itch·GitHub 무료, Steam 유료). 사는 까닭으로 꼽히는 것: 업적·클라우드·자동 업데이트·Workshop·멀티 편의, 그리고 개발자 응원 [2차]. 위 "다른 곳 알리기" 때문에 Steam 쪽 글에는 무료판을 쓰지 않는다 |
 | macOS | Mac App Store와 무관하게 Steam이 macOS 데포를 받는다. 공증은 "권장, 필수 아님"(2019 공지 댓글 인용, 2차) — 기술 연동은 [Rust 게임을 Steam에 붙이기](../../guides/steam-release-for-rust-games.md) |
 | 세금(미국 원천징수) | 조약이 없으면 30%. W-8BEN으로 조약 세율. **한국: 저작권 사용료 10%**(IRS 표 1, 2023-05판; 특허·노하우 15%). 게임 판매에는 "royalty copyright" 세율. TIN을 나중에 넣어도 이미 뗀 것은 돌려주지 않는다 |
 
