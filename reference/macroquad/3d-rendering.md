@@ -6,6 +6,13 @@ status: verified
 created: 2026-11-03
 updated: 2026-11-04
 verified: |
+  소스로 확인(2026-11-04, macroquad 0.4.16·miniquad 0.4.11): `render_target_ex(.., depth: true)`는 깊이 텍스처를 만들어 렌더 패스에 붙이지만
+  돌려주는 `RenderTarget.depth_texture`는 None — 깊이를 셰이더에서 읽을 수 없다. miniquad 웹은 WebGL1(`getContext("webgl")`)이고
+  `WEBGL_depth_texture`를 켠다. `Camera3D`의 정사영은 `fovy` = 세로 전체 높이(m), `matrix()`는 `Camera` 트레이트 메서드라 `use macroquad::camera::Camera`.
+  재질은 `MaterialParams { uniforms: Vec<UniformDesc>, textures: Vec<String> }` + `set_uniform`·`set_texture`, 기본 꼭짓점 입력 `position`·`texcoord`·`color0`(÷255), `Model`·`Projection`.
+  직접 실행(2026-11-04, knellroot 0044·0045): (1) 굽는 지형의 달빛 그림자를 0.25m 가림 높이 지도 + 광선으로 셈해 바닥 빛 지도 텍스처(가장 가까운 픽셀)에 담으니
+  또렷한 픽셀 그림자가 됐다. (2) 캐릭터 그림자는 달 쪽 정사영 카메라로 실루엣을 256² 렌더 타깃에 흰색으로 찍고, 바닥 재질이 월드 자리를 같은 행렬로 옮겨 읽게 했다
+  (깊이 비교 없는 가림판 — 위 이유로 깊이를 못 읽어서). 같은 행렬로 찍고 읽으니 렌더 타깃 위아래 뒤집힘을 따로 맞출 필요가 없었다. 120초 누수 시험 평평·60fps(헤드리스).
   1차 출처로 확인(2026-11-03, macroquad master 소스 — `src/models.rs`·`src/camera.rs`·`src/quad_gl.rs`·`src/window.rs`, Cargo 0.4.16과 같은 줄기):
   - `Vertex { position: Vec3, uv: Vec2, color: [u8; 4], normal: Vec4 }`, `Mesh { vertices: Vec<Vertex>, indices: Vec<u16>, texture: Option<Texture2D> }`.
   - `draw_mesh(&Mesh)`는 텍스처를 묶고 `gl.geometry(&vertices, &indices)`를 부를 뿐이다. 버퍼는 `BufferUsage::Stream`으로 **매 프레임 다시 올린다**
@@ -56,7 +63,11 @@ macroquad의 3D는 **"카메라 행렬 + 즉시 모드 삼각형"** 까지다. `
 ### 조명·재질
 - 기본 셰이더는 `color × texture`뿐. `normal`은 정점에 실려 가지만 **셰이더가 안 읽는다**. 램버트 한 줄이라도 `load_material`(커스텀 GLSL, WebGL1 = GLSL ES 1.0)로 쓴다. 2D에서 더하기 빛(`light_material`)을 쓰던 방식과 같다.
 - 레트로풍이면 조명을 **정점 색**에 미리 구워(`Vertex.color`) 기본 셰이더로 끝낼 수도 있다 — 부위별 회전이 있으면 법선이 돌아가므로 CPU 변형 때 색을 다시 계산한다.
-- 그림자는 없다. 바닥에 원판(2D에서 쓰던 `draw_circle`을 바닥 평면에) 또는 투영 메시를 직접.
+- 그림자는 엔진에 없다. 직접 하는 길(가벼운 순):
+  1. 바닥 원판(접촉 그림자).
+  2. **구운 그림자**(움직이지 않는 것): 굽기 때 높이 지도 + 광선으로 가려짐을 셈해 정점 색이나 바닥 **빛 지도 텍스처**(가장 가까운 픽셀이면 픽셀 그림자)에.
+  3. **가림판**(움직이는 것): 빛 쪽 정사영 카메라로 실루엣을 작은 렌더 타깃에 찍고, 받는 면의 재질이 같은 행렬로 읽는다. 깊이 비교가 없어 빛과 물체 사이의 면도 어두워질 수 있다.
+  4. 진짜 셰도맵: 깊이를 RGBA에 싸서(WebGL1) 빛 쪽에서 찍고 비교 — `RenderTarget`이 깊이 텍스처를 내주지 않아 색으로 싸야 한다.
 
 ### 모델·애니메이션
 - 로더가 없다. 선택지: ① `gltf` 크레이트(1.4.x, 노드 트리·애니메이션 채널 읽기 지원)로 읽어 `Mesh`로 옮김, ② 자체 JSON(상자 목록 + 부위 트리). 스켈레탈 스키닝은 직접 써야 하므로, **부위가 강체로 도는 애니메이션**(마인크래프트식)이 이 스택과 맞는다 → [레트로 3D 모델 파이프라인](../assets/retro-3d-models-blockbench-gltf.md).
