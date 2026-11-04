@@ -4,7 +4,7 @@ type: map
 tags: [ci, deploy, hosting, github-actions, netlify]
 status: verified
 created: 2026-10-24
-updated: 2026-11-03
+updated: 2026-11-04
 ---
 
 # 지도: CI/CD와 호스팅
@@ -16,6 +16,7 @@ updated: 2026-11-03
 - [공개 레포를 비공개로 바꿀 때](../reference/github-actions/public-to-private-repo.md) — Actions가 돈이 된다(Free 월 $12어치, macOS ≈10배)·Pages 자동 내림·Release 익명 404, 바꾸기 전 실행 양 재기·줄이기·홈페이지 먼저 옮기기
 - [공개 레포에서 배포 파이프라인 지키기](../guides/protect-deploy-pipeline-in-public-repo.md) — 배포 잡을 떼고 시크릿은 Environment(정한 갈래만), 배포 갈래는 브랜치 규칙 우회 목록만, CODEOWNERS·Actions 권한, 레포 시크릿을 지우지 않으면 소용없다
 - [Node 20 폐기 — 액션을 node24 판으로](../reference/github-actions/node24-action-runtime.md) — `runs.using`이 정한다(`node-version`과 무관), 액션마다 node24 메이저·올릴 때 깨지는 것(checkout v6 자격 증명 파일, setup-node 자동 캐시, upload-artifact는 v6부터)
+- [Playwright 연기 시험이 느려질 때](../reference/github-actions/playwright-smoke-test-ci-time.md) — ubuntu-latest에서 `--with-deps`가 새로 받는 건 글꼴 apt뿐(미러가 느리면 몇 분), 브라우저 캐시는 공식 비권장, 같은 SHA를 운영 갈래에서 다시 시험하지 않기
 - [Android APK 빌드](../guides/macroquad-android-apk-github-actions.md) — 덮어 설치 = 같은 키 + 큰 versionCode, 키를 캐시에만 두면 7일 뒤 사라짐
 - [공개 레포 + 비공개 에셋 레포](../guides/pixel-art-without-an-artist.md#공개-레포에서-유료-팩-다루기) — 두 번째 checkout, fine-grained 토큰, Actions 비용은 도는 레포 기준
 

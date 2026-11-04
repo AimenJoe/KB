@@ -4,7 +4,7 @@ type: reference
 tags: [macroquad, miniquad, rust, wasm, gamedev]
 status: verified
 created: 2026-10-24
-updated: 2026-10-26
+updated: 2026-11-04
 verified: |
   1차 출처로 확인: macroquad 0.4.16 README(빌드 명령, 산출물 경로, index.html 템플릿),
   js/mq_js_bundle.js 소스(프로토콜 version=2, 플러그인 버전, 버전 체크 로직),
@@ -167,6 +167,7 @@ await page.goto('http://127.0.0.1:8000/'); await page.waitForTimeout(2000);
 await page.focus('#glcanvas'); await page.keyboard.press('j');   // 입력도 들어간다
 await page.screenshot({ path: 'web.png' });
 ```
+- CI에서 돌릴 때 설치가 느리면(`--with-deps`가 받는 apt 글꼴, 같은 커밋 두 번 시험): [연기 시험이 느려질 때](../github-actions/playwright-smoke-test-ci-time.md).
 - 기대하는 콘솔: `Plugin sapp_jsutils is present in JS bundle, but is not used`(정상), AudioContext 자동재생 경고(정상, 첫 클릭에 번들이 resume하며 "fix"를 찍음). `ReferenceError: register_plugin is not defined`(mq_js_bundle.js 안, 2026-10-26 확인)도 원래 난다: 번들에 든 quad-net 웹소켓 플러그인이 엄격 모드에서 선언 없이 전역 `register_plugin`에 대입한다. 그 플러그인을 안 쓰면 무해하다. `Version mismatch`·`version mismatch`·`Missed function`이 있으면 번들/플러그인/링크 문제.
 
 ## 에셋 로딩

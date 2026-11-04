@@ -4,7 +4,7 @@ type: guide
 tags: [ci, deploy, github-actions, netlify, android, rust, gamedev]
 status: draft
 created: 2026-10-28
-updated: 2026-11-03
+updated: 2026-11-04
 verified: |
   1차 출처로 확인:
     - 직접 실행(nail-under-the-roots 0227, 2026-10-28): release/v0.6에 쌓인 고침·그림을 main에 합쳐 v0.5.1로 냈다(release·deploy-web·build-android·pages·build-ios·smoke-web 모두 성공, Release에 APK).
@@ -35,7 +35,7 @@ sources:
 ### 빌드 기능(Cargo feature)
 - 개발 메뉴·검사 도구를 `dev` 기능 뒤에 두고, 로컬 편의를 위해 `default = ["dev"]`로 두되 **운영 빌드는 CI가 `--no-default-features`**로 짓는다. 갈래는 워크플로 한 단계에서 `GITHUB_REF`로 정해 `$GITHUB_ENV`에 `FEATURES`를 적는다.
 - clippy를 **두 갈래 다** `-D warnings`로 돌린다. 처음 돌리면 `cfg(feature)` 안에서만 쓰이던 것이 죽은 코드로 걸린다(메뉴 장면 변종, 검사용 함수).
-- 연기 시험이 개발 메뉴로 장면에 들어간다면 그 시험만은 개발 빌드로 돈다(나가지 않는 빌드).
+- 연기 시험이 개발 메뉴로 장면에 들어간다면 그 시험만은 개발 빌드로 돈다(나가지 않는 빌드). 그러면 운영 갈래의 시험은 운영 빌드를 보지 않으므로, 같은 SHA가 개발 갈래에서 이미 통과했다면 운영 push 때 다시 돌릴 이유가 거의 없다 — 배포 앞에 둔 시험이면 그만큼 운영 반영이 늦다([연기 시험이 느려질 때](../reference/github-actions/playwright-smoke-test-ci-time.md)).
 
 ### 따로 열기 — 웹
 - Netlify(CLI 업로드 모델): 같은 사이트에 `netlify deploy --alias=dev`(`--prod` 없이). 주소 `dev--<사이트>.netlify.app`. 오리진이 달라 localStorage가 운영판과 갈린다.
