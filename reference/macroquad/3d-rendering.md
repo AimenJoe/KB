@@ -4,7 +4,7 @@ type: reference
 tags: [macroquad, rust, gamedev, 3d, rendering, camera]
 status: verified
 created: 2026-11-03
-updated: 2026-11-03
+updated: 2026-11-04
 verified: |
   1차 출처로 확인(2026-11-03, macroquad master 소스 — `src/models.rs`·`src/camera.rs`·`src/quad_gl.rs`·`src/window.rs`, Cargo 0.4.16과 같은 줄기):
   - `Vertex { position: Vec3, uv: Vec2, color: [u8; 4], normal: Vec4 }`, `Mesh { vertices: Vec<Vertex>, indices: Vec<u16>, texture: Option<Texture2D> }`.
@@ -17,6 +17,9 @@ verified: |
   - 모델 파일 로더(obj·gltf)는 없다. `models.rs`에는 `draw_cube/sphere/cylinder/plane/line_3d/grid`와 `Mesh`뿐.
   - 드로콜 용량은 `Conf` 필드가 아니라 숨은 헬퍼 `gl_set_drawcall_buffer_capacity(max_vertices, max_indices)` → `update_drawcall_capacity`로 바꾼다(window.rs). 기본값 숫자는 이번에 확인하지 못했다(`QuadGl::new` 호출부를 안 읽음).
   - miniquad `Conf`: `high_dpi` 기본 false(Android는 true), `sample_count` 기본 1, `platform.webgl_version` 기본 **WebGL1**(conf.rs).
+  렌더 타깃 깊이(2026-11-04, 0.4.16 `texture.rs` 소스 + knellroot 0033 헤드리스 스크린숏): `render_target(w, h)` = `RenderTargetParams::default()` = **`depth: false`**.
+    `Camera3D`가 깊이 시험을 켜도 붙은 깊이 버퍼가 없으면 시험이 없는 것과 같아 **그린 순서로만 덮인다**(모델 부위 상자·벽이 엉킴) — `render_target_ex(.., RenderTargetParams { depth: true, .. })`로 고쳐 확인.
+    파이프라인 컬링: macroquad 기본 파이프라인은 `cull_face` 기본값(Nothing), 커스텀 `load_material`의 `PipelineParams { cull_face, .. }`는 miniquad `set_cull_face`로 그대로 먹는다(소스). 렌더 타깃 + y-up Camera3D + glTF(반시계 앞면)에서 키운 상자의 앞면을 버리는 것은 `CullFace::Front`(스크린숏).
   2차 출처만 있음: 없음. 확인 못 함: 실제 기본 max_vertices/max_indices 값, `draw_mesh` 수백 개(적 20마리 × 부위 6)일 때의 프레임 비용(측정 전), WebGL1에서 깊이 버퍼 정밀도.
 sources:
   - https://github.com/not-fl3/macroquad/blob/master/src/models.rs
@@ -40,7 +43,7 @@ macroquad의 3D는 **"카메라 행렬 + 즉시 모드 삼각형"** 까지다. `
 | 좌표계 | 기본 `up = (0,0,1)` **z-up**. y-up으로 쓰려면 `up: vec3(0,1,0)`을 **매번** 적는다(기본값에 기대면 바닥이 벽이 된다) |
 | 투영 | `Perspective`(fovy 라디안, `perspective_rh_gl`) / `Orthographics`(fovy = 세로 폭 월드 단위) |
 | 행렬 | `matrix() = projection * look_at_rh(position, target, up)`. 화면→월드 광선은 `matrix().inverse()`로 직접 |
-| 깊이 | `Camera3D`를 `set_camera`하면 깊이 테스트 켜짐. 2D HUD는 `set_default_camera()` 뒤에 |
+| 깊이 | `Camera3D`를 `set_camera`하면 깊이 테스트 켜짐. **그러나 렌더 타깃에 그릴 때는 타깃에 깊이 버퍼가 붙어 있어야 한다** — `render_target()`은 깊이 없음, `render_target_ex(.., depth: true)`. 2D HUD는 `set_default_camera()` 뒤에 |
 | 렌더 타깃 | `render_target: Some(rt)` + `aspect: Some(w/h)`(안 적으면 화면 비율로 찌그러진다). 낮은 해상도(예 480×270)에 그려 `Nearest`로 키우면 PS1 느낌 |
 | near/far | `z_near 0.01`·`z_far 10000` 기본 — WebGL1 깊이 24bit에서 z-fighting이 나면 near를 0.1~0.5로 올린다(확인 전) |
 
@@ -62,6 +65,7 @@ macroquad의 3D는 **"카메라 행렬 + 즉시 모드 삼각형"** 까지다. `
 macroquad는 2D 즉시 모드 라이브러리에 3D 카메라를 얹은 것이다. 모든 그리기가 "정점 배열을 매 프레임 배치해 올리기"라서 상태를 가진 GPU 자원(VBO에 상주하는 메시, 본 행렬 유니폼 배열)이 없다. 그 단순함이 웹 번들 400KB와 빠른 컴파일의 대가다. 이 전제를 알고 설계하면(작은 메시, 아틀라스, CPU 변형) 3D도 무리 없이 돌고, 모르고 Unity식으로 짜면(메시마다 드로콜·머티리얼) 드로콜이 폭발한다.
 
 ## 함정
+- **`render_target()`에는 깊이 버퍼가 없다.** 3D를 저해상도 타깃에 그리면 깊이 시험이 조용히 사라지고 그린 순서로만 덮인다 — 상자 모델이 "속이 비치거나 엉켜" 보이고 벽이 얇은 판처럼 겹친다. 오류도 경고도 없어서 화풍 문제로 착각하기 쉽다(knellroot는 첫 스테이지까지 모르고 왔다). 3D 타깃은 처음부터 `render_target_ex(.., depth: true)`.
 - `Camera3D::default()`의 z-up. 2D 머리로 y-up을 가정하고 `position (0,10,-10)`을 주면 세상이 옆으로 눕는다.
 - 렌더 타깃에 3D를 그릴 때 `aspect`를 빼먹으면 화면 비율로 찌그러진다.
 - 정점이 잘리는 실패는 조용하다 — 큰 메시가 "일부만 그려지면" 용량부터 의심.
