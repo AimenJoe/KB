@@ -55,6 +55,7 @@ sources:
   - https://dev.epicgames.com/docs/epic-games-store/requirements-guidelines/content-ratings/game-rating-korea
   - https://dev.epicgames.com/docs/epic-games-store/requirements-guidelines/content-ratings/pricing-overview
   - https://dev.epicgames.com/docs/epic-games-store/requirements-guidelines/content-ratings/iarc-ratings
+  - https://dev.epicgames.com/docs/epic-games-store/services/epic-achievements/achievements-setup
   - https://store.epicgames.com/news/epic-games-store-updates-revenue-share-keep-100-of-the-first-1m-per-product-per-year
   - https://partner.steamgames.com/doc/gettingstarted/contentsurvey/germany
   - https://partner.steamgames.com/doc/gettingstarted/contentsurvey/indonesia
@@ -94,7 +95,7 @@ sources:
 |---|---|
 | 수익 배분 | 상품마다 해마다 **순매출 첫 $1M은 100%**, 넘으면 88/12(2025-06-01부터, 해마다 1월 1일에 새로) [Epic 공지 — 검색 요약] |
 | 등록비 | 게임당 $100, 돌려받는 돈(배포 FAQ 인용) [보도·가이드로만 — 원문 직접 못 읽음] |
-| 업적 | **다른 PC 상점에 업적이 있으면 Epic에도 비슷한 업적을 넣어야 한다**(2023-03-09 뒤 등록한 것, Epic Online Services SDK). 웹 게임은 면제 [원문] |
+| 업적 | **다른 PC 상점에 업적이 있으면 Epic에도 비슷한 업적을 넣어야 한다**(2023-03-09 뒤 등록한 것, Epic Online Services SDK — EOS 업적에 Epic 상점 업적을 잇는다). 웹 게임·**macOS 판은 면제**(EOS 오버레이 없음). **XP 합 정확히 1,000**(하나에 5~200, 5의 배수, 동 5~45·은 50~95·금 100~200, 다 모으면 플래티넘), 잠김 아이콘은 안 쓴다(반투명 + 자물쇠), 올린 뒤 XP 수정·삭제 불가(삭제는 지원 요청), 일괄 올리기는 `achievementDefinitions.csv`·`achievementLocalizations.csv` zip [원문] |
 | 멀티 | 온라인 멀티는 PC 상점 사이 크로스플레이 필수 [원문] |
 | 한국 | **IARC 설문으로 게임위 등급을 무료로 받는다**(청소년이용불가 19+만 게임위에 직접, 6주 여유). 한국은 기본으로 꺼져 있어 등급 뒤 켠다. 한국에 내면 **모든 업데이트에 content notes**(등급이 바뀌면 Epic이 게임위로 보낸다). 확률형 아이템 표시·GaaS 과몰입 안내 같은 한국 규정 안내도 있다 [원문] |
 | 가격 | USD 가격 등급 → 43개 통화 자동, 할인 끝나고 30일 안에 그보다 싸게 못 바꾼다, 출시 30일 안·바꾼 뒤 30일 안 다시 못 바꾼다, 한 지역이 무료면 전부 무료 [원문] |
