@@ -12,7 +12,12 @@ verified: |
     포크의 같은 이름 갈래·같은 이름 태그로는 그 환경에 배포할 수 없다. "prevent self-review" 선택지가 있다.
   - Available rules for rulesets: Restrict creations·updates·deletions(우회 권한자만), Block force pushes(기본 켬), PR 필수 + 코드 주인 검토,
     우회 목록에 역할·팀·GitHub App. push ruleset(파일 경로로 막기)은 Team 플랜의 internal·private 레포용.
-  직접 해 봄(nail-under-the-roots, 2026-11-04): 웹 배포 워크플로를 build(시크릿 없음)·publish(Environment) 두 잡으로 가름 — 실제 CI 결과는 그 레포 기록.
+  직접 해 봄(nail-under-the-roots, 2026-11-04): 웹 배포 워크플로를 build(시크릿 없음)·publish(Environment) 두 잡으로 가름 →
+  ① 환경이 없을 때 첫 실행이 보호 없는 환경을 저절로 만들고 레포 시크릿으로 배포 성공, ② 같은 이름 시크릿을 환경에 넣자 환경 값으로 배포 성공
+  (환경 시크릿이 레포 시크릿보다 앞선다), ③ 레포 시크릿을 지운 뒤에도 배포 성공. 브랜치 규칙을 켠 뒤 우회 목록의 GitHub App으로 push하면
+  원격이 "Bypassed rule violations for refs/heads/…"(때로 "Cannot update this protected ref" 한 줄 뒤 통과)를 찍는다.
+  공개 API `GET /repos/{o}/{r}/rules/branches/{b}`·`/rulesets/{id}`로 규칙·우회 목록·`current_user_can_bypass`를 읽어 설정을 확인할 수 있다.
+  확인 못 함: 자동화 봇(사용자 권한으로 붙는 앱)이 "관리자만 우회"인 규칙을 우회하는지 — API는 우회 가능이라 답했으나 운영 갈래라 push로 시험하지 않음.
   2차 출처만 있음: 포크 PR 워크플로에 레포 시크릿이 가지 않는다(GitHub 문서의 일반 설명으로 알려진 것 — 이번에 해당 쪽 원문은 다시 읽지 않음),
   코드 주인은 자기 PR을 승인할 수 없어 혼자 하는 레포는 우회 목록이 필요하다(블로그).
 sources:
@@ -37,6 +42,8 @@ sources:
 GitHub는 **워크플로를 실행하는 갈래의 워크플로 파일**을 쓴다. 같은 레포에 push할 수 있는 사람은 자기 갈래에서 워크플로를 고쳐 레포 시크릿을 출력할 수 있다 — 레포 시크릿은 "레포에 쓸 수 있는 모든 사람의 것"이다. Environment 시크릿은 환경의 갈래 규칙을 통과한 잡만 받으니, 고친 워크플로가 다른 갈래에서 돌면 시크릿이 비어 있다. 그 갈래(main·release)에 쓰는 것 자체는 브랜치 규칙이 막는다. 둘이 같이 있어야 닫힌다.
 
 ## 함정
+- **봇이 사장 권한으로 붙으면 "관리자만 우회"가 봇도 통과시킬 수 있다.** 그래서 운영 갈래는 규칙만 믿지 말고 운영 환경에 **Required reviewers**(사람 승인)를 겹친다 — 누가 넣어도 배포는 사람이 누를 때만.
+- 운영 갈래 반영을 "봇이 PR → 사람이 Merge"로 바꾸면 문서(작업 규칙)도 같이 고친다 — 안 그러면 봇이 습관대로 직접 push하려다 막힌다.
 - 시크릿을 환경으로 옮기고 레포 시크릿을 지우지 않으면 아무것도 안 바뀐다.
 - 하나의 잡이 PR에서도 돌고 배포도 하면 환경 갈래 규칙에 PR 실행이 막힌다 — 그래서 잡을 나눈다(PR 미리 보기 배포는 포기하거나 별도 환경).
 - 아직 없는 환경 이름을 워크플로에 쓰면 첫 실행 때 보호 없는 환경이 저절로 생긴다 — 규칙은 사람이 따로 건다.
