@@ -43,9 +43,10 @@ sources:
 `rust-toolchain.toml`을 레포에 두면 로컬과 CI가 같은 버전을 쓴다. 액션은 이 파일을 존중한다.
 ```toml
 [toolchain]
-channel = "stable"
+channel = "1.99.1"   # "stable"이면 새 버전마다 새 clippy 경고가 -D warnings를 깬다
 targets = ["wasm32-unknown-unknown"]
 ```
+`channel = "stable"`은 "고정"이 아니다 — 6주마다 바뀐다. 숫자로 고정하는 법과 액션 SHA 고정은 → [액션·Rust 버전 고정](pin-actions-and-rust-toolchain.md)
 
 ### 캐시가 중요한 이유
 Rust는 의존성 컴파일이 빌드 시간의 대부분이다. `rust-cache`는 `~/.cargo`와 `target/`을 `Cargo.lock` 해시 기준으로 캐시해 두 번째 빌드부터 수 분 → 수십 초로 줄인다. Netlify 같은 호스팅 빌더에는 이 캐시가 없다. → [decisions/0001](../../decisions/0001-build-rust-wasm-in-github-actions-deploy-via-netlify-cli.md)
