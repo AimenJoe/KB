@@ -19,7 +19,7 @@ verified: |
   - netlify-cli 23.15.1 소스(npm 패키지): `deploy --json`의 출력에 `--prod`일 때만 `url`(사이트 주소)이 붙는다. 그 밖에는 `deploy_url`.
   직접 해 봄(nail-under-the-roots, 2026-11-04): 액션 11종을 SHA + `# v태그` 주석으로 바꾸고, Rust를 `rust-toolchain.toml`의 1.99.1로,
   dtolnay(master SHA + `toolchain` 입력)·rust-cache를 묶은 액션 하나로 — 결과는 아래 "실행 결과".
-  확인 못 함: macOS 러너에서 묶은 액션이 도는지(장애로 못 돌림), 잠금 파일 기능을 무료 공개 레포에서 지금 쓸 수 있는지(문서가 기능 플래그 아래), Dependabot이 `# master` 주석의 SHA를 어떻게 올리는지.
+  확인 못 함: 잠금 파일 기능을 무료 공개 레포에서 지금 쓸 수 있는지(문서가 기능 플래그 아래), Dependabot이 `# master` 주석의 SHA를 어떻게 올리는지.
 sources:
   - https://docs.github.com/en/actions/reference/security/secure-use
   - https://docs.github.com/en/actions/concepts/security/workflow-dependency-lockfiles
@@ -62,7 +62,7 @@ sources:
 ## 실행 결과
 nail-under-the-roots `5689511`(2026-11-04):
 - 통과: deploy-web(fmt·clippy·test·wasm 빌드 + 개발판 배포 확인), smoke-web(개발판 시나리오 + 운영판 타이틀), build-android, build-desktop의 Windows·Linux — 묶은 액션(SHA 고정 dtolnay + `toolchain: 1.99.1` + rust-cache)이 리눅스·윈도 러너에서 그대로 돌았다.
-- 못 돌림: macOS 러너 잡 둘(PC 묶음의 Mac판·iOS) — GitHub Actions 장애(상태 페이지 "Incident with Actions and Pages")로 러너를 못 받아 두 번 다 단계 하나 없이 취소("The job was not acquired by Runner of type hosted even after multiple attempts"). macOS에서의 동작은 **확인 못 함**.
+- macOS 러너 잡 둘(PC 묶음의 Mac판·iOS)은 GitHub Actions 장애(상태 페이지 "Incident with Actions and Pages")로 처음 두 번은 러너를 못 받아 단계 하나 없이 취소("The job was not acquired by Runner of type hosted even after multiple attempts") — 장애가 풀린 뒤 다시 돌려 **둘 다 통과**. 묶은 액션의 `sed`(BSD)·dtolnay·rust-cache가 macOS에서도 그대로 돈다.
 
 ## 관련 노트
 - [공개 레포에서 배포 파이프라인 지키기](../../guides/protect-deploy-pipeline-in-public-repo.md)
