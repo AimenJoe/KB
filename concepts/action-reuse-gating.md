@@ -4,18 +4,21 @@ type: concept
 tags: [gamedev, game-design, combat, game-feel]
 status: draft
 created: 2026-10-25
-updated: 2026-11-03
+updated: 2026-11-04
 verified: |
   1차 출처로 확인(직접 구현·테스트, nail-under-the-roots 2026-10-25, 결정 0038): 공격 연타 1초 동안 패링 창 비율이
   창/대기(0.12/0.45) 이하로 떨어지는 것, 성공 뒤엔 대기 없이 다시 열리는 것, 먹기 = 먹는 시간 뒤에만 회복·맞으면 끊김·
   굴파기로 끊김·시작부터 대기를 단위 테스트로, 헤드리스 Chromium에서 먹는 그림·슬롯 덮개·대기 중 연타 무시·터치 버튼 테두리를 확인.
   손맛(수치가 맞는지)은 아직 사람이 해 보지 않았다.
+  2차 출처만 있음(2026-11-04): 근접 명중으로 원거리 칸을 채우는 HLD(twinfinite 공략)·Death's Door(gamerant 공략).
   2차 출처만 있음: "실패에 대가가 없으면 연타가 정답 → 패링 자체에 대기"(Unity 포럼 답변), "누른 순간부터 짧은 잠금이라
   정확한 연속 패링은 되고 연타는 안 된다"(Deadlock 팬 가이드, 0.25초), 회복에 진행 표시를 달라는 플레이어 피드백(itch.io 댓글).
   Estus식 "마시는 동안 무방비"가 회복의 값이라는 해석은 원칙에서 끌어낸 추론이고 개발사 출처는 못 찾았다.
   "눌렀는데 못 하면 알려 준다"(소리 + 그 HUD 칸 떨기)는 직접 구현·사람 플레이 피드백(nail-under-the-roots 0093·0149)에서 왔다.
   UX 휴리스틱(시스템 상태 보이기) 원문은 이 세션 네트워크에서 열지 못해 확인하지 못했다.
 sources:
+  - https://twinfinite.net/pc/hyper-light-drifter-combat-tips-and-tricks/5/
+  - https://gamerant.com/beginner-tips-deaths-door/
   - https://discussions.unity.com/t/parry-mechanic-not-working-as-desired/363046
   - https://steamdb.com/pl/deadlock/mechanics/parry
   - https://itch.io/post/5859074
@@ -39,6 +42,7 @@ sources:
 | 고정 대기 | 회피·무적 이동 | 무적 연타를 막는다. 장신구로 줄일 수 있게 배율로(하한 있음) |
 | 게이지(맞혀야 참) | 필살기 | 공격적인 플레이를 부른다. 필살기 자체는 게이지를 안 채운다 |
 | **쓰는 시간 + 시작부터 대기** | 회복 아이템 | 쓰는 시간이 "언제 먹나"에 값을 매긴다(거리·틈). 대기는 끊겼다 바로 다시 먹는 연타를 막는다 |
+| **근접으로 맞혀야 차는 칸** | 근접 게임의 원거리·마법 | 멀리서 쏘기만 하는 플레이를 막고 근접을 중심에 둔다 — Hyper Light Drifter(칼로 맞히면 탄이 참)·Death's Door(근접 4타에 마법 1칸)(2차). 쉼터에서 가득 |
 | **창이 열린 순간부터 대기, 성공하면 해제** | 패링 창 | 연타로 창을 이어 붙이는 것을 막는다. 정확한 연속 패링은 보상으로 남긴다 |
 
 ### 회복 아이템

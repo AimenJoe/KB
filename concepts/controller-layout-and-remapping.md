@@ -4,7 +4,7 @@ type: concept
 tags: [gamedev, input, accessibility, game-design, macroquad]
 status: draft
 created: 2026-10-25
-updated: 2026-11-03
+updated: 2026-11-04
 verified: |
   직접 실행(2026-10-25, nail-under-the-roots): 장치별 안내(키보드·패드·터치), 터치 첫 화면 짐작(pointer: coarse)을 헤드리스 Chromium 데스크톱·폰(터치만)으로 확인. 패드는 단위 테스트만.
   1차 출처로 확인(직접 구현·실행, 2026-10-25, nail-under-the-roots, macroquad 0.4 + gamepads 0.1.7): 동작마다 키 하나·패드 버튼 하나의
@@ -15,9 +15,13 @@ verified: |
   뒤로·바깥 탭 = 취소를 직접 구현해 단위 테스트·헤드리스 Chromium(다섯 언어)으로 확인. Apple HIG "Alerts" 원문(2024-02 개정판)을 직접 읽었다.
   Windows 가이드라인(learn.microsoft.com)은 세션 네트워크에서 열리지 않아 원문 미확인 — "위험한 동작이면 기본 단추는 안전한 쪽"은 그것을 인용한
   2차 자료(GitHub Desktop 설계 문서·AutoCAD 도움말)로만 봤다. 패드 게임에서 커서를 어디에 둘지에 관한 공식 지침은 찾지 못했다(플레이어 불만 글만).
+  2차 출처만 있음(2026-11-04 조사): 조준과 같이 쓰는 버튼은 어깨에 — HLD(gog 포럼 유저 보고), Minecraft Dungeons(trueachievements), Enter the Gungeon(twinfinite), Diablo IV 합친 상호작용 불만(icy-veins·Blizzard 포럼), Tunic 공유 버튼(gamepressure). 엄지 충돌 자체는 Knellroot 플레이 피드백(직접).
   2차 출처만 있음: Hades·Hades II의 기본 배치(X 공격·A 대시·B 캐스트·Y 특수 — 공략 기사·위키 표, 공식 문서 아님).
   가이드라인 사이트(Game Accessibility Guidelines, Xbox Accessibility Guidelines 107, Can I Play That)의 권고는 원문 요약으로 봤다.
 sources:
+  - https://gog.com/forum/hyper_light_drifter/issues_with_the_xbox_controls
+  - https://wp-prod.icy-veins.com/?p=86298
+  - https://www.gamepressure.com/tunic/keybinds/z8f972
   - https://gameaccessibilityguidelines.com/allow-controls-to-be-remapped-reconfigured
   - https://devdocs.xbox.com/gaming/accessibility/xbox-accessibility-guidelines/107
   - https://caniplaythat.com/?p=8886
@@ -40,6 +44,8 @@ sources:
 - **고정할 것**: 이동, 메뉴 열기(Esc/Start), 메뉴 확인·뒤로(Enter/A, Esc/B). 이걸 바꾸게 하면 배치를 망쳤을 때 메뉴로 돌아올 길이 없다. 권고(메뉴까지 전부 바꿀 수 있게)와 부딪히면 "기본값으로"를 메뉴 안에 둔다.
 - **다시 붙이기 화면**: 위아래로 동작, 좌우로 키보드/패드 칸, 확인 → "누르세요… 5"(시간 제한, Esc로 취소). 확인을 누른 그 프레임의 키가 바로 잡히지 않게 다음 프레임부터 받는다.
 - **안내 글**: "{0} 세 번" 같은 자리표시자에 `prompt(동작)`. 패드를 만지면 패드 이름, 키를 누르면 키 이름(마지막 장치).
+- **조준 스틱과 같이 누를 버튼은 어깨에**: 오른쪽 스틱과 얼굴 버튼(X·A·B·Y)은 같은 엄지라 "겨누면서 누르기"가 안 된다(Knellroot 플레이 피드백, 2026-11-04). 겨누는 동작(원거리·마법)은 어깨·트리거로, 얼굴 버튼의 동작은 자동 조준·이동 방향으로 겨눈다. 트리거로 쏘는 쪽이 장르 관례(Hyper Light Drifter LT 조준·RT 사격, Minecraft Dungeons RT 원거리, Enter the Gungeon — 모두 2차).
+- **상호작용을 다른 동작과 한 버튼에 둘 때는 싸움 중에 연타하지 않는 동작과**: Diablo IV는 "기본 기술 + 상호작용"을 한 버튼에 합치는 기본값 때문에 적이 있으면 상자·문을 못 연다는 불만이 많아 공략들이 그 옵션부터 끄라고 한다(2차). Tunic은 회피·달리기·상호작용이 한 버튼(2차). 겹칠 때는 조건(가까움 + 앞쪽 + 깨어 있는 적이 없음)을 두고, 지금 그 버튼이 무엇을 할지 화면에 띄운다.
 
 ## 왜?
 - 손이 가장 자주 가는 넷을 같은 손가락 한 개로 오갈 수 있는 자리에 모으면, 회피 → 공격 같은 연계가 엄지 굴리기 하나로 된다. 어깨 버튼은 다른 손가락이라 동시에 누르기는 쉽지만 연타는 어렵다 → 가끔 쓰는 것.

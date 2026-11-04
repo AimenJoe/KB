@@ -4,7 +4,7 @@ type: guide
 tags: [macroquad, miniquad, android, apk, github-actions, ci-cd, rust]
 status: verified
 created: 2026-10-24
-updated: 2026-11-03
+updated: 2026-11-04
 verified: |
   1차 출처로 확인: cargo-quad-apk git master(커밋 d411c8f, 2026-07-28) 소스 — src/config.rs(NDK_HOME 필수, ANDROID_SDK_HOME→ANDROID_HOME,
   build-tools 중 가장 높은 버전 자동 선택, android_version 기본 36, min_sdk 기본 18), src/ops/build.rs(aapt2·d8·zipalign·javac -source/-target 1.8,
@@ -20,6 +20,7 @@ verified: |
   1차 출처로 확인(2026-10-26): developer.android.com behavior-changes-12 원문("…doesn't have an explicitly-declared value for android:exported, your app can't be installed on a device that runs Android 12 or higher"), cargo-quad-apk d411c8f src/ops/build.rs·config.rs(MainActivity 속성에 exported 없음, activity_attributes를 그대로 붙임), 릴리스 APK를 androguard로 읽어 exported 없음 확인. 사용자 실기에서 v0.1.4 설치 거부 메시지.
   사용자 실기(2026-10-25~26): exported를 넣은 v0.1.5부터 설치·실행·패드 버튼(0075)이 됐다. 기기 모델·Android 버전은 기록하지 않았다.
   1차 출처로 확인(2026-10-26, nail 0087): cargo-quad-apk d411c8f의 `res`·`icon` 메타데이터로 앱 아이콘이 들어가고, CI의 `aapt2 dump badging`에 application-icon이 찍힌다. 실제 런처 모양(적응형 잘림)은 미확인.
+  1차 출처로 확인(2026-11-04, Knellroot 0046): miniquad 0.4.11 소스(`src/native/android.rs`의 `conf.fullscreen` 분기, `java/MainActivity.java` `setFullScreen`), Android 개발자 문서 "Hide system bars for immersive mode"(바는 `hide(systemBars())`로 숨긴다, 동작 `BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE`). 고친 판은 컴파일(cargo check)까지 — 실기기에서 바가 숨는지는 아직 확인 못 함.
   확인 못 함: 디버그 키 서명 APK가 Android 14+ 기기에서 사이드로드되는지(기기 버전 기록이 없다).
 sources:
   - https://github.com/not-fl3/cargo-quad-apk
@@ -49,7 +50,7 @@ android_version = 36        # compileSdk. 러너의 platforms/android-36/android
 target_sdk_version = 36
 min_sdk_version = 26
 build_targets = ["aarch64-linux-android"]  # 기본은 armv7·aarch64·i686 세 개. 실기만이면 arm64로 줄여 시간 절약
-fullscreen = true
+fullscreen = true           # 매니페스트 테마뿐 — 바를 실제로 숨기려면 아래 함정 "몰입 모드"
 version_code = 1            # 배포마다 증가
 
 res = "android/res"         # 앱 아이콘(아래 "아이콘"). 없으면 런처에 기본 아이콘
@@ -107,6 +108,10 @@ NDK 없이도 `rustup target add aarch64-linux-android && cargo check --target a
 - **커밋 고정**: 상류 master가 바뀌어 조용히 깨지는 것을 막는다. 올릴 때 CI 한 번 보고 올린다.
 
 ## 함정
+- **`fullscreen = true`만으로는 내비게이션 바가 남는다(Android 11+).** 두 군데를 고쳐야 한다.
+  - miniquad는 `Conf::fullscreen`이 참일 때만 시작·복귀 때 `setFullScreen`을 부른다 — 메타데이터와 별개로 `window_conf`에 `fullscreen: cfg!(target_os = "android")`.
+  - miniquad 0.4.11 `java/MainActivity.java` `setFullScreen`은 API 30+에서 `setDecorFitsSystemWindows(false)`만 한다 — 내용이 바 밑까지 그려질 뿐 바는 그대로다. 바를 숨기는 것은 `getWindow().getInsetsController().hide(WindowInsets.Type.statusBars() | WindowInsets.Type.navigationBars())` + `setSystemBarsBehavior(BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE)`(쓸면 잠깐 보였다 다시 숨음). 패치한 miniquad(`third_party/miniquad`)의 자바 파일을 고치면 cargo-quad-apk가 그것을 가져간다.
+  - 29 이하는 원본의 `SYSTEM_UI_FLAG_IMMERSIVE_STICKY` 그대로 된다.
 - **`android:exported`가 없으면 Android 12+ 폰에 설치되지 않는다.** 설치 화면에는 "App not installed as package appears to be invalid"만 뜬다.
   - 원인: cargo-quad-apk(d411c8f)가 만드는 `MainActivity`에는 MAIN/LAUNCHER intent-filter가 있는데 `android:exported`가 없다. Android 문서(behavior-changes-12)에 따르면, targetSdk 31 이상에서 intent-filter가 있는 컴포넌트가 exported를 명시하지 않으면 Android 12 이상 기기에 설치할 수 없다.
   - 해결: `activity_attributes`에 `"android:exported" = "true"`. 이 표의 키·값은 `<activity>` 속성으로 그대로 옮겨진다(`build_attribute_string`).
