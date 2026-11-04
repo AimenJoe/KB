@@ -18,9 +18,13 @@ verified: |
     recommended" — 캐시 복원이 받기와 비슷하게 걸리고, Linux OS 의존성은 캐시할 수 없다고 적혀 있다. 공식 컨테이너 이미지
     `mcr.microsoft.com/playwright`를 쓰는 방법도 있다.
   - 공식 문서(playwright.dev/docs/docker, 2026-11-04 읽음): 이미지 태그는 `mcr.microsoft.com/playwright:v<버전>-noble`, "browsers and browser system dependencies"가 들어 있고 playwright 패키지는 따로 설치한다.
+  - 직접 실행(nail-under-the-roots smoke-web, 2026-11-04, ubuntu-24.04 이미지 20261025.353.1, playwright@1.63.0):
+    최근 실행 12개의 "Install Playwright" 단계는 18~41초(잡 전체 4~5분). 한 실행을 로그로 나누면 npm 2초, apt(목록 9.9MB + 같은 글꼴 9개 21.1MB를
+    32MB/s로) 약 10초, 브라우저 본체 약 7초 — 미러가 빠른 날은 `--with-deps`가 10초 남짓이다. 잡 시간의 대부분은 시험 자체(약 3분).
+  - 직접 실행(같은 레포, 작업 갈래에서 손으로 한 번, run 41851593291): `--with-deps`를 빼고 `npx playwright install chromium`만 해도
+    Chromium이 떠서 연기 시험 39개 확인이 모두 통과, 설치 단계 8초. 즉 이 러너 이미지에는 브라우저가 쓰는 OS 라이브러리가 이미 다 있다.
   확인 못 함:
-  - `--with-deps`를 빼고 `npx playwright install chromium`만 했을 때 ubuntu-latest에서 그대로 뜨는지는 아직 CI에서 돌려 보지 않았다
-    (위 로그로 보면 라이브러리는 이미 있다). 러너 이미지가 바뀌면 달라질 수 있다 — 깨지면 브라우저가 안 떠서 시험이 크게 실패하므로 조용히 틀리지는 않는다.
+  - 러너 이미지가 바뀐 뒤에도 그대로인지(이미지 버전마다 다를 수 있다 — 깨지면 브라우저가 안 떠서 시험이 크게 실패하므로 조용히 틀리지는 않는다).
 sources:
   - https://playwright.dev/docs/ci
   - https://playwright.dev/docs/docker
@@ -50,7 +54,8 @@ sources:
 
 ## 함정
 - 운영판이 개발 기능을 뺀 빌드라 시험이 개발 빌드를 따로 짓는다면(개발 메뉴로 장면에 들어가는 시험), 운영 갈래의 시험은 **운영 빌드를 보지 않는다** — 건너뛰어도 잃는 확인이 거의 없다는 뜻이기도 하다. → [개발판·운영판 나누기](../../guides/dev-and-release-flavors.md)
-- 시험 단계를 건너뛸 때 SHA 비교는 "같은 커밋"이어야 한다. 머지 커밋이 새로 생기는 흐름(merge commit)에서는 SHA가 달라 매번 돈다.
+- 시험 단계를 건너뛸 때 SHA 비교는 "같은 커밋"이어야 한다. 운영 갈래를 PR로 합치면(merge·squash·rebase 모두) 새 커밋이 생겨 SHA가 늘 달라 건너뛰기가 한 번도 걸리지 않는다. 그 흐름에서 같은 내용인지 보려면 커밋이 아니라 **트리 해시**(`git rev-parse HEAD^{tree}`)를 비교해야 한다 — 다만 그만큼 워크플로가 복잡해지니, 시험이 배포를 막지 않는 구조면 그냥 두 번 돌리는 편이 싸다.
+- 설치 단계가 길다고 느껴지면 먼저 단계를 나눠 잰다. 미러가 빠른 날은 `--with-deps`가 10초 남짓이라, 연기 시험이 느린 진짜 이유는 시험 안의 고정 대기(`waitForTimeout`)인 경우가 많다.
 
 ## 관련 노트
 - [WASM 빌드와 JS 번들 — 헤드리스로 웹 빌드 확인](../macroquad/wasm-build.md#헤드리스로-웹-빌드-확인-playwright)
