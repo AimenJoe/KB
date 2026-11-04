@@ -6,6 +6,7 @@ status: draft
 created: 2026-10-29
 updated: 2026-11-04
 verified: |
+  2026-11-04 더함(셋째, 한국 등급): GCRB 이관(2025-11-01)·개정법 시행(2025-10-09)·Steam 미지정·수수료(조견표 36만 원, 개인회원 50% 감면)·차단 기준은 모두 보도·학교 공지·블로그로만 봤다 — grac.or.kr·gcrb.or.kr·law.go.kr은 작업 환경에서 열리지 않아 원문 확인 못 함. GCRB도 50% 감면을 하는지, 제작업 등록이 개인에게 필요한지는 확인 못 함.
   2026-11-04 더함(둘째): "Steam에서는 Steam판만 알린다"(Steamworks FAQ 인용)와 상점 설명 글의 바깥 링크 금지(2024-09)는 보도(PC Gamer·GamesRadar)로만 봤다 — 원문 직접 못 읽음. 무료판 + Steam 유료판의 예(Mindustry)와 사는 까닭은 GamingOnLinux 기사·itch 댓글(2차, 2019~2022).
   2026-11-04 더함: 가격 바닥($0.99 등급)은 Steamworks 가격 문서의 검색 요약과 보도(Game World Observer·PC Gamer)로만 봤다(partner 사이트가 작업 환경에서 막힘). macOS 공증은 2차(공지 댓글·개발자 블로그).
   1차 출처로 확인(2026-10-29, 원문을 직접 받아 읽음): Steamworks 문서(Content Survey의 AI 절, Steam Direct, Coming Soon, Next Fest와 2027-02판, 오픈소스 배포, 세금 FAQ),
@@ -13,7 +14,7 @@ verified: |
   Apple Developer(회비 면제·Small Business Program), itch.io FAQ와 오픈 수익 배분 공지, Gemini API 추가 약관(2026-03-23판), 문체부 보도자료(2019 시행령).
   데이터 회사·분석가의 원문(1차 데이터지만 추정치): Gamalytic 위시리스트 전환(2024-04-29), GameDiscoverCo EA 졸업작(2026), Sulka Haro의 Steam AI 표시 전수 조사(2023-07~2026-07).
   2차 출처만 있음: 매출 중앙값($249·$1,136), Boxleiter 배수(리뷰×20~60), Next Fest 위시리스트 중앙값(설문), 플레이어 AI 반감 설문(8% "절대 안 산다"), 캡슐 외주 시세.
-  확인 못 함: Valve의 한국 자체등급분류사업자 지정 여부(2024 "관심" 보도 뒤 소식 없음), 게임위 등급분류 수수료표, STOVE 수수료.
+  확인 못 함: Valve의 한국 자체등급분류사업자 지정 여부(2026-10까지 소식 없음), GCRB 현행 수수료표(원문), STOVE 수수료.
 sources:
   - https://partner.steamgames.com/doc/gettingstarted/contentsurvey
   - https://partner.steamgames.com/steamdirect
@@ -34,6 +35,11 @@ sources:
   - https://ai.google.dev/gemini-api/terms
   - https://www.mcst.go.kr/site/s_notice/press/pressView.jsp?pSeq=17434
   - https://gamalytic.com/blog/exploring-steam-wishlist-sale-ratio
+  - https://www.gametoc.co.kr/news/articleView.html?idxno=103447
+  - https://www.inews24.com/view/1435322
+  - https://zdnet.co.kr/view/?no=20231004113116
+  - https://www.grac.or.kr/institution/etcform01.aspx
+  - https://www.kimchang.com/ko/insights/preview.kc?sch_section=4&idx=31706
   - https://www.pcgamer.com/valve-clarifies-rule-against-using-steam-to-promote-games-on-other-storefronts
   - https://www.pcgamer.com/games/valve-issues-new-rules-outlawing-links-in-steam-page-descriptions-hopefully-bringing-an-end-to-the-plague-of-demos-pretending-theyre-prologue-games
   - https://www.gamingonlinux.com/2019/09/mindustry-the-factorio-like-tower-defense-game-is-now-on-steam/
@@ -78,7 +84,13 @@ sources:
 
 ### 그림 도구·에셋·한국 규칙
 - Gemini API 추가 약관(2026-03-23): 생성물 소유권을 주장하지 않는다, 같거나 비슷한 것을 남에게도 만들 수 있다, **무료 사용분(AI Studio·무료 할당)은 입력·결과를 제품 개선에 쓰고 사람이 볼 수 있다**, 18세 이상·업무 목적. 소비자용 Gemini 앱은 이 약관이 아니라 Google 서비스 약관 — 어느 제품을 썼는지 기록해 둔다.
-- 등급분류(한국): 2019-09-03 시행령으로 개인·동호회의 **비영리 단순공개** 게임은 면제(청소년이용불가 내용 제외). 판매하면 면제 밖. Google·Apple은 자체등급분류사업자, Valve는 지정 소식 없음 — 한국 판매 전 게임위 확인.
+- 등급분류(한국): 2019-09-03 시행령으로 개인·동호회의 **비영리 단순공개** 게임은 면제(청소년이용불가 내용 제외). **판매하면 면제 밖** — 한국 이용자가 사거나 받을 수 있으면 해외 플랫폼이어도 받아야 하고, 의무는 플랫폼이 아니라 개발자(게임위 설명).
+  - 받는 곳: PC·콘솔은 **게임콘텐츠등급분류위원회(GCRB, 게임문화재단)** — 전체·12·15세는 전부터, 청소년이용불가도 2025-11-01부터(내용수정신고는 12-01, 위탁은 2030-05-22까지). 그 전 접수분만 게임위.
+  - Steam은 자체등급분류사업자가 아니다(2024 "관심" → 2024 말 "권고에 응하지 않음", 2026-10 개인 블로그도 지정 소식 못 찾음). Google·Apple·MS·Sony·Epic·STOVE는 지정 — 그 스토어로 내면 따로 안 받는다.
+  - 2025-10-09 시행 개정법: 자체등급분류사업자 요건 완화(재지정 5년), 내용수정신고는 사전 신고 가능·경미하면 면제, 청불 민간 위탁 근거.
+  - 수수료: 게임위 조견표의 PC온라인 등 기초 36만 원(장르·용량·네트워크·한글화 계수로 달라짐, 시점 불명), 개인회원은 신청 때 50% 자동 감면(2023-10-05부터, 게임위). 개인 블로그(2026-10)는 GCRB 36만~72만 원 + 부가세.
+  - 집행: 게임위의 해외 플랫폼 차단 요청은 "한국어 지원 + 국내 심의 통과 불가 내용"이 겹칠 때(주로 성인물). 전체이용가 내용이면 차단될 일은 낮지만 의무는 남는다.
+  - 게임제작업·배급업 등록(법 25조, 시군구): 개인 개발자에게도 필요한지 자료가 엇갈린다(2011 문체부 해명은 "개인은 복잡한 등록 불필요" 취지) — 관할 구청에 물을 것.
 
 ## 왜?
 - 판매는 품질보다 **출시 때 찜한 사람 수**를 따라간다(전환율 분포가 넓어도 기준점은 위시리스트). 그래서 상점 페이지를 일찍 열고(손해 없음), 한 번뿐인 Next Fest를 위시리스트가 쌓인 뒤에 쓴다.
