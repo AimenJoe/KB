@@ -15,7 +15,7 @@ verified: |
   - `Camera3D` 기본값: `position (0,-10,0)`, `target 0`, `up (0,0,1)`(**z-up**), `fovy 45°(라디안)`, `Perspective`, `z_near 0.01`, `z_far 10000`, `aspect None`(매 프레임 화면 비율).
     `depth_enabled()`는 `Camera3D`가 `true`, `Camera2D`가 `false`. `Projection::Orthographics`는 `top = fovy/2, right = top*aspect`로 **fovy를 세로 폭(월드 단위)** 으로 쓴다(구조체 주석 "near plane width"와 다르다).
   - 모델 파일 로더(obj·gltf)는 없다. `models.rs`에는 `draw_cube/sphere/cylinder/plane/line_3d/grid`와 `Mesh`뿐.
-  - 드로콜 용량은 `Conf` 필드가 아니라 숨은 헬퍼 `gl_set_drawcall_buffer_capacity(max_vertices, max_indices)` → `update_drawcall_capacity`로 바꾼다(window.rs). 기본값 숫자는 이번에 확인하지 못했다(`QuadGl::new` 호출부를 안 읽음).
+  - 드로콜 용량: 숨은 헬퍼 `gl_set_drawcall_buffer_capacity(max_vertices, max_indices)`(window.rs), 또는 **macroquad `conf::Conf`의 `draw_call_vertex_capacity`·`draw_call_index_capacity`(기본 10,000 / 5,000, 0.4.16 `lib.rs` 1차)**. `#[macroquad::main]` 함수가 miniquad `Conf`를 돌려주면 `From`이 기본값으로 고정한다 — 바꾸려면 macroquad `Conf { miniquad_conf, draw_call_index_capacity, .. }`를 돌려준다(knellroot 0036: 둥근 모델 한 벌 인덱스 ≈ 7,800이 5,000에서 잘려 몸·다리가 사라졌다).
   - miniquad `Conf`: `high_dpi` 기본 false(Android는 true), `sample_count` 기본 1, `platform.webgl_version` 기본 **WebGL1**(conf.rs).
   렌더 타깃 깊이(2026-11-04, 0.4.16 `texture.rs` 소스 + knellroot 0033 헤드리스 스크린숏): `render_target(w, h)` = `RenderTargetParams::default()` = **`depth: false`**.
     `Camera3D`가 깊이 시험을 켜도 붙은 깊이 버퍼가 없으면 시험이 없는 것과 같아 **그린 순서로만 덮인다**(모델 부위 상자·벽이 엉킴) — `render_target_ex(.., RenderTargetParams { depth: true, .. })`로 고쳐 확인.
@@ -68,7 +68,7 @@ macroquad는 2D 즉시 모드 라이브러리에 3D 카메라를 얹은 것이�
 - **`render_target()`에는 깊이 버퍼가 없다.** 3D를 저해상도 타깃에 그리면 깊이 시험이 조용히 사라지고 그린 순서로만 덮인다 — 상자 모델이 "속이 비치거나 엉켜" 보이고 벽이 얇은 판처럼 겹친다. 오류도 경고도 없어서 화풍 문제로 착각하기 쉽다(knellroot는 첫 스테이지까지 모르고 왔다). 3D 타깃은 처음부터 `render_target_ex(.., depth: true)`.
 - `Camera3D::default()`의 z-up. 2D 머리로 y-up을 가정하고 `position (0,10,-10)`을 주면 세상이 옆으로 눕는다.
 - 렌더 타깃에 3D를 그릴 때 `aspect`를 빼먹으면 화면 비율로 찌그러진다.
-- 정점이 잘리는 실패는 조용하다 — 큰 메시가 "일부만 그려지면" 용량부터 의심.
+- 정점이 잘리는 실패는 조용하다 — 큰 메시가 "일부만 그려지면" 용량부터 의심. **인덱스가 먼저 찬다**(기본 5,000 = 삼각형 1,666개) — 둥근(부드러운) 모델은 정점은 적어도 삼각형이 많다. 모델 한 벌이 용량 안에 드는지 시험으로 지킨다.
 - `Orthographics`의 `fovy`는 각도가 아니라 세로 폭. 45(라디안 아님)를 주면 45 월드 단위가 세로로 보인다.
 - 기본 WebGL1: `#version 300 es` 셰이더 문법·정수 텍스처·MRT 없음. 레트로엔 상관없지만 커스텀 GLSL은 ES 1.0으로.
 
