@@ -4,8 +4,9 @@ type: reference
 tags: [gamedev, marketing, steam, business, legal, ai-image, itch-io]
 status: draft
 created: 2026-10-29
-updated: 2026-10-29
+updated: 2026-11-04
 verified: |
+  2026-11-04 더함: 가격 바닥($0.99 등급)은 Steamworks 가격 문서의 검색 요약과 보도(Game World Observer·PC Gamer)로만 봤다(partner 사이트가 작업 환경에서 막힘). macOS 공증은 2차(공지 댓글·개발자 블로그).
   1차 출처로 확인(2026-10-29, 원문을 직접 받아 읽음): Steamworks 문서(Content Survey의 AI 절, Steam Direct, Coming Soon, Next Fest와 2027-02판, 오픈소스 배포, 세금 FAQ),
   IRS 조세조약 표 1(2023-05판, 한국 줄), Google Play Console 도움말(서비스 수수료·12명 시험), Android Developers(target SDK·개발자 확인)·Developer Console 도움말,
   Apple Developer(회비 면제·Small Business Program), itch.io FAQ와 오픈 수익 배분 공지, Gemini API 추가 약관(2026-03-23판), 문체부 보도자료(2019 시행령).
@@ -51,6 +52,8 @@ sources:
 | Next Fest | **게임당 한 번만**. 조건: 상점 페이지 공개, 행사 시작 때 공개 데모, 행사 끝까지 미출시. 데모 길이·독점 조건 없음. 데모 빌드 검토는 약 3주 전. 2027-02판: 02-22~03-01, 등록 마감 01-10 |
 | AI 공개 | Content Survey의 생성형 AI 절. **Pre-Generated**(개발 중 AI로 만들어 게임과 함께 나가 플레이어가 보는 것: 그림·소리·서사·현지화)와 **Live-Generated**(실행 중 생성, 불법 생성물 가드레일 설명 추가). 효율을 위한 개발 도구(코드 도우미 등)는 대상이 아니라고 문서가 밝힌다. 마케팅 자료가 대상인지는 문서에 없다 |
 | 오픈소스 | Steamworks SDK는 카피레프트(GPL)와 문제가 된다. MIT·BSD·Apache 2.0은 괜찮다 |
+| 가격 바닥 | 기본 가격은 **$0.99 등급**이 바닥(다른 통화는 2023-08부터 그 등급에 맞춘 값), 할인은 그 절반(약 $0.49)까지 [Steamworks 가격 문서 검색 요약 + 보도 — 원문 직접 못 읽음] |
+| macOS | Mac App Store와 무관하게 Steam이 macOS 데포를 받는다. 공증은 "권장, 필수 아님"(2019 공지 댓글 인용, 2차) — 기술 연동은 [Rust 게임을 Steam에 붙이기](../../guides/steam-release-for-rust-games.md) |
 | 세금(미국 원천징수) | 조약이 없으면 30%. W-8BEN으로 조약 세율. **한국: 저작권 사용료 10%**(IRS 표 1, 2023-05판; 특허·노하우 15%). 게임 판매에는 "royalty copyright" 세율. TIN을 나중에 넣어도 이미 뗀 것은 돌려주지 않는다 |
 
 ### 위시리스트·성과 숫자(데이터 회사 추정)
@@ -83,6 +86,7 @@ sources:
 - 매출 숫자 대부분은 리뷰 수에서 거꾸로 추정한 것이다(±크다).
 
 ## 관련 노트
+- [Rust 게임을 Steam에 붙이기](../../guides/steam-release-for-rust-games.md)
 - [공개 데모와 바깥 의견 받기](../../concepts/public-demo-and-outside-feedback.md)
 - [인디 게임 공식 페이지](../../guides/indie-game-landing-page.md)
 - [게임 그림 외주 맡기기](../../guides/commissioning-game-art.md)

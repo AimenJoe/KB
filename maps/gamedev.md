@@ -68,6 +68,7 @@ updated: 2026-11-03
 - [컨트롤러 버튼 배치와 다시 붙이기](../concepts/controller-layout-and-remapping.md) — 오른쪽 넷 = 자주 쓰는 넷, 키보드 다이아몬드, 겹치면 맞바꿈, 메뉴 키 고정, 안내는 배치를 따라, 격자 끝에서 옆 탭으로, 되돌릴 수 없는 메뉴 항목은 묻는 창(단추 = 하는 일 이름, 커서는 취소에서)
 
 ## 판매·비즈니스
+- [Rust 게임을 Steam에 붙이기](../guides/steam-release-for-rust-games.md) — Cargo 기능 하나로 PC만·연결 없으면 그냥 켜기, SDK 재배포 파일은 크레이트가 복사(커밋 안 함), 업적 = 목표 목록에서 고른 표(API 이름 고정·숨김·등록표는 시험이 만든다·아이콘은 있는 그림에서), Auto-Cloud, 빌더 계정 + config.vdf + beta까지만 자동, macOS 공증은 필수 아님(2차), 가격 바닥 $0.99, Deck 글자 9px·패드 글자만
 - [인디 게임을 팔 때의 규칙과 숫자](../reference/game-business/selling-an-indie-game-rules-and-numbers.md) — Steam Direct·Coming Soon 2주·Next Fest 게임당 한 번·AI 공개(Pre/Live-Generated)·원천징수(한국 저작권 10%), 위시리스트 전환·AI 표시 게임의 성과, Play(한국 15%)·Android 개발자 확인·Apple·itch, Gemini 약관, 한국 비영리 등급 면제
 
 ## 다국어
