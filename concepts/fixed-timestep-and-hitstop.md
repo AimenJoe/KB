@@ -4,8 +4,9 @@ type: concept
 tags: [gamedev, game-feel, input, rust]
 status: draft
 created: 2026-10-24
-updated: 2026-11-02
+updated: 2026-11-04
 verified: |
+  직접 실행(2026-11-04, Knellroot 0056): RB 쥐고 있음을 take()에서 넘기지 않아 헤드리스 웹에서 모으기가 안 들어감 → carry()로 넘기니 모으기·모은 탄이 나감.
   1차 출처로 확인: 직접 구현·실행(nail-under-the-roots 1단계 프로토타입, macroquad 0.4.16, 2026-10-24). 누적기 루프, 입력 래치,
   보간, 히트스톱 중 로직 시계 정지, 일시정지·히트스톱 중 보간 prev 동기화를 코드로 넣고 Xvfb 캡처·헤드리스 Chromium으로 동작을 확인했다.
   2차 출처만 있음: Glenn Fiedler "Fix Your Timestep!"(누적기·보간·프레임 시간 상한의 원형. 이 세션에서는 사이트에 접속되지 않아 기억에 의존),
@@ -45,6 +46,7 @@ render(&world, alpha);                   // pos = prev.lerp(cur, alpha)
 - 프레임마다 `poll()`: 눌림을 `pending |= pressed`로 모으고, 축(스틱·이동 방향)은 최신 값으로 덮는다.
 - 틱마다 `take()`: `pending`을 돌려주고 비운다. 축은 최신 값.
 - 게임 로직은 `Actions` 구조체만 본다. 키보드·패드 번역은 이 레이어 안에서 끝낸다.
+- **"쥐고 있음"(상태)은 `take()`가 비우지 말고 다음 틱으로 넘긴다** — 축과 같은 갈래(Knellroot 0056): 새 "쥐는 버튼"을 더하며 `take()`의 넘길 목록에 빠뜨려, 한 프레임에 틱이 둘 이상이면 둘째 틱부터 놓은 것으로 읽혀 모으기가 끊겼다. 단위 시험은 월드에 `Actions`를 바로 넣어 못 잡았고 헤드리스 화면에서 드러났다 → 넘길 것을 순수 함수(`carry`) 하나로 두고 시험한다.
 
 ### 히트스톱
 - 명중 순간 `hitstop = max(hitstop, n초)`. 틱 머리에서 `hitstop > 0`이면 `hitstop -= DT`만 하고 **로직을 건너뛴다**.
