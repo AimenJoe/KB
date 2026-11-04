@@ -4,8 +4,9 @@ type: reference
 tags: [macroquad, pixel-art, rendering, rust, gamedev]
 status: verified
 created: 2026-10-24
-updated: 2026-10-25
+updated: 2026-11-04
 verified: |
+  직접 실행(2026-11-04, knellroot 0041, 3D 렌더 타깃): 480×270을 1280×720 창(헤드리스 Chromium)에 올리면 ×2 = 960×540, 둘레 44%가 검다 — 표 그대로. 640×360으로 바꾸니 ×2로 꽉 찼다. 같은 FOV면 보이는 범위는 같고 캐릭터만 20 → 27px. 글·HUD 크기를 렌더 배율에 묶어 두었다면 1080p에서 배율이 4 → 3으로 줄어 글이 25% 작아진다 → UI 배율 = 렌더 배율 × 새 높이 / 옛 높이로 떼었다. 예전에 게임 화면보다 넓던 안내 줄이 테두리가 사라지자 창 밖으로 잘렸다(테두리가 넘침을 가리고 있었다).
   1차 출처로 확인: macroquad 0.4.16 src/texture.rs(render_target(), Texture2D::set_filter 문서 주석
   "Use Nearest if you need integer-ratio scaling for pixel art", draw_texture_ex의 flip_y 처리), src/camera.rs(from_display_rect가
   zoom.y를 음수로 두고, matrix()가 render_target이 있으면 invert_y = 1.0, 없으면 -1.0을 곱함), miniquad 0.4.11 src/conf.rs(high_dpi 기본 false).
@@ -30,6 +31,11 @@ sources:
 
 ## 요약
 도트 게임은 **작은 내부 해상도의 렌더 타깃에 그리고, 화면에는 정수 배율로 확대**해야 픽셀이 균일하다. macroquad에서는 `render_target` + `Camera2D { render_target: Some(..) }` + `set_filter(FilterMode::Nearest)` 조합으로 한다.
+
+## 해상도를 바꿀 때(3D 렌더 타깃 포함)
+- 720p 핸드헬드가 대상이면 480×270은 피한다(정수 배율이 없어 ×2 + 검은 테두리). 640×360은 720p·1080p·1440p·4K 모두 정수.
+- UI 크기는 렌더 정수 배율에 바로 묶지 말고 "기준 해상도" 배율로 따로 둔다 — 렌더 해상도를 바꿔도 화면 속 글 크기가 그대로.
+- 테두리가 없어지면 그동안 넘치던 UI가 드러난다 → 바꾼 뒤 메뉴·안내를 한 번씩 찍어 본다.
 
 ## 왜 내부 해상도를 고정하는가
 - 화면 해상도에 직접 그리면 스프라이트마다 확대 비율이 달라져 픽셀 크기가 들쭉날쭉해진다("레트로 느낌"이 깨지는 가장 흔한 원인).
