@@ -6,6 +6,7 @@ status: draft
 created: 2026-11-04
 updated: 2026-11-04
 verified: |
+  2026-11-04 더함: app build VDF·SetLive 규칙은 Steamworks "Uploading to Steam" 원문, 재배포 파일 자리·dylib 설치 이름은 steamworks-sys 0.13 크레이트 파일에서 직접 봄. 실제 업로드는 아직(앱 번호 전).
   1차 출처로 확인(직접 실행·소스, nail-under-the-roots 0276, 2026-11-04): `steamworks` 0.13.1을 선택 의존성 + Cargo 기능 `steam`으로 PC 대상에만 붙여
   리눅스·Windows(cross clippy) 빌드와 웹·Android 빌드가 모두 통과. `steamworks-sys` 0.13.0의 build.rs가 OS별 재배포 파일(steam_api64.dll·libsteam_api.so 등)을
   크레이트 안 `lib/steam/redistributable_bin`에서 `OUT_DIR`로 복사한다는 것, `Client::init()`이 앱 번호를 Steam 실행 환경 또는 지금 폴더의 `steam_appid.txt`에서
@@ -81,6 +82,10 @@ steamworks = { version = "0.13", optional = true }
 - 데포는 OS마다 하나(Windows·macOS·Linux). 릴리스 태그 때 Steam 기능으로 다시 빌드해 데포 폴더에 놓고 **`beta` 브랜치까지만** 올린다. 기본(default) 브랜치로 옮기는 것은 사람이 파트너 사이트에서.
 - 도커로 도는 액션은 Windows 러너에서 안 된다 — 리눅스 러너에서 세 OS 묶음을 받아 steamcmd로 한 번에 올리거나, steamcmd를 직접 부른다.
 
+- app build 스크립트(원문 "Uploading to Steam"): `"AppBuild" { "AppID" … "Desc" … "SetLive" "<베타 갈래>" "ContentRoot" … "BuildOutput" … "Depots" { "<데포>" { "FileMapping" { "LocalPath" "windows/*" "DepotPath" "." "recursive" "1" } } … } }` → `steamcmd +login <빌더> +run_app_build <vdf> +quit`. **`SetLive`는 베타 갈래만 — 기본 갈래는 자동으로 못 건다**(원문). 실패하면 콘솔이 아니라 BuildOutput의 `*.log`를 본다.
+- 재배포 파일 놓기(steamworks-sys 0.13 소스에서 확인): Windows `steam_api64.dll`, macOS `libsteam_api.dylib`(겸용 x86_64+arm64, 설치 이름 `@loader_path/libsteam_api.dylib` → `.app/Contents/MacOS/`에 실행 파일과 같이), Linux `libsteam_api.so`(실행 파일을 rpath `$ORIGIN`으로 빌드 — Steam이 게임 폴더를 라이브러리 경로에 넣어 준다는 보장을 못 찾음). 모두 빌드 때 `target/**/steamworks-sys-*/out/`에 생긴다.
+- 묶기는 스크립트 하나로(직접 받는 판·Steam 판·다른 상점 판이 같은 단계를 쓰게) — 상점 판만 재배포 파일·rpath를 더한다.
+
 ### 6. 플랫폼·가격
 - **macOS**: Mac App Store와 무관하게 Steam이 macOS 데포를 받는다. 공증(Apple $99/년)은 Valve가 "권장, 필수 아님"이라 했고, Steam 클라이언트가 내려받은 파일엔 격리 표시가 없어 Gatekeeper가 공증을 보지 않는다는 보고가 여럿이다(2차) — 공증 없이 먼저 내고 실기에서 막히면 그때 가입해도 된다. 직접 내려받는 zip은 격리 표시가 붙으니 공증 없으면 "그래도 열기"를 안내한다.
 - **Linux**: 낮은 glibc(오래된 우분투 러너)로 빌드하면 오래된 배포판·SteamOS에서 돈다.
@@ -105,6 +110,7 @@ steamworks = { version = "0.13", optional = true }
 - 개발 중 Valve 시험 앱(480, Spacewar)으로 붙이면 연결·콜백은 시험되지만 우리 업적 이름은 없다 — 업적 시험은 앱이 생긴 뒤.
 
 ## 관련 노트
+- [Rust 게임을 Epic Games Store에 붙이기](epic-games-store-for-rust-games.md)
 - [인디 게임을 팔 때의 규칙과 숫자](../reference/game-business/selling-an-indie-game-rules-and-numbers.md)
 - [macroquad PC 빌드](../reference/macroquad/desktop-build.md)
 - [운영판과 개발판을 갈라 내보내기](dev-and-release-flavors.md)

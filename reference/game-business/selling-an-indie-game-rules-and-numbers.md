@@ -1,7 +1,7 @@
 ---
 title: 인디 게임을 팔 때의 규칙과 숫자 — Steam·Epic·Play·Apple·itch, AI 공개, 위시리스트, 한국 세금·등급
 type: reference
-tags: [gamedev, marketing, steam, business, legal, ai-image, itch-io]
+tags: [gamedev, marketing, steam, business, legal, ai-image, itch-io, epic]
 status: draft
 created: 2026-10-29
 updated: 2026-11-04
