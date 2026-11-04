@@ -1,11 +1,12 @@
 ---
-title: 인디 게임을 팔 때의 규칙과 숫자 — Steam·Play·Apple·itch, AI 공개, 위시리스트, 한국 세금·등급
+title: 인디 게임을 팔 때의 규칙과 숫자 — Steam·Epic·Play·Apple·itch, AI 공개, 위시리스트, 한국 세금·등급
 type: reference
 tags: [gamedev, marketing, steam, business, legal, ai-image, itch-io]
 status: draft
 created: 2026-10-29
 updated: 2026-11-04
 verified: |
+  2026-11-04 더함(여섯째, Epic): 요구사항·한국 배포·가격·IARC 무료는 dev.epicgames.com 원문(헤드리스 브라우저로 읽음). 100%/$1M은 Epic 공지의 검색 요약, $100 등록비는 보도·가이드로만.
   2026-11-04 더함(다섯째, IARC): IARC 참여 기관·상점·무료·설문 위치는 globalratings.com 원문, Steam의 독일·인도네시아 등급은 Steamworks 원문. IARC로 받은 한국 등급을 다른 상점(Steam)에 옮겨 쓸 수 있는지는 확인 못 함.
   2026-11-04 더함(넷째, 처분·판례): 법 32·38·44·45·47조와 인천지법 2009노306·헌재 2009헌바38은 원문(법제처). Steam 집행 수치(309건)는 게임메카 정보공개청구 기사, 나머지 사례는 보도·나무위키. 사행성 없는 인디 개발자 처벌 판결은 찾지 못함(없다는 증명은 아님).
   2026-11-04 더함(셋째, 한국 등급): 원문 확인 — 게임산업법 시행령[시행 2026-03-24] 제11조의3(면제 = 개인·동호회의 국내 단순 공개), GCRB 수수료 안내 페이지(조견표·감면·내용수정신고·표시 의무), 법제처 게임산업법[시행 2025-10-23](21조 등급분류·면제, 25조 제작업 등록, 33조 표시, 2조 11호 확률형 아이템).
@@ -50,6 +51,11 @@ sources:
   - https://www.law.go.kr/LSW/detcInfoP.do?mode=2&detcSeq=12989
   - https://www.gamemeca.com/view.php?gid=1745559
   - https://www.globalratings.com/storefronts/
+  - https://dev.epicgames.com/docs/epic-games-store/requirements-guidelines/distribution-requirements/requirements-overview
+  - https://dev.epicgames.com/docs/epic-games-store/requirements-guidelines/content-ratings/game-rating-korea
+  - https://dev.epicgames.com/docs/epic-games-store/requirements-guidelines/content-ratings/pricing-overview
+  - https://dev.epicgames.com/docs/epic-games-store/requirements-guidelines/content-ratings/iarc-ratings
+  - https://store.epicgames.com/news/epic-games-store-updates-revenue-share-keep-100-of-the-first-1m-per-product-per-year
   - https://partner.steamgames.com/doc/gettingstarted/contentsurvey/germany
   - https://partner.steamgames.com/doc/gettingstarted/contentsurvey/indonesia
   - https://www.gamemeca.com/view.php?gid=532470
@@ -82,6 +88,18 @@ sources:
 | 무료판 + 유료 Steam판 | 오픈소스·무료판을 두고 Steam에서만 값을 받는 모양이 있다(예: Mindustry — itch·GitHub 무료, Steam 유료). 사는 까닭으로 꼽히는 것: 업적·클라우드·자동 업데이트·Workshop·멀티 편의, 그리고 개발자 응원 [2차]. 위 "다른 곳 알리기" 때문에 Steam 쪽 글에는 무료판을 쓰지 않는다 |
 | macOS | Mac App Store와 무관하게 Steam이 macOS 데포를 받는다. 공증은 "권장, 필수 아님"(2019 공지 댓글 인용, 2차) — 기술 연동은 [Rust 게임을 Steam에 붙이기](../../guides/steam-release-for-rust-games.md) |
 | 세금(미국 원천징수) | 조약이 없으면 30%. W-8BEN으로 조약 세율. **한국: 저작권 사용료 10%**(IRS 표 1, 2023-05판; 특허·노하우 15%). 게임 판매에는 "royalty copyright" 세율. TIN을 나중에 넣어도 이미 뗀 것은 돌려주지 않는다 |
+
+### Epic Games Store(원문 dev.epicgames.com 2026-11-04 — store.epicgames.com은 봇 확인 창에 막혀 보도로)
+| 항목 | 내용 |
+|---|---|
+| 수익 배분 | 상품마다 해마다 **순매출 첫 $1M은 100%**, 넘으면 88/12(2025-06-01부터, 해마다 1월 1일에 새로) [Epic 공지 — 검색 요약] |
+| 등록비 | 게임당 $100, 돌려받는 돈(배포 FAQ 인용) [보도·가이드로만 — 원문 직접 못 읽음] |
+| 업적 | **다른 PC 상점에 업적이 있으면 Epic에도 비슷한 업적을 넣어야 한다**(2023-03-09 뒤 등록한 것, Epic Online Services SDK). 웹 게임은 면제 [원문] |
+| 멀티 | 온라인 멀티는 PC 상점 사이 크로스플레이 필수 [원문] |
+| 한국 | **IARC 설문으로 게임위 등급을 무료로 받는다**(청소년이용불가 19+만 게임위에 직접, 6주 여유). 한국은 기본으로 꺼져 있어 등급 뒤 켠다. 한국에 내면 **모든 업데이트에 content notes**(등급이 바뀌면 Epic이 게임위로 보낸다). 확률형 아이템 표시·GaaS 과몰입 안내 같은 한국 규정 안내도 있다 [원문] |
+| 가격 | USD 가격 등급 → 43개 통화 자동, 할인 끝나고 30일 안에 그보다 싸게 못 바꾼다, 출시 30일 안·바꾼 뒤 30일 안 다시 못 바꾼다, 한 지역이 무료면 전부 무료 [원문] |
+| 그 밖 | 만 18세 이상, 판매 페이지 + 검토 제출 뒤 출시. Epic 런처는 Windows·macOS(Linux 네이티브 클라이언트는 "곧" — 2026-08 보도) |
+| Rust | EOS C SDK 바인딩 `eos-sys`·`eos-rs` 0.1.1(2026-04, 내려받기 수백 — 미성숙). SDK는 개발자 포털에서 받는다 |
 
 ### 위시리스트·성과 숫자(데이터 회사 추정)
 - Gamalytic(2024-04): 첫 주 판매 = 출시 위시리스트의 중앙값 22%, 첫 달 27%(첫 달 500장 미만 제외). EA는 약 20%, 정식은 약 30%. 상위 10%는 134%, 하위 10%는 6%. 출시 할인 10~15%는 전환을 크게 바꾸지 않는다.
