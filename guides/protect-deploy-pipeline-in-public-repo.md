@@ -47,7 +47,8 @@ sources:
 1. **배포 잡을 따로 뗀다.** 빌드·시험 잡에는 배포 시크릿을 두지 않고, 산출물을 아티팩트로 넘겨 `publish` 잡만 `environment:`에 들어간다. 갈래마다 환경을 고르려면 `environment: ${{ github.ref == 'refs/heads/main' && 'prod' || 'dev' }}`.
 2. **Environment**(Settings → Environments): Deployment branches = Selected → `main`(운영)·`release/**`(개발판). 운영에는 Required reviewers(본인)를 걸면 배포마다 승인 버튼이 생긴다. 시크릿을 환경에 넣고 **레포 시크릿의 같은 이름은 지운다** — 남겨 두면 다른 갈래·PR 워크플로가 여전히 읽는다(순서: 환경에 넣기 → 한 번 배포 확인 → 레포 것 지우기).
 3. **브랜치 규칙**(Rulesets): 갈래가 어떻게 바뀌는지에 따라 둘 중 하나.
-   - **바로 push하는 갈래**(개발판 `release/**`): Restrict updates·deletions·Block force pushes, 우회 목록 = Repository admin + 쓰는 GitHub App(자동화 봇).
+   - **바로 push하는 갈래**(개발판 `release/**`): Restrict **creations**·updates·deletions·Block force pushes, 우회 목록 = Repository admin + 쓰는 GitHub App(자동화 봇). 필수 상태 검사는 걸지 않는다(검사는 push 뒤에 돈다) — 배포 잡이 빌드 잡을 `needs:`로 기다리면 빨간 커밋은 안 나간다.
+     - **creations가 빠지면 환경이 뚫린다**: 환경의 Deployment branches가 `release/**` 같은 패턴이면, 그 이름으로 새 갈래를 만들 수 있는 사람은 그 갈래의 워크플로로 환경 시크릿을 읽는다. 운영과 개발에 같은 토큰을 넣었다면 운영 권한까지 — 그래서 패턴 갈래의 "만들기"를 막는 것이 이 규칙의 핵심이다.
    - **PR로만 바뀌는 갈래**(운영 `main`, 혼자 하는 레포): **Require a pull request(Required approvals = 0) + Require status checks(빌드 잡) + Restrict deletions + Block force pushes**, Restrict updates는 **끈다**. 직접 push는 PR 필수가, 빨간 빌드의 Merge는 상태 검사가, 배포는 Environment 승인(2)이 막는다. Merge할 수 있는 사람은 Write 이상뿐이라 협업자가 없으면 본인 혼자다(6).
 4. **CODEOWNERS**: `/.github/ @본인` — PR이 워크플로를 고치면 본인 검토가 걸린다(규칙에서 코드 주인 검토를 켰을 때만 막는 힘이 있다).
 5. **Actions 설정**: 포크 PR 워크플로는 외부 기여자 승인 필요, `GITHUB_TOKEN` 기본 권한은 읽기만(쓰기가 필요한 잡은 `permissions:`에 적는다), Actions의 PR 만들기·승인 끔.
@@ -61,6 +62,7 @@ GitHub는 **워크플로를 실행하는 갈래의 워크플로 파일**을 쓴�
 - **혼자 하는 레포에서 승인 1 이상을 걸면 우회 없이는 Merge하지 못한다**: PR 작성자는 자기 PR을 승인할 수 없다(GitHub 문서). 봇이 주인 계정으로 PR을 열어도 작성자는 주인이다. 승인 수는 0으로 두고, 사람의 확인은 Environment Required reviewers(배포 승인)에 건다. 이쪽도 **prevent self-review는 끈다** — 켜면 Merge한 본인이 그 배포를 승인할 수 없다.
 - **승인 단추가 안 보이면 브라우저로**: 승인은 워크플로 실행(run) 첫 화면 위 노란 알림의 Review deployments에 있다 — 잡 로그 화면·PR 화면엔 없다. 폰의 GitHub 앱으로 연 링크에서는 안 보였고 브라우저에서는 됐다(앱은 알림 탭에서 승인한다고 changelog에 나온다).
 - **봇이 사장 권한으로 붙으면 "관리자만 우회"가 봇도 통과시킬 수 있다.** 그래서 운영 갈래는 규칙만 믿지 말고 운영 환경에 **Required reviewers**(사람 승인)를 겹친다 — 누가 넣어도 배포는 사람이 누를 때만.
+- **Dependabot의 `target-branch`가 Restrict updates 갈래면** 그 PR의 Merge도 update라 우회 단추로만 들어간다(main에서 겪은 것과 같은 원리 — 개발 갈래는 아직 직접 겪지 않음). 개발 갈래면 우회 Merge로 두거나, 운영 갈래 쪽으로 받아 PR 흐름에 태운다.
 - 운영 갈래 반영을 "봇이 PR → 사람이 Merge"로 바꾸면 문서(작업 규칙)도 같이 고친다 — 안 그러면 봇이 습관대로 직접 push하려다 막힌다.
 - 시크릿을 환경으로 옮기고 레포 시크릿을 지우지 않으면 아무것도 안 바뀐다.
 - 하나의 잡이 PR에서도 돌고 배포도 하면 환경 갈래 규칙에 PR 실행이 막힌다 — 그래서 잡을 나눈다(PR 미리 보기 배포는 포기하거나 별도 환경).
