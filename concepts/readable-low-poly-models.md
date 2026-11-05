@@ -15,7 +15,13 @@ verified: |
   2차 출처만 있음: hull 외곽선이 후처리(깊이·법선 가장자리)보다 싸고 안쪽 선이 없다는 비교(MS MixedReality MeshOutlines 문서 성격), 모바일에서 깊이 텍스처 후처리가 비싸다(포럼).
   AI 3D 생성 약관(서브에이전트 조사, 2026-11-04): Meshy 무료 = CC BY 4.0·유료 = 소유(도움말 1차), Hunyuan3D 2.x 라이선스는 한국·EU·영국 제외(라이선스 원문 미러 1차),
   Meshy 요금 페이지(1차, 2026-11-04 확인): 무료 = 월 100 크레딧·**다운로드 월 10개, Meshy 6 Lite 모델만**(Meshy 6 정식으로 만든 것은 못 받는다)·CC BY 4.0(상업 사용 가능, 출처 표기), Pro 월 $20 = 다운로드 무제한·"Private & Customer owned". 형식은 fbx·obj·usdz·glb·stl·blend(FAQ). 요금·한도는 자주 바뀐다.
-  TRELLIS.2 = MIT(모델 카드 1차), Tripo 무료 출력은 Tripo 권리(도움말 요약만 — 원문 403), Rodin 약관은 확인 못 함. Synty는 공개 레포 재배포 불가(EULA 1차), Kenney·Quaternius CC0(2차 포함).
+  2026-11-05 다시 확인(1차): **Meshy 무료 = 다운로드 월 10개, 텍스처 없는 Meshy 6 Lite 모델만**(텍스처를 입힌 Lite·Meshy 6/7·T2.5는 유료) — 도움말
+  "What Is Included on the Free Plan"(날짜 없음, "일주일 넘게 전 갱신"). 11-04에 무료로 받은 방랑자 GLB는 텍스처가 있었으니 그 사이 바뀐 것으로 본다(확인 못 함).
+  Tripo(공식 문서 "Pricing & Credits" 2026-10판, 헤드리스 브라우저로 읽음 — 일반 요청은 Cloudflare 403): 무료 = 월 200크레딧(HD 모델 15·Smart Mesh P2.0 100·P1.0 35),
+  내보내기는 H2.5만, Smart Mesh P2.0·Smart UV 각 2번 체험, **상업 사용은 출처 표기 조건, 결과 IP는 Tripo 것**. 유료는 모델을 비공개로 두면 사용자 소유.
+  이용약관 3.2: 결과는 합법적 상업·비상업 사용 가능하되 "약관과 맞지 않게 제3자에게 배포하지 않는 한" — 공개 레포 재배포가 되는지는 문구로 알 수 없다.
+  무료 다운로드 수(월 15개)는 2차 출처만.
+  TRELLIS.2 = MIT(모델 카드 1차), Rodin 약관은 확인 못 함. Synty는 공개 레포 재배포 불가(EULA 1차), Kenney·Quaternius CC0(2차 포함).
   확인 못 함: 외곽선의 실제 폰·WebGL 비용, Blockbench glTF 내보내기 옵션 이름, AI 생성 저폴리 품질(판매사 자료뿐).
 sources:
   - https://github.com/not-fl3/macroquad/blob/master/src/texture.rs
