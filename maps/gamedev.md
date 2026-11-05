@@ -4,7 +4,7 @@ type: map
 tags: [gamedev, macroquad, rust, game-design, pixel-art, game-feel]
 status: verified
 created: 2026-10-24
-updated: 2026-11-04
+updated: 2026-11-05
 ---
 
 # 지도: 게임 개발
@@ -68,7 +68,7 @@ updated: 2026-11-04
 
 ## 입력·접근성
 - [작은 픽셀 HUD 읽히게 하기](../concepts/hud-readability-and-quick-slots.md) — 바탕판·테두리 글자, 게이지 굵게·가득 신호, 퀵 슬롯 자리 고정·저절로 바꾸기 + 깜빡임, 창 밑 HUD 숨기기
-- [컨트롤러 버튼 배치와 다시 붙이기](../concepts/controller-layout-and-remapping.md) — 오른쪽 넷 = 자주 쓰는 넷, 키보드 다이아몬드, 겹치면 맞바꿈, 메뉴 키 고정, 안내는 배치를 따라, 격자 끝에서 옆 탭으로, 되돌릴 수 없는 메뉴 항목은 묻는 창(단추 = 하는 일 이름, 커서는 취소에서)
+- [컨트롤러 버튼 배치와 다시 붙이기](../concepts/controller-layout-and-remapping.md) — 오른쪽 넷 = 자주 쓰는 넷, 키보드 다이아몬드 + 키보드 두 손(동작마다 주·보조 키 — WASD+JKL / 방향키+ZXC, 메뉴 Z 확인·X 취소), 겹치면 맞바꿈, 메뉴 키 고정, 안내는 배치를 따라, 격자 끝에서 옆 탭으로, 되돌릴 수 없는 메뉴 항목은 묻는 창(단추 = 하는 일 이름, 커서는 취소에서)
 - [액션 게임 터치 배치](../concepts/touch-action-layout.md) — 공격 둘레 호(자주 쓰는 넷), 상황 버튼은 제 자리에만(쓸 수 없으면 숨김), 합칠 수 있으면 합치기(점프 = 상호작용), 짝 버튼은 캡슐, 배치는 순수 함수 + 시험
 
 ## 판매·비즈니스
@@ -86,7 +86,7 @@ updated: 2026-11-04
 
 ## macroquad
 - 입력
-  - [게임패드와 Android 입력 현황](../reference/macroquad/gamepad-and-android-input.md) — `gamepads` 크레이트, miniquad Android 백엔드의 공백과 패치 범위, 메뉴 스틱 탐색(히스테리시스)
+  - [게임패드와 Android 입력 현황](../reference/macroquad/gamepad-and-android-input.md) — `gamepads` 크레이트, miniquad Android 백엔드의 공백과 패치 범위, 메뉴 스틱 탐색(히스테리시스), 모바일 웹 실제 키보드(번들은 캔버스·`e.code`만 — 포커스 밖·빈 code를 창 capture에서 채워 넘기기)
 - 렌더링
   - [픽셀 퍼펙트 렌더링](../reference/macroquad/pixel-perfect-rendering.md) — 내부 해상도 320×180, render target, Nearest, 정수 배율
   - [오래 켜면 죽을 때: GPU 메모리가 자라는 원인과 재는 법](../reference/macroquad/gpu-memory-growth.md) — `telemetry::capture_frame`이 텍스처를 흘림, 호출 칸 버퍼는 최댓값을 쥠, WebGL 탐침, Rust 힙 도구

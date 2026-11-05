@@ -1,10 +1,10 @@
 ---
 title: 컨트롤러 버튼 배치와 다시 붙이기 — 오른쪽 넷은 자주 쓰는 넷, 메뉴 키는 고정, 안내는 배치를 따라
 type: concept
-tags: [gamedev, input, accessibility, game-design, macroquad]
+tags: [gamedev, input, keyboard, accessibility, game-design, macroquad]
 status: draft
 created: 2026-10-25
-updated: 2026-11-04
+updated: 2026-11-05
 verified: |
   직접 실행(2026-10-25, nail-under-the-roots): 장치별 안내(키보드·패드·터치), 터치 첫 화면 짐작(pointer: coarse)을 헤드리스 Chromium 데스크톱·폰(터치만)으로 확인. 패드는 단위 테스트만.
   1차 출처로 확인(직접 구현·실행, 2026-10-25, nail-under-the-roots, macroquad 0.4 + gamepads 0.1.7): 동작마다 키 하나·패드 버튼 하나의
@@ -16,6 +16,11 @@ verified: |
   Windows 가이드라인(learn.microsoft.com)은 세션 네트워크에서 열리지 않아 원문 미확인 — "위험한 동작이면 기본 단추는 안전한 쪽"은 그것을 인용한
   2차 자료(GitHub Desktop 설계 문서·AutoCAD 도움말)로만 봤다. 패드 게임에서 커서를 어디에 둘지에 관한 공식 지침은 찾지 못했다(플레이어 불만 글만).
   2차 출처만 있음(2026-11-04 조사): 조준과 같이 쓰는 버튼은 어깨에 — HLD(gog 포럼 유저 보고), Minecraft Dungeons(trueachievements), Enter the Gungeon(twinfinite), Diablo IV 합친 상호작용 불만(icy-veins·Blizzard 포럼), Tunic 공유 버튼(gamepressure). 엄지 충돌 자체는 Knellroot 플레이 피드백(직접).
+  키보드 두 손(2026-11-05, nail-under-the-roots 0278): 동작마다 키 둘(주 J·K·L·I + 보조 Z·X·C·V), 열네 칸 통틀어 겹침 없음·맞바꾸기, 옛 저장에 보조 키 채우기,
+  안내가 쓰는 손을 따르기를 단위 시험과 헤드리스 Chromium(조작 설정 화면 여섯 언어)으로 확인. 실제 사람이 방향키로 해 보는 것은 아직.
+  2차 출처만 있음(2026-11-05 조사): 방향키 + Z·X·C(Celeste — 공략·포럼마다 Z/X/C의 뜻이 엇갈림, Hollow Knight — 위키가 점프 Z만 확인), 마우스 조준 게임의 대시 = Space
+  (Hades II 표 셋이 일치: 좌클릭 공격·Space 대시·Q 캐스트·우클릭 특수). XAG 107(learn.microsoft.com)은 세션에서 안 열려 검색 요약으로만 — "다시 붙이기만으로는 부족, WASD·방향키 둘 다"
+  취지. 접근성 개발자 가이드(abratabia)의 미리 맞춘 배치(왼손·한 손·ESDF)는 상업 사이트.
   2차 출처만 있음: Hades·Hades II의 기본 배치(X 공격·A 대시·B 캐스트·Y 특수 — 공략 기사·위키 표, 공식 문서 아님).
   가이드라인 사이트(Game Accessibility Guidelines, Xbox Accessibility Guidelines 107, Can I Play That)의 권고는 원문 요약으로 봤다.
 sources:
@@ -30,6 +35,11 @@ sources:
   - https://github.com/desktop/desktop/blob/development/docs/technical/button-order.md
   - https://help.autodesk.com/cloudhelp/2015/ENU/AutoCAD-AutoLISP/files/GUID-71616D0C-9B91-4182-9D14-85D0145C2358.htm
   - https://itch.io/post/7757806
+  - https://maxroll.gg/hades-2/guides/hades-2-beginners-guide
+  - https://steamcommunity.com/app/504230/discussions/0/1726450077697676244
+  - https://hollowknight.wiki.fextralife.com/Controls
+  - https://www.abratabia.com/game-accessibility/remappable-controls.php
+  - https://itch.io/t/3367967/a-plea-to-developers-dont-only-use-wasd
 ---
 
 # 컨트롤러 버튼 배치와 다시 붙이기
@@ -39,7 +49,7 @@ sources:
 
 ## 본문
 - **기본 배치(액션 로그라이트 관례)**: 왼쪽 버튼 = 기본 공격, 아래 = 회피, 오른쪽·위 = 특수·아이템. Hades가 X 공격·A 대시·B 캐스트·Y 특수(2차 출처). 어깨 = 아이템/탭 넘기기, Select = 지도, Start = 메뉴.
-- **키보드는 같은 모양으로**: 패드의 다이아몬드를 키 다이아몬드(I 위·J 왼쪽·K 아래·L 오른쪽)로 옮기면 패드·키보드 설명이 같은 그림이 된다. 왼손은 WASD.
+- **키보드는 같은 모양으로**: 패드의 다이아몬드를 키 다이아몬드(I 위·J 왼쪽·K 아래·L 오른쪽)로 옮기면 패드·키보드 설명이 같은 그림이 된다. 왼손은 WASD. 단 이것만이면 방향키로 걷는 사람의 손이 겹친다 — 아래 "키보드는 두 손".
 - **배치표 = 동작 → (키 하나, 버튼 하나)**. 저장은 표의 번호(정수)로. 다시 붙일 때 이미 다른 동작이 쓰던 키면 **서로 바꾼다**(빈 동작이 생기지 않는다).
 - **고정할 것**: 이동, 메뉴 열기(Esc/Start), 메뉴 확인·뒤로(Enter/A, Esc/B). 이걸 바꾸게 하면 배치를 망쳤을 때 메뉴로 돌아올 길이 없다. 권고(메뉴까지 전부 바꿀 수 있게)와 부딪히면 "기본값으로"를 메뉴 안에 둔다.
 - **다시 붙이기 화면**: 위아래로 동작, 좌우로 키보드/패드 칸, 확인 → "누르세요… 5"(시간 제한, Esc로 취소). 확인을 누른 그 프레임의 키가 바로 잡히지 않게 다음 프레임부터 받는다.
@@ -51,6 +61,15 @@ sources:
 - 손이 가장 자주 가는 넷을 같은 손가락 한 개로 오갈 수 있는 자리에 모으면, 회피 → 공격 같은 연계가 엄지 굴리기 하나로 된다. 어깨 버튼은 다른 손가락이라 동시에 누르기는 쉽지만 연타는 어렵다 → 가끔 쓰는 것.
 - 다시 붙이기는 접근성 불만 1위권이다(손 크기·장애·왼손잡이·패드 종류). 하드코딩 키(특히 Esc·WASD)가 흔한 실패로 꼽힌다.
 - 안내 글이 배치를 따라가지 않으면, 바꾼 사람에게 튜토리얼이 거짓말을 한다.
+
+## 키보드는 두 손
+마우스로 겨누지 않는 게임의 키보드에는 관례가 둘이다. **WASD + 오른손 J·K·L**(패드 다이아몬드를 옮긴 꼴)과 **방향키 + 왼손 Z·X·C**(Celeste·Hollow Knight 계열 — 2차). 이동은 둘 다 받으면서 동작 키를 한쪽 손에만 두면, 다른 관례의 사람은 이동과 동작이 한 손에 몰려 게임을 못 한다.
+- **동작마다 키 둘**: 주 키(WASD 손) + 보조 키(방향키 손). 기본값 예: 공격 J/Z, 회피 K/X, 특수 L/C, 아이템 I/V, 지도 M/Tab. 가끔 쓰는 것(Q·E 넘기기)은 보조를 비워도 된다 — 양손 어디서든 닿는다.
+- **겹침 규칙은 두 칸을 통틀어**: 한 키는 열네 칸 중 한 곳에만. 겹치면 서로 바꾸고, 빈 보조 칸으로 남의 주 키를 가져오면 그 동작의 보조 키를 주 키로 올린다(올릴 것이 없으면 막는다 — 빈 동작이 생기면 안 된다).
+- **메뉴는 관례 "Z 확인 · X 취소"를 따른다**: 확인 = Enter·Space + 공격 키, 뒤로 = Esc + 회피 키(주·보조). 뒤로가 Esc뿐이면 메뉴마다 손을 옮긴다. 패드의 거울(뒤로 = B = 특수 자리)보다 보조 키 Z·X가 붙은 쪽이 손에 맞는다.
+- **안내는 쓰는 손을 따른다**: 방향키·보조 키를 눌렀으면 "←↑↓→"·보조 키 이름, WASD·주 키면 그쪽. 장치(키보드·패드·터치)를 따르는 것과 같은 "마지막으로 누른 것" 규칙을 한 단계 더.
+- **저장은 칸을 뒤에 붙이고 옛 저장에는 기본 보조 키를 채운다** — 사용자가 주 키를 그 키로 옮겨 두었으면 그 칸만 비운다(전부 기본값으로 되돌리지 않는다).
+- **왜**: 손 배치는 사람마다 습관(왼손잡이·노트북 방향키·한 손)이라 기본값 하나로 맞출 수 없다. 키 둘이면 다시 붙이기 화면에 들어가지 않고도 두 관례가 다 된다. 다시 붙이기는 그 위의 마지막 수단이다.
 
 ## 탭 + 격자 메뉴를 좌우로만
 - 탭(상태·가방·설정…) 중 **좌우 이동이 없는 탭은 좌우가 곧 탭 넘기기**, 격자(가방)가 있는 탭은 좌우가 칸 이동이다. 그러면 격자 탭이 막다른 골목이 된다(어깨 버튼만 빠져나가는 길).
