@@ -98,14 +98,14 @@ jobs:
         env:
           NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
           NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
-        run: npx netlify-cli@23 deploy --dir=dist --prod --message="${{ github.sha }}"
+        run: npx netlify-cli@23 deploy --no-build --dir=dist --prod --message="${{ github.sha }}"
 
       - name: Deploy PR preview
         if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.fork == false
         env:
           NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
           NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
-        run: npx netlify-cli@23 deploy --dir=dist --alias="pr-${{ github.event.number }}"
+        run: npx netlify-cli@23 deploy --no-build --dir=dist --alias="pr-${{ github.event.number }}"
 ```
 
 `mygame`은 크레이트 이름으로 바꾼다. 미리보기 URL은 `pr-<번호>--<site>.netlify.app`.
