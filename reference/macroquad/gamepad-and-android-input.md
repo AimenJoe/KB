@@ -51,7 +51,7 @@ verified: |
   고친 것(iOS에서 touchstart preventDefault 덮기)은 헤드리스 iPad 흉내로 defaultPrevented만 확인, **실기 확인 전**.
   키 자리·이름(2026-11-05, nail 0282): Linux 자리 패치를 Xvfb(`-noreset`, XChangeKeyboardMapping으로 AZERTY 흉내 + XTest 키코드)에서
   확인 — W·A·Q·Z 자리를 누르면 원본 Z·Q·A·W, 패치본 W·A·Q·Z. 웹 이름은 getLayoutMap을 가짜 AZERTY로 바꾼 헤드리스 Chromium에서
-  조작 설정 화면 글자가 바뀌는 것으로 확인. Windows·macOS 이름은 컴파일(clippy)만 — 실제 AZERTY로는 안 해 봤다. MDN getLayoutMap 지원표는 원문 미확인(검색 요약).
+  조작 설정 화면 글자가 바뀌는 것으로 확인. Windows·macOS 이름은 컴파일(clippy)만 — 실제 AZERTY로는 안 해 봤다. MDN getLayoutMap 지원표·MapVirtualKeyW 문서·GLFW glfwGetKeyName은 원문을 이 세션에서 읽지 못했다(learn.microsoft.com 차단, 나머지는 기억) — 출처 목록은 확인할 곳.
   키 자리 표(2026-11-05): miniquad 0.4.11 사본 `native/windows.rs`(HIWORD(lparam) & 0x1FF → keycodes)·`apple/apple_util.rs get_event_keycode`(NSEvent keyCode)·
   `linux_x11/keycodes.rs translate_key`(XGetKeyboardMapping keysym)·mq_js_bundle `into_sapp_keycode(e.code)`를 읽음. 실제 AZERTY 키보드로는 안 해 봤다.
 sources:
