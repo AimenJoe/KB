@@ -4,8 +4,9 @@ type: reference
 tags: [web, pwa, service-worker, manifest, fullscreen, orientation, ios, android, netlify, wasm]
 status: draft
 created: 2026-11-02
-updated: 2026-11-02
+updated: 2026-11-05
 verified: |
+  2026-11-05 더함: localStorage·서비스 워커 캐시가 출처(scheme+host+port)마다 따로라는 것은 웹 표준의 동일 출처 규칙(MDN Web Storage·Same-origin policy) — 옮겨 본 실험은 하지 않음.
   1차 출처로 확인:
   - Chrome의 설치 조건에서 fetch 처리기 요구가 빠진 것(모바일 108·데스크톱 112), 자동 설치 안내(beforeinstallprompt)는 여전히 처리기가 있어야 한다는 것 — Chrome for Developers 블로그.
   - WebKit의 ScreenOrientation lock은 전체 화면 API가 있어야 돈다 — WebKit Bugzilla 257695.
@@ -67,6 +68,7 @@ sources:
 - iPhone 가로 잠금은 WebKit이 잠금을 전체 화면 API에 묶어 두었고 iPhone에는 그 API가 없어서 막혔다 — 우회 대신 안내로 처리하는 것이 유지 비용이 적다.
 
 ## 함정
+- **웹 게임의 주소(도메인)를 옮기지 않는다.** localStorage 기록·설치한 PWA·서비스 워커 캐시는 출처(scheme+host+port)마다 따로라, 새 도메인으로 옮기면 기존 플레이어에게는 기록이 사라진 것처럼 보인다. 회사·소개 페이지만 새 도메인으로 두고 게임은 처음 주소에 남기거나, 옮겨야 하면 기록 내보내기·가져오기를 먼저 만든다.
 - 서비스 워커를 PR·임시 주소에 걸면 그 출처에 옛 캐시가 남아 "고쳤는데 안 바뀐다"가 된다.
 - `index.html`을 캐시 먼저로 두면 새 배포가 한 번 늦게 보인다(네트워크 먼저로).
 - 헤드리스 시험에서 오프라인 재로드는 `context.setOffline(true)` 뒤 `reload`로 본다 — 워커가 activated 된 다음에.
