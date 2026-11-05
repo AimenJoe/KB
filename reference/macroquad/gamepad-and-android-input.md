@@ -49,6 +49,9 @@ verified: |
   2차 출처만 있음: WebKit 206887(touchstart preventDefault → WKWebView에서 keydown 없음), 276640·280651(iPadOS가 탭 전까지 키보드 포커스를 미룸),
   cordova-ios #1132(실행 직후 탭 전엔 키 없음 → 웹뷰를 first responder로 고침) — bugs.webkit.org·lists.webkit.org는 세션에서 안 열려 검색 요약.
   고친 것(iOS에서 touchstart preventDefault 덮기)은 헤드리스 iPad 흉내로 defaultPrevented만 확인, **실기 확인 전**.
+  키 자리·이름(2026-11-05, nail 0282): Linux 자리 패치를 Xvfb(`-noreset`, XChangeKeyboardMapping으로 AZERTY 흉내 + XTest 키코드)에서
+  확인 — W·A·Q·Z 자리를 누르면 원본 Z·Q·A·W, 패치본 W·A·Q·Z. 웹 이름은 getLayoutMap을 가짜 AZERTY로 바꾼 헤드리스 Chromium에서
+  조작 설정 화면 글자가 바뀌는 것으로 확인. Windows·macOS 이름은 컴파일(clippy)만 — 실제 AZERTY로는 안 해 봤다. MDN getLayoutMap 지원표는 원문 미확인(검색 요약).
   키 자리 표(2026-11-05): miniquad 0.4.11 사본 `native/windows.rs`(HIWORD(lparam) & 0x1FF → keycodes)·`apple/apple_util.rs get_event_keycode`(NSEvent keyCode)·
   `linux_x11/keycodes.rs translate_key`(XGetKeyboardMapping keysym)·mq_js_bundle `into_sapp_keycode(e.code)`를 읽음. 실제 AZERTY 키보드로는 안 해 봤다.
 sources:
@@ -75,6 +78,8 @@ sources:
   - https://bugs.webkit.org/show_bug.cgi?id=280651
   - https://github.com/apache/cordova-ios/issues/1132
   - https://developer.mozilla.org/en-US/docs/Web/API/Keyboard/getLayoutMap
+  - https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-mapvirtualkeyw
+  - https://www.glfw.org/docs/latest/group__input.html#gaeaed62e69c3bd62b7ff8f7b19913ce4f
   - https://bugzilla.cendio.com/show_bug.cgi?id=7422
   - https://kiwix.lema.org/stackoverflow.com_en_all_2023-11/questions/18880236/how-do-i-detect-hardware-keyboard-presence-with-javascript
 ---
@@ -162,17 +167,21 @@ macroquad 0.4.16의 `touches()`는 `Touch { id, phase, position }`를 돌려준�
 - **고치기(번들은 그대로)**: 셸 JS에서 ① 캔버스의 `touchstart`·`pointerdown`·`mousedown`과 창 `focus`에 `canvas.focus({preventScroll:true})`, ② `window`에 capture로 `keydown/keyup`을 걸어 **캔버스 밖이거나 `code`가 빈 것만** `key`(글자·숫자·이름·두벌식 자모 → 같은 자리 영문 키)와 `keyCode`로 `code`를 채운 객체를 번들 처리기(`canvas.onkeydown`)에 직접 넘긴다. ③ 번들 처리기를 한 번 감싸 우리가 넘긴 이벤트(표식)를 번들이 빈 `code`로 또 처리하지 않게 한다. `stopPropagation`은 쓰지 않는다 — 번들의 오디오 깨우기도 `document`의 keydown을 듣는다.
 - **시험**: 헤드리스에서 `document.body.focus()` 뒤 키 → 게임에 닿고 포커스가 캔버스로 돌아오는지, 빈 `code` 이벤트를 캔버스에 `dispatchEvent` → 한 번씩 닿는지. 게임에 닿았는지는 번들 전역 `wasm_exports`를 복사한 객체로 바꿔 `key_down`만 감싸 센다(내보낸 함수 객체는 얼어 있어 직접 못 바꾼다).
 - **iPhone·iPad(WKWebView)에서는 `touchstart`의 `preventDefault`가 실제 키보드를 죽인다**: 홈 화면 웹앱·앱 안 브라우저에서 캔버스 `touchstart`를 막으면 `keydown`이 아예 안 온다(WebKit 206887, Safari 탭은 된다 — 2차). 게다가 iPadOS는 화면을 탭할 때까지 웹 내용에 키보드 포커스를 주지 않는다(WebKit 276640, 2024-07 고침·280651 — 2차, cordova-ios #1132도 같은 증상). macroquad 번들은 `touchstart`마다 `preventDefault`라 둘이 겹치면 키가 영영 안 들어온다. 고치기(번들은 그대로): iOS에서만 창 capture `touchstart`에서 `Object.defineProperty(e, "preventDefault", {value(){}})`로 그 이벤트의 것을 덮는다. 스크롤·확대는 CSS `touch-action: none`이, 흉내 클릭은 번들의 `touchend` `preventDefault`가 그대로 막는다. 헤드리스에서는 Playwright iPad 흉내로 `defaultPrevented`(touchstart false·touchend true)와 터치가 게임에 닿는지만 볼 수 있다 — 키는 실기로.
-- **키는 자리로, 이름은 글자로**: macroquad·miniquad가 키를 읽는 방식이 플랫폼마다 다르다(소스 확인).
+- **키는 자리로, 이름은 글자로**: 다국어 게임이면 기본 배치(WASD·J·K·L)는 어느 배열에서도 **같은 손가락 자리**여야 하고, 화면의 키 이름은 그 사람 키캡의 글자여야 한다. macroquad·miniquad가 키를 읽는 방식(소스 확인):
 
-  | 플랫폼 | 읽는 것 | AZERTY 등 다른 배열 |
-  |---|---|---|
-  | 웹 | `e.code`(물리 자리) | 같은 자리 |
-  | Windows | 스캔코드(`lparam` 16~24비트) | 같은 자리 |
-  | macOS | `NSEvent.keyCode`(가상 키 = ANSI 자리) | 같은 자리 |
-  | Linux X11 | `XGetKeyboardMapping`의 첫 keysym(글자) | **배열을 따라 바뀐다** |
-  | Android | Android 키코드 | 확인 못 함 |
+  | 플랫폼 | 원본이 읽는 것 | 자리로? | 그 자리의 배열 글자 얻기 |
+  |---|---|---|---|
+  | 웹 | `e.code` | ✔ | `navigator.keyboard.getLayoutMap()` — Chromium 계열만(Safari·Firefox 없음), 비동기라 미리 읽어 두기 |
+  | Windows | 스캔코드(`lparam` 16~24비트) | ✔ | `MapVirtualKeyW(sc, VSC_TO_VK)` → `MapVirtualKeyW(vk, VK_TO_CHAR)`(죽은 키는 윗비트) |
+  | macOS | `NSEvent.keyCode`(ANSI 가상 키) | ✔ | `TISCopyCurrentKeyboardLayoutInputSource` + `UCKeyTranslate`(GLFW `glfwGetKeyName`과 같은 길) |
+  | Linux X11 | `XGetKeyboardMapping`의 첫 keysym | **✗ 배열 글자** | (keysym 그대로) |
+  | Linux Wayland | xkb keysym | **✗ 배열 글자** | xkb |
+  | Android | Android 키코드 | 확인 못 함 | `KeyCharacterMap` |
 
-  자리로 읽으면 WASD는 어느 배열에서도 같은 자리지만, 화면에 QWERTY 글자("WASD")를 쓰면 AZERTY 키캡(ZQSD)과 어긋난다. 배열에 맞는 이름은 웹 `navigator.keyboard.getLayoutMap()`(Chromium 계열만, Safari·Firefox 없음 — MDN)이나 OS API가 필요하다.
+  - **Linux를 자리로**: 글자·숫자·기호 블록은 evdev 키 코드 = PC set-1 스캔코드(KEY_Q 16 … KEY_SLASH 53, KEY_SPACE 57)라, X11은 `xkey.keycode − 8`, Wayland는 `key`를 그 표로 먼저 바꾸고 표 밖(화살표·F키·Enter)만 keysym으로. miniquad 패치 파일 하나 + 호출 넷.
+  - **Xvfb로 배열 시험**: `setxkbmap fr`은 Xvfb에서 돌아도 키 매핑이 안 바뀐다(조회는 그대로 us). `XChangeKeyboardMapping`으로 키코드 → keysym을 직접 바꾸고 `XTestFakeKeyEvent`로 키코드를 누르면 된다 — 단 **Xvfb는 마지막 클라이언트가 끊기면 리셋**되므로 `-noreset`. xdotool `key <글자>`는 지금 매핑에서 키코드를 찾아 보내므로 배열 시험에 못 쓴다.
+  - **이름 고르기**: 받은 글자가 라틴(ASCII·Latin-1·라틴 확장 A)이 아니면(러시아 배열의 키릴) QWERTY 이름 — 그 키보드에도 라틴 글자가 같이 찍혀 있다. 대문자로, 공백은 이름이 아니다. 배열은 게임 중에 바뀔 수 있으니 몇 초마다 다시 읽는다(싸다). 표는 순수 함수(가짜 배열 → 이름)로 시험한다.
+  - **글에 키 글자를 박지 않는다**: "WASD로 걷기"·"Q/E로 탭" 같은 안내도 `{0}` + 지금 이름. AZERTY면 "ZQSD"·"A/E".
 - **실제 키보드가 붙었는지는 알 수 없다**: 브라우저 API가 없다(가상·실제 키보드를 구별 못 함, 2차). 첫 화면은 `pointer: coarse`로 터치라 짐작하고, 첫 키에서 바뀌게 — 그 첫 키가 닿게 하는 것이 위 고치기다.
 
 ## 메뉴 탐색: 스틱을 한 칸 눌림으로
