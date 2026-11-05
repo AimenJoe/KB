@@ -4,7 +4,7 @@ type: guide
 tags: [3d, ai-assets, blender, gltf, animation, gamedev, art-pipeline]
 status: draft
 created: 2026-11-04
-updated: 2026-11-04
+updated: 2026-11-05
 verified: |
   1차(직접, 2026-11-05, Knellroot 문지기 v2): Meshy 7.1 결과(삼각형 31만·정점 17만)를 같은 변환(10번 줄여 보는 이분 탐색 + 굽기)에 넣으니 30분(CPU 한 개) —
   방랑자(6 Lite, 10만)의 몇 배. 부위로 자르면 이음매에서 정점이 갈려 2,192 → 2,462. 밝은 회색 돌 텍스처는 어두운 장면에서 혼자 떠서 채도 낮은 칸만 어둡게 했다.
