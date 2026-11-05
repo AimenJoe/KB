@@ -6,6 +6,7 @@ status: draft
 created: 2026-11-05
 updated: 2026-11-05
 verified: |
+  1차(2026-11-05, Knellroot 0068 덧붙임): 설명 칸 굴리기 — 오른쪽 스틱·칸 위 휠/끌기(`Actions::point`), 넘칠 때만 ▲▼·화살표 자리, 시험용 긴 글로 스크린숏 확인. WCAG 2.2.2는 W3C 문서(1차 기준 문서).
   1차 출처(직접 구현·측정): Knellroot 0066(2026-11-05) — 장면 스택(`app/stack.rs`, 시험 둘), 줄 표 몰이꾼(`app/menu.rs`),
   창 틀, 슬롯 창. 바꾸기 전 `tick_scene` 340줄(한 주에 8번 고침)·`app/mod.rs` 1,676줄 → 35줄·545줄, 헤드리스 시험 여섯 통과.
   "닫으면 연 줄로" 고침이 헤드리스 길 다섯 곳을 깨뜨린 것(커서가 0으로 돌아간다고 가정한 스크립트)도 직접 겪었다.
@@ -18,6 +19,7 @@ verified: |
   2차: IMGUI hot/active(Sol IMGUI 3장 — Muratori 2005 글 자체는 id·hot/active를 말하지 않는다).
   확인 못 한 것: 스택이 컷씬·전환(페이드)까지 맡을 때의 비용 — Knellroot에는 아직 컷씬이 없다.
 sources:
+  - https://www.w3.org/WAI/WCAG22/Understanding/pause-stop-hide.html
   - https://gameprogrammingpatterns.com/state.html
   - https://devdocs.xbox.com/gaming/accessibility/xbox-accessibility-guidelines/112
   - https://learn.microsoft.com/windows/uwp/design/input/gamepad-and-remote-interactions
@@ -64,6 +66,7 @@ sources:
 - 닫기는 ✕(그림 작게, 누르는 칸 넉넉히) + **창 밖 네 쪽**(창 안 빈 곳은 닫지 않는다). 묻는 창은 목록을 비우고 제 단추와 창 밖만.
 - 탭은 손가락을 뗄 때, 끌면 누름이 아니다(IMGUI의 active → hot에서 떼면 눌림과 같은 생각, [컨트롤러 노트](controller-layout-and-remapping.md)의 "탭은 뗄 때").
 - 넘치는 목록의 ▲▼는 목록 줄을 먹지 말고 창 제목 줄에(nail 0239) — 목록 위·아래에 두면 화살 자리만큼 줄이 빠진다.
+- **넘치는 글 칸(설명)은 읽는 사람이 굴린다 — 저절로 흐르게 하지 않는다.** 저절로 흐르면 읽는 속도를 빼앗고(다 못 읽었는데 올라가거나, 다 읽고 기다리거나) 움직이는 글은 읽기 어렵다(WCAG 2.2.2: 5초 넘게 저절로 움직이면 멈출 방법을 줘야 — 흐르게 해 놓고 멈추는 장치를 붙이는 셈). 패드는 메뉴에서 놀고 있는 **오른쪽 스틱**(위아래 목록과 안 겹친다, Microsoft "글만 있는 칸은 따로 굴리게"), 휠·끌기는 **그 칸 위에서 일어났을 때만**(휠 = 마우스 자리, 끌기 = 손가락이 처음 닿은 자리를 입력에 실어 가른다). 넘칠 때만 ▲▼, 그때만 화살표 자리를 비워 다시 줄을 나눈다(늘 비우면 원래 들던 글이 넘친다). 원칙은 여전히 "몇 줄 안에" — 굴리기는 언어가 늘 때의 안전망. (Knellroot 0068, 사장 "왜.. 흘러야해?")
 
 ## 왜?
 - 메뉴는 "넓어지는 축"이다(슬롯·도감·저널·가게가 계속 붙는다). 표·스택이면 새 화면 = 표 한 줄 + 함수 둘이 되고, 큰 match 몸통이 자라지 않는다([건강 신호 노트](solo-game-codebase-health-signals.md): 자주 고치는 긴 함수는 지금 쪼갠다).
