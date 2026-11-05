@@ -70,6 +70,7 @@ updated: 2026-11-05
 - [개발용 시나리오 진입점과 스텝 스크립트 컷씬](../concepts/dev-scenarios-and-scripted-cutscenes.md) — 시나리오 목록 → 월드 구성, JRPG식 대화창, 길게 눌러 건너뛰기, 배우 좌표계·싸움 끝 연타 함정, 일러스트 장면(2배 밀도 한 장 그림·패닝·입자·내레이션, 홀수 배율), 컷씬이 보간을 얼려 플레이어가 미끄러지는 함정, 고친 뒤 확인 세 겹(수정 전 실패하는 시험·헤드리스·실기)
 
 ## 입력·접근성
+- [게임 메뉴의 뼈대 — 장면 스택·줄 표·포커스·누를 자리](../concepts/game-menu-scene-stack-and-focus.md) — 창은 얹고 뒤로 = 꺼내기(닫으면 연 줄로), 목록 화면 = 줄 표 하나(입력·그림 공용, 이름 … 값·◀ 값 ▶·→), 포커스 규칙 표(Xbox 112·Microsoft), `(칸, 뜻)` 목록(먼저 넣은 칸이 이긴다·창 밖 = 닫기·▲▼는 제목 줄), 헤드리스 길이 커서 0을 가정하던 함정
 - [작은 픽셀 HUD 읽히게 하기](../concepts/hud-readability-and-quick-slots.md) — 바탕판·테두리 글자, 게이지 굵게·가득 신호, 퀵 슬롯 자리 고정·저절로 바꾸기 + 깜빡임, 창 밑 HUD 숨기기
 - [컨트롤러 버튼 배치와 다시 붙이기](../concepts/controller-layout-and-remapping.md) — 오른쪽 넷 = 자주 쓰는 넷, 키보드 다이아몬드, 겹치면 맞바꿈, 메뉴 키 고정, 안내는 배치를 따라, 격자 끝에서 옆 탭으로, 넘치는 목록은 굴린다(창을 기억·키 커서와 손가락이 따로·가장자리 한 줄 여유·탭은 뗄 때), 되돌릴 수 없는 메뉴 항목은 묻는 창(단추 = 하는 일 이름, 커서는 취소에서)
 - [액션 게임 키보드·마우스 배치](../concepts/keyboard-and-mouse-layout-for-action-games.md) — 소울라이크·Hades·Diablo·PoE 2 기본 키, 마우스의 일은 카메라가 정한다(3인칭 = 카메라·탑다운 = 조준·ARPG = 이동), 왼손은 WASD 둘레에서 빈도 순, 조합키는 패드 직역의 흔적, 프리셋으로 덧붙이기, 스캔코드(miniquad Linux는 글자)
@@ -107,7 +108,7 @@ updated: 2026-11-05
   - [0001 빌드는 CI, 호스팅은 Netlify](../decisions/0001-build-rust-wasm-in-github-actions-deploy-via-netlify-cli.md)
 
 ## 아직 없는 것
-- 상태 관리 — 노트가 생기면 추가
+- 컷씬·전환을 포함한 장면 상태 관리(메뉴 쪽은 위 "게임 메뉴의 뼈대") — 노트가 생기면 추가
 
 ## 다른 지도
 - [Rust](rust.md) · [CI/CD와 호스팅](ci-cd-hosting.md)
