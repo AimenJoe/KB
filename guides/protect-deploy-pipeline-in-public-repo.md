@@ -26,11 +26,16 @@ verified: |
   (우회)만 보였다 → Restrict updates를 끄고 PR 필수(승인 0) + 상태 검사 `build`로 바꾸자 우회 없이 Merge됐고, Merge 커밋의 운영 배포 잡이
   Environment 승인 대기(waiting)로 멈추는 것까지 봤다. 화면의 Merge 단추가 규칙을 바꾼 때와 Copilot 검토가 끝난 때 중 어느 쪽에서 살아났는지는 가르지 못했다.
   확인 못 함: Required reviewers 검색 칸에 레포 주인 본인이 안 나온다는 사용자 보고 — 결국 승인 대기가 걸렸으니 넣어진 것으로 보이나 어떻게 넣었는지는 모른다.
+  직접 겪음(2026-11-05, 사용자 보고): 승인 대기 run 링크를 폰의 GitHub 앱으로 열면 Review deployments 단추가 안 보였고, 같은 링크를 브라우저로 열자 승인됐다.
+  2차 출처만 있음: GitHub Mobile은 2021-04 changelog에서 배포 승인·거절과 알림 탭의 승인 요청을 지원한다고 했다 — 그래서 "앱에 기능이 없다"가 아니라
+  "링크로 연 화면에 안 나온다"일 수 있다(알림 탭으로 들어가 보지는 않았다).
   2차 출처만 있음: 포크 PR 워크플로에 레포 시크릿이 가지 않는다(GitHub 문서의 일반 설명으로 알려진 것 — 이번에 해당 쪽 원문은 다시 읽지 않음).
 sources:
   - https://docs.github.com/en/actions/reference/workflows-and-actions/deployments-and-environments
   - https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/available-rules-for-rulesets
   - https://github.com/github/docs/blob/main/data/reusables/repositories/request-changes-tips.md
+  - https://docs.github.com/en/actions/how-tos/deploy/configure-and-manage-deployments/review-deployments
+  - https://github.blog/changelog/2021-04-01-reviewing-deployments-on-github-mobile
 ---
 
 # 공개 레포에서 배포 파이프라인 지키기
@@ -54,6 +59,7 @@ GitHub는 **워크플로를 실행하는 갈래의 워크플로 파일**을 쓴�
 ## 함정
 - **Restrict updates는 PR Merge도 막는다.** Merge도 그 갈래를 바꾸는 일이라 우회 목록 밖이면(직접 겪음) "병합할 수 없음"이 뜨고, 주인에게는 "요구사항을 충족하지 않고 병합"(우회 단추)만 남는다 — 매번 우회하면 규칙이 기록상 매번 깨진다. PR로 들이는 갈래에는 Restrict updates 대신 PR 필수를.
 - **혼자 하는 레포에서 승인 1 이상을 걸면 우회 없이는 Merge하지 못한다**: PR 작성자는 자기 PR을 승인할 수 없다(GitHub 문서). 봇이 주인 계정으로 PR을 열어도 작성자는 주인이다. 승인 수는 0으로 두고, 사람의 확인은 Environment Required reviewers(배포 승인)에 건다. 이쪽도 **prevent self-review는 끈다** — 켜면 Merge한 본인이 그 배포를 승인할 수 없다.
+- **승인 단추가 안 보이면 브라우저로**: 승인은 워크플로 실행(run) 첫 화면 위 노란 알림의 Review deployments에 있다 — 잡 로그 화면·PR 화면엔 없다. 폰의 GitHub 앱으로 연 링크에서는 안 보였고 브라우저에서는 됐다(앱은 알림 탭에서 승인한다고 changelog에 나온다).
 - **봇이 사장 권한으로 붙으면 "관리자만 우회"가 봇도 통과시킬 수 있다.** 그래서 운영 갈래는 규칙만 믿지 말고 운영 환경에 **Required reviewers**(사람 승인)를 겹친다 — 누가 넣어도 배포는 사람이 누를 때만.
 - 운영 갈래 반영을 "봇이 PR → 사람이 Merge"로 바꾸면 문서(작업 규칙)도 같이 고친다 — 안 그러면 봇이 습관대로 직접 push하려다 막힌다.
 - 시크릿을 환경으로 옮기고 레포 시크릿을 지우지 않으면 아무것도 안 바뀐다.
