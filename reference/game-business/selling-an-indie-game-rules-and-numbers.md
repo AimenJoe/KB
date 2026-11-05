@@ -4,8 +4,9 @@ type: reference
 tags: [gamedev, marketing, steam, business, legal, ai-image, itch-io, epic]
 status: draft
 created: 2026-10-29
-updated: 2026-11-04
+updated: 2026-11-05
 verified: |
+  2026-11-05 더함(일곱째, EU DSA 거래자): Epic 'Trader Status' 원문(legal.epicgames.com, 2026-08-28판, 헤드리스 브라우저로 읽음). 다른 상점(Steam)의 DSA 처리는 찾지 못함.
   2026-11-04 더함(여섯째, Epic): 요구사항·한국 배포·가격·IARC 무료는 dev.epicgames.com 원문(헤드리스 브라우저로 읽음). 100%/$1M은 Epic 공지의 검색 요약, $100 등록비는 보도·가이드로만.
   2026-11-04 더함(다섯째, IARC): IARC 참여 기관·상점·무료·설문 위치는 globalratings.com 원문, Steam의 독일·인도네시아 등급은 Steamworks 원문. IARC로 받은 한국 등급을 다른 상점(Steam)에 옮겨 쓸 수 있는지는 확인 못 함.
   2026-11-04 더함(넷째, 처분·판례): 법 32·38·44·45·47조와 인천지법 2009노306·헌재 2009헌바38은 원문(법제처). Steam 집행 수치(309건)는 게임메카 정보공개청구 기사, 나머지 사례는 보도·나무위키. 사행성 없는 인디 개발자 처벌 판결은 찾지 못함(없다는 증명은 아님).
@@ -52,6 +53,7 @@ sources:
   - https://www.gamemeca.com/view.php?gid=1745559
   - https://www.globalratings.com/storefronts/
   - https://dev.epicgames.com/docs/epic-games-store/requirements-guidelines/distribution-requirements/requirements-overview
+  - https://legal.epicgames.com/epicgames/marketplace-disclosure-requirements
   - https://dev.epicgames.com/docs/epic-games-store/requirements-guidelines/content-ratings/game-rating-korea
   - https://dev.epicgames.com/docs/epic-games-store/requirements-guidelines/content-ratings/pricing-overview
   - https://dev.epicgames.com/docs/epic-games-store/requirements-guidelines/content-ratings/iarc-ratings
@@ -99,6 +101,7 @@ sources:
 | 멀티 | 온라인 멀티는 PC 상점 사이 크로스플레이 필수 [원문] |
 | 한국 | **IARC 설문으로 게임위 등급을 무료로 받는다**(청소년이용불가 19+만 게임위에 직접, 6주 여유). 한국은 기본으로 꺼져 있어 등급 뒤 켠다. 한국에 내면 **모든 업데이트에 content notes**(등급이 바뀌면 Epic이 게임위로 보낸다). 확률형 아이템 표시·GaaS 과몰입 안내 같은 한국 규정 안내도 있다 [원문] |
 | 가격 | USD 가격 등급 → 43개 통화 자동, 할인 끝나고 30일 안에 그보다 싸게 못 바꾼다, 출시 30일 안·바꾼 뒤 30일 안 다시 못 바꾼다, 한 지역이 무료면 전부 무료 [원문] |
+| EU 거래자(DSA 30조) | **Epic Games Store에서는 비거래자(Non-Trader)를 고를 수 없다** — 거래자로 확인을 받아야 EU에 판다. 이메일·주소·전화번호를 내고, EU 구매자에게 공개된다(주소·전화가 개인 것과 같으면 숨길 수 있고, 숨기면 도시·나라만). 사업체로 내면 상호·등록번호·주소가 든 공문서 한 장(자가 작성 문서·W-8 안 됨), 개인으로 내면 이름·주소가 든 신분증 + 전화 확인(SMS·통화). 거래자의 기준: 이익을 위해 자주 판다·사업체·개인사업자·VAT 번호·많이 판다 중 하나 [원문] |
 | 그 밖 | 만 18세 이상, 판매 페이지 + 검토 제출 뒤 출시. Epic 런처는 Windows·macOS(Linux 네이티브 클라이언트는 "곧" — 2026-08 보도) |
 | Rust | EOS C SDK 바인딩 `eos-sys`·`eos-rs` 0.1.1(2026-04, 내려받기 수백 — 미성숙). SDK는 개발자 포털에서 받는다 |
 
