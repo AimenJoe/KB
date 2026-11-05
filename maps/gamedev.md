@@ -86,7 +86,7 @@ updated: 2026-11-05
 
 ## macroquad
 - 입력
-  - [게임패드와 Android 입력 현황](../reference/macroquad/gamepad-and-android-input.md) — `gamepads` 크레이트, miniquad Android 백엔드의 공백과 패치 범위, 메뉴 스틱 탐색(히스테리시스), 모바일 웹 실제 키보드(번들은 캔버스·`e.code`만 — 포커스 밖·빈 code를 창 capture에서 채워 넘기기)
+  - [게임패드와 Android 입력 현황](../reference/macroquad/gamepad-and-android-input.md) — `gamepads` 크레이트, miniquad Android 백엔드의 공백과 패치 범위, 메뉴 스틱 탐색(히스테리시스), 모바일 웹 실제 키보드(번들은 캔버스·`e.code`만 — 포커스 밖·빈 code를 창 capture에서 채워 넘기기, iPad 웹앱은 touchstart preventDefault가 키를 죽인다), 키는 자리로·이름은 글자로(플랫폼별 표, Linux X11만 글자)
 - 렌더링
   - [픽셀 퍼펙트 렌더링](../reference/macroquad/pixel-perfect-rendering.md) — 내부 해상도 320×180, render target, Nearest, 정수 배율
   - [오래 켜면 죽을 때: GPU 메모리가 자라는 원인과 재는 법](../reference/macroquad/gpu-memory-growth.md) — `telemetry::capture_frame`이 텍스처를 흘림, 호출 칸 버퍼는 최댓값을 쥠, WebGL 탐침, Rust 힙 도구

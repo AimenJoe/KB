@@ -1,7 +1,7 @@
 ---
 title: macroquad 게임패드와 Android 입력 현황
 type: reference
-tags: [macroquad, miniquad, gamepad, android, input, touch, keyboard, wasm, rust]
+tags: [macroquad, miniquad, gamepad, android, ios, input, touch, keyboard, wasm, rust]
 status: verified
 created: 2026-10-24
 updated: 2026-11-05
@@ -44,7 +44,13 @@ verified: |
   `code`가 ""·"Unidentified"면 번들이 "Unsupported keyboard key"로 버리는 것을 재현했고, 창 전체 capture에서 `key`·`keyCode`로 채워 넘기면
   한 번씩만 닿는 것을 확인(`wasm_exports.key_down` 엿보기). 2차 출처만 있음: Android에서 실제 키보드도 키보드 앱(IME)을 거쳐 캔버스 포커스일 때
   `code`가 빈다(ThinLinc 버그 7422 — 원문은 세션에서 안 열려 검색 요약, Gboard 정상·SwiftKey 문제), Android Chrome만 keydown이 안 온다(Reddit).
-  확인 못 함: 실기(사장 기기)에서 둘 중 어느 쪽이었는지, iPad Safari.
+  확인 못 함: 실기(사장 기기)에서 둘 중 어느 쪽이었는지.
+  iPad 홈 화면 웹앱(2026-11-05, nail 0281): 사장 iPad에서 홈 화면 웹앱으로 켜면 실제 키보드가 안 듣고 Safari 탭은 됐다(사용자 보고).
+  2차 출처만 있음: WebKit 206887(touchstart preventDefault → WKWebView에서 keydown 없음), 276640·280651(iPadOS가 탭 전까지 키보드 포커스를 미룸),
+  cordova-ios #1132(실행 직후 탭 전엔 키 없음 → 웹뷰를 first responder로 고침) — bugs.webkit.org·lists.webkit.org는 세션에서 안 열려 검색 요약.
+  고친 것(iOS에서 touchstart preventDefault 덮기)은 헤드리스 iPad 흉내로 defaultPrevented만 확인, **실기 확인 전**.
+  키 자리 표(2026-11-05): miniquad 0.4.11 사본 `native/windows.rs`(HIWORD(lparam) & 0x1FF → keycodes)·`apple/apple_util.rs get_event_keycode`(NSEvent keyCode)·
+  `linux_x11/keycodes.rs translate_key`(XGetKeyboardMapping keysym)·mq_js_bundle `into_sapp_keycode(e.code)`를 읽음. 실제 AZERTY 키보드로는 안 해 봤다.
 sources:
   - https://developer.android.com/develop/ui/views/touch-and-input/game-controllers/controller-input
   - https://www.smashingmagazine.com/2012/02/finger-friendly-design-ideal-mobile-touchscreen-target-sizes/
@@ -64,6 +70,11 @@ sources:
   - https://forum.babylonjs.com/t/how-to-use-the-gamepads-left-analog-to-navigate-a-game-menu-screen/40099
   - https://www.shawnhargreaves.com/blog/gamepads-suck.html
   - https://github.com/emscripten-core/emscripten/issues/21960
+  - https://bugs.webkit.org/show_bug.cgi?id=206887
+  - https://bugs.webkit.org/show_bug.cgi?id=276640
+  - https://bugs.webkit.org/show_bug.cgi?id=280651
+  - https://github.com/apache/cordova-ios/issues/1132
+  - https://developer.mozilla.org/en-US/docs/Web/API/Keyboard/getLayoutMap
   - https://bugzilla.cendio.com/show_bug.cgi?id=7422
   - https://kiwix.lema.org/stackoverflow.com_en_all_2023-11/questions/18880236/how-do-i-detect-hardware-keyboard-presence-with-javascript
 ---
@@ -150,6 +161,18 @@ macroquad 0.4.16의 `touches()`는 `Touch { id, phase, position }`를 돌려준�
 - **키는 `e.code`로만 가른다**: 키보드 앱(IME)을 거친 이벤트는 `code`가 ""·"Unidentified"로 올 수 있고(2차), 그러면 번들이 버린다. 한글 입력 상태면 `key`가 자모("ㅓ")다.
 - **고치기(번들은 그대로)**: 셸 JS에서 ① 캔버스의 `touchstart`·`pointerdown`·`mousedown`과 창 `focus`에 `canvas.focus({preventScroll:true})`, ② `window`에 capture로 `keydown/keyup`을 걸어 **캔버스 밖이거나 `code`가 빈 것만** `key`(글자·숫자·이름·두벌식 자모 → 같은 자리 영문 키)와 `keyCode`로 `code`를 채운 객체를 번들 처리기(`canvas.onkeydown`)에 직접 넘긴다. ③ 번들 처리기를 한 번 감싸 우리가 넘긴 이벤트(표식)를 번들이 빈 `code`로 또 처리하지 않게 한다. `stopPropagation`은 쓰지 않는다 — 번들의 오디오 깨우기도 `document`의 keydown을 듣는다.
 - **시험**: 헤드리스에서 `document.body.focus()` 뒤 키 → 게임에 닿고 포커스가 캔버스로 돌아오는지, 빈 `code` 이벤트를 캔버스에 `dispatchEvent` → 한 번씩 닿는지. 게임에 닿았는지는 번들 전역 `wasm_exports`를 복사한 객체로 바꿔 `key_down`만 감싸 센다(내보낸 함수 객체는 얼어 있어 직접 못 바꾼다).
+- **iPhone·iPad(WKWebView)에서는 `touchstart`의 `preventDefault`가 실제 키보드를 죽인다**: 홈 화면 웹앱·앱 안 브라우저에서 캔버스 `touchstart`를 막으면 `keydown`이 아예 안 온다(WebKit 206887, Safari 탭은 된다 — 2차). 게다가 iPadOS는 화면을 탭할 때까지 웹 내용에 키보드 포커스를 주지 않는다(WebKit 276640, 2024-07 고침·280651 — 2차, cordova-ios #1132도 같은 증상). macroquad 번들은 `touchstart`마다 `preventDefault`라 둘이 겹치면 키가 영영 안 들어온다. 고치기(번들은 그대로): iOS에서만 창 capture `touchstart`에서 `Object.defineProperty(e, "preventDefault", {value(){}})`로 그 이벤트의 것을 덮는다. 스크롤·확대는 CSS `touch-action: none`이, 흉내 클릭은 번들의 `touchend` `preventDefault`가 그대로 막는다. 헤드리스에서는 Playwright iPad 흉내로 `defaultPrevented`(touchstart false·touchend true)와 터치가 게임에 닿는지만 볼 수 있다 — 키는 실기로.
+- **키는 자리로, 이름은 글자로**: macroquad·miniquad가 키를 읽는 방식이 플랫폼마다 다르다(소스 확인).
+
+  | 플랫폼 | 읽는 것 | AZERTY 등 다른 배열 |
+  |---|---|---|
+  | 웹 | `e.code`(물리 자리) | 같은 자리 |
+  | Windows | 스캔코드(`lparam` 16~24비트) | 같은 자리 |
+  | macOS | `NSEvent.keyCode`(가상 키 = ANSI 자리) | 같은 자리 |
+  | Linux X11 | `XGetKeyboardMapping`의 첫 keysym(글자) | **배열을 따라 바뀐다** |
+  | Android | Android 키코드 | 확인 못 함 |
+
+  자리로 읽으면 WASD는 어느 배열에서도 같은 자리지만, 화면에 QWERTY 글자("WASD")를 쓰면 AZERTY 키캡(ZQSD)과 어긋난다. 배열에 맞는 이름은 웹 `navigator.keyboard.getLayoutMap()`(Chromium 계열만, Safari·Firefox 없음 — MDN)이나 OS API가 필요하다.
 - **실제 키보드가 붙었는지는 알 수 없다**: 브라우저 API가 없다(가상·실제 키보드를 구별 못 함, 2차). 첫 화면은 `pointer: coarse`로 터치라 짐작하고, 첫 키에서 바뀌게 — 그 첫 키가 닿게 하는 것이 위 고치기다.
 
 ## 메뉴 탐색: 스틱을 한 칸 눌림으로

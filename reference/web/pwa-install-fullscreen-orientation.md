@@ -77,3 +77,4 @@ sources:
 - [정적 WASM 호스팅](../../concepts/static-wasm-hosting.md)
 - [macroquad WASM 빌드·JS 번들](../macroquad/wasm-build.md)
 - [운영판과 개발판을 갈라 내보내기](../../guides/dev-and-release-flavors.md)
+- [게임패드와 입력 현황](../macroquad/gamepad-and-android-input.md) — iPad 홈 화면 웹앱에서 실제 키보드가 안 듣는 것(touchstart preventDefault·탭 전 포커스 없음)
