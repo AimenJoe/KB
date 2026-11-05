@@ -16,6 +16,9 @@ verified: |
   Diablo IV(Fextralife·Game8·MagicGameWorld — 물약 키는 엇갈림), Diablo IV 시즌 3(2025-01) WASD 프리셋(Prima·Dexerto 등 여럿),
   PoE 2 WASD(PC Gamer·Shacknews — "기본인지 옵션인지"는 출처끼리 다르다, 기술 키 기본값은 못 확인), Last Epoch 시즌 2 실험 옵션(Icy Veins).
   Hades 원작의 "커서가 있으면 커서 쪽, 숨기면 가까운 적" 조준은 Steam 유저 글 하나. 공식 매뉴얼은 어느 게임도 직접 읽지 못했다.
+  감도(2026-11-05): macroquad 0.4.16 `set_cursor_grab`·`mouse_delta_position`, 웹 번들의 `movementX` 전달은 코드로 확인. MDN Pointer Lock API 원문 —
+  Esc로 잠금이 풀림, 잠그려면 사용자 제스처, `unadjustedMovement`. 엘든 링 마우스 감도·카메라 속도 두 칸은 Steam 글·가이드(2차), Diablo IV에 마우스 감도 칸이
+  없고 커서 크기·색 칸이 있다는 것은 공략 글(2차, 감도 칸은 "못 찾음"이지 "없음" 확인은 아님).
   스캔코드 원칙은 Factorio 개발자 포럼 글·SDL 메인테이너 글(2011)·업체 블로그(bugnet) — 서로 맞는다.
 sources:
   - https://shacknews.com/article/128968/elden-ring-controls-and-pc-keybindings
@@ -30,6 +33,9 @@ sources:
   - https://pcgamer.com/games/rpg/path-of-exile-2s-developers-ended-up-reworking-the-entire-games-combat-around-a-new-control-scheme-because-of-a-single-class
   - https://www.switchbladegaming.com/path-of-exile-2/keybinds-guide-3/
   - https://wp-prod.icy-veins.com/wasd-controls-coming-to-last-epoch-with-season-2-launch/
+  - https://developer.mozilla.org/en-US/docs/Web/API/Pointer_Lock_API
+  - https://steamcommunity.com/app/1245620/discussions/0/3183486320475253581
+  - https://www.icy-veins.com/d4/news/how-to-make-diablo-4-even-better-7-hidden-things-you-should-do/
   - https://forums.factorio.com/viewtopic.php?p=403127
   - https://discourse.libsdl.org/t/scancodes-vs-keycodes/18036
   - https://bugnet.io/blog/how-to-fix-keyboard-shortcuts-wrong-on-non-qwerty-layouts
@@ -77,6 +83,7 @@ PC 액션 게임의 키보드 배치는 장르마다 놀랄 만큼 같다. 왼�
 - **왼손은 WASD에서 손을 떼지 않는 거리 = 빈도 순**: 엄지 Space(가장 급한 방어 동작), 검지 E·R·F·Q(W에서 한 칸), 새끼 Shift·Ctrl(쥐고 있는 동작 — 달리기·방어), 1~4는 손을 뻗는다 → 가끔 쓰는 주문·아이템.
 - **패드를 키보드로 직역하면 조합키가 생긴다**: 프롬의 `Shift + 클릭` = 패드 R2·L2를 옮긴 흔적. 뒤의 게임(P의 거짓·오공)은 강공격을 오른쪽 클릭에 따로 뒀다. 동시에 누르기는 접근성 비용이다.
 - **프리셋으로 덧붙이기**: Diablo IV처럼 "키보드+마우스 / 키보드만"을 프리셋으로 두면 기존 배치를 깨지 않고 마우스 쪽을 더할 수 있다. 프리셋 안에서 다시 붙이기는 그대로.
+- **감도는 상대 움직임에만 뜻이 있다.** 감도 = 움직인 양에 곱하는 배율. 3인칭 카메라·대상 바꾸기처럼 마우스 움직임(델타)을 쓰는 곳에는 필수다(엘든 링은 마우스 감도와 카메라 속도가 따로, 2차). OS 커서로 겨누는 탑다운에서는 빠르기를 OS·DPI가 정하므로, 게임이 배율을 곱하면 보이는 커서와 겨누는 자리가 어긋난다. 그 자리에는 커서 크기·색·잘 보이기 칸을 둔다(Diablo IV, 2차). 커서형에 감도를 넣으려면 포인터 잠금 + 게임이 그리는 가상 커서가 필요하다 — 웹은 클릭 뒤에만 잠기고 Esc가 늘 잠금을 푼다(MDN), 가속을 끄는 `unadjustedMovement` 옵션이 있다.
 - **키는 물리 위치로(스캔코드), 안내는 그 자판의 글자로.** 프랑스 AZERTY의 WASD 자리는 ZQSD — 위치로 받으면 손 모양이 같다. 글자 입력(이름 짓기)만 글자 기준. 다시 붙이기는 그래도 필요한 마지막 안전망.
 
 ## 왜?
