@@ -73,6 +73,7 @@ sources:
 - 비용은 데스크톱 헤드리스로 상대값만 — 폰은 따로 잰다.
 
 ## 관련 노트
+- [3D 도트 룩(t3ssel8r 풍)](3d-pixel-art-look.md)
 - [macroquad 3D 렌더링](../reference/macroquad/3d-rendering.md)
 - [레트로 3D 모델 파이프라인 — Blockbench → glTF](../reference/assets/retro-3d-models-blockbench-gltf.md)
 - [게임 손맛: 입자와 빛](game-feel-particles-and-light.md)
