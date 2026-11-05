@@ -4,7 +4,7 @@ type: concept
 tags: [gamedev, input, accessibility, game-design, macroquad]
 status: draft
 created: 2026-10-25
-updated: 2026-11-04
+updated: 2026-11-05
 verified: |
   직접 실행(2026-10-25, nail-under-the-roots): 장치별 안내(키보드·패드·터치), 터치 첫 화면 짐작(pointer: coarse)을 헤드리스 Chromium 데스크톱·폰(터치만)으로 확인. 패드는 단위 테스트만.
   1차 출처로 확인(직접 구현·실행, 2026-10-25, nail-under-the-roots, macroquad 0.4 + gamepads 0.1.7): 동작마다 키 하나·패드 버튼 하나의
@@ -39,7 +39,7 @@ sources:
 
 ## 본문
 - **기본 배치(액션 로그라이트 관례)**: 왼쪽 버튼 = 기본 공격, 아래 = 회피, 오른쪽·위 = 특수·아이템. Hades가 X 공격·A 대시·B 캐스트·Y 특수(2차 출처). 어깨 = 아이템/탭 넘기기, Select = 지도, Start = 메뉴.
-- **키보드는 같은 모양으로**: 패드의 다이아몬드를 키 다이아몬드(I 위·J 왼쪽·K 아래·L 오른쪽)로 옮기면 패드·키보드 설명이 같은 그림이 된다. 왼손은 WASD.
+- **키보드는 같은 모양으로**(마우스를 쓰는 배치는 [키보드·마우스 배치](keyboard-and-mouse-layout-for-action-games.md)): 패드의 다이아몬드를 키 다이아몬드(I 위·J 왼쪽·K 아래·L 오른쪽)로 옮기면 패드·키보드 설명이 같은 그림이 된다. 왼손은 WASD.
 - **배치표 = 동작 → (키 하나, 버튼 하나)**. 저장은 표의 번호(정수)로. 다시 붙일 때 이미 다른 동작이 쓰던 키면 **서로 바꾼다**(빈 동작이 생기지 않는다).
 - **고정할 것**: 이동, 메뉴 열기(Esc/Start), 메뉴 확인·뒤로(Enter/A, Esc/B). 이걸 바꾸게 하면 배치를 망쳤을 때 메뉴로 돌아올 길이 없다. 권고(메뉴까지 전부 바꿀 수 있게)와 부딪히면 "기본값으로"를 메뉴 안에 둔다.
 - **다시 붙이기 화면**: 위아래로 동작, 좌우로 키보드/패드 칸, 확인 → "누르세요… 5"(시간 제한, Esc로 취소). 확인을 누른 그 프레임의 키가 바로 잡히지 않게 다음 프레임부터 받는다.
@@ -80,6 +80,7 @@ sources:
 - 저장 형식에 버전 표식을 둔다. 표가 바뀌었는데 옛 번호를 그대로 읽으면 엉뚱한 키가 붙는다 → 표식이 다르거나 겹치면 기본값.
 
 ## 관련 노트
+- [액션 게임 키보드·마우스 배치](keyboard-and-mouse-layout-for-action-games.md)
 - [게임패드와 Android 입력 현황](../reference/macroquad/gamepad-and-android-input.md)
 - [WASM 빌드와 JS 번들](../reference/macroquad/wasm-build.md) — 설정 저장용 정수 플러그인
 - [작은 게임 다국어 구조](../guides/small-game-localization.md) — 자리표시자
