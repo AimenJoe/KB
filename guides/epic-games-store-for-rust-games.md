@@ -4,7 +4,7 @@ type: guide
 tags: [gamedev, epic, rust, release, achievements, github-actions]
 status: draft
 created: 2026-11-04
-updated: 2026-11-05
+updated: 2026-11-06
 verified: |
   1차 출처로 확인(2026-11-04, dev.epicgames.com 원문을 헤드리스 브라우저로 읽음 — store.epicgames.com은 봇 확인 창에 막힘):
   - EOS "Log In with an Epic Games Account"(Connect): Auth 로그인 → EOS_Auth_CopyIdToken → EOS_Connect_Login(EOS_ECT_EPIC_ID_TOKEN) →
@@ -33,6 +33,7 @@ sources:
   - https://dev.epicgames.com/docs/epic-online-services/eos-fundamentals/tools/bulk-importer-exporter-tool
   - https://dev.epicgames.com/docs/epic-games-store/publishing-tools/uploading-binaries/bpt-instructions-180
   - https://crates.io/crates/eos-sys
+  - https://dev.epicgames.com/docs/epic-games-store/store-presence/manage-artifacts
   - https://dev.epicgames.com/docs/epic-online-services/eos-fundamentals/client-and-client-policy/client-policy-reference
   - https://dev.epicgames.com/docs/epic-online-services/eos-fundamentals/client-and-client-policy/client-policy-guide
   - https://dev.epicgames.com/docs/epic-account-services/getting-started
@@ -67,6 +68,7 @@ Steam처럼 **Cargo 기능 하나**(`epic`, Windows만)로 가르고, 없으면 
 
 ### 4. 업로드
 - BuildPatchTool `-mode=UploadBinary`(조직·제품·아티팩트·클라이언트 아이디, 비밀은 `-ClientSecretEnvVar`, `-BuildVersion`은 겹치지 않게, `-CloudDir`은 임시 폴더). 라벨 붙이기·출시는 포털에서 사람이.
+- **아티팩트**는 오퍼(기본 게임)를 만들면 자동으로 하나 생기는 "내려받는 것 하나"다. 플랫폼마다·샌드박스마다 따로 만들지 않는다 — Windows·macOS 바이너리를 같은 아티팩트에 올리고 바이너리마다 Manage Platforms로 플랫폼을 고른다. 올리는 곳은 늘 Dev 샌드박스, Stage·Live로는 Release Management로 올린다. `-BuildVersion`은 아티팩트 안에서 플랫폼까지 겹치면 안 된다(`1.0.0-windows`·`1.0.0-macos`). 아티팩트에 배포(deployment) ID를 걸어 두면 런처가 `-epicdeploymentid`·`-epicsandboxid`를 넘긴다(선택). [원문: Manage Artifacts·BPT 1.8]
 - 리눅스 러너에서 Linux판 BuildPatchTool로 Windows·macOS 빌드를 올릴 수 있다(빌드 폴더만 있으면 된다 — 원문이 플랫폼별 도구가 같다고 함).
 
 ### 5. 포털 준비(사람이 하는 순서)
