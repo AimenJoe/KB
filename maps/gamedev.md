@@ -4,7 +4,7 @@ type: map
 tags: [gamedev, macroquad, rust, game-design, pixel-art, game-feel]
 status: verified
 created: 2026-10-24
-updated: 2026-11-05
+updated: 2026-11-07
 ---
 
 # 지도: 게임 개발
@@ -56,6 +56,7 @@ updated: 2026-11-05
 - [필살기의 임팩트](../concepts/special-move-impact.md) — 시동 정지(슈퍼 플래시), 화면 한 폭 거리, 넉백 > 속도로 끌고 가기, 소리 하나, 빠른 돌진 겨누기(시동 동안만 콘 안의 적 쪽으로 + 점선)
 - [근접 평타·모으기 공격의 손맛](../concepts/melee-light-and-charged-attack-feel.md) — 평타는 누르는 순간(모으기 때문에 떼는 순간에 묶지 않기), 작은 타격의 층(히트스톱 사다리·피격자 진동·카메라 킥·공격자 확인, trauma²는 작은 타격을 0으로), 모으기는 같은 시간의 콤보보다 세야(자세 깨기·벽 쿵), 박자 콤보는 반응 시간 밖의 템포 + 몸에서 닫히는 고리 + 창 전 입력은 박자에 스냅
 - [도트 액션의 손맛 효과](../concepts/game-feel-particles-and-light.md) — 입자 세 무리(타격·몸짓·분위기), 흙덩이 높이·중력, 맞은 쪽 불똥, 상태 없는 환경 입자(자리는 월드 칸에서 — 화면에서 뽑으면 카메라를 따라간다), 더하기 빛 겹
+- [액션 게임 적의 쫓기 길찾기](../concepts/enemy-chase-pathfinding-for-action-games.md) — 거리 지도는 땅 + 부딪힘 상자(기둥·문)를 같이, 몸 폭(가운데 + 양옆) 끈 당기기, 처음·끝 반지름은 빼고, 옆으로만 퍼지기, 돌진 띠 = 맞는 곳(폭·끝·쓸고 간 선분·벽에서 멈춤)
 - [근접 주인공의 원거리 보스](../concepts/ranged-boss-for-melee-player.md) — 부채꼴 탄 + 되받아치기, 바닥 위험은 발밑 + 둘레·고리 둘(어디·언제)·파내기·무적 굴, 표시 끝 = 판정, 위험물은 적이 아니라 별도 목록
 
 ## 이야기
