@@ -4,7 +4,7 @@ type: guide
 tags: [macroquad, miniquad, android, apk, github-actions, ci-cd, rust]
 status: verified
 created: 2026-10-24
-updated: 2026-11-04
+updated: 2026-11-07
 verified: |
   1차 출처로 확인: cargo-quad-apk git master(커밋 d411c8f, 2026-07-28) 소스 — src/config.rs(NDK_HOME 필수, ANDROID_SDK_HOME→ANDROID_HOME,
   build-tools 중 가장 높은 버전 자동 선택, android_version 기본 36, min_sdk 기본 18), src/ops/build.rs(aapt2·d8·zipalign·javac -source/-target 1.8,
@@ -21,6 +21,7 @@ verified: |
   사용자 실기(2026-10-25~26): exported를 넣은 v0.1.5부터 설치·실행·패드 버튼(0075)이 됐다. 기기 모델·Android 버전은 기록하지 않았다.
   1차 출처로 확인(2026-10-26, nail 0087): cargo-quad-apk d411c8f의 `res`·`icon` 메타데이터로 앱 아이콘이 들어가고, CI의 `aapt2 dump badging`에 application-icon이 찍힌다. 실제 런처 모양(적응형 잘림)은 미확인.
   1차 출처로 확인(2026-11-04, Knellroot 0046): miniquad 0.4.11 소스(`src/native/android.rs`의 `conf.fullscreen` 분기, `java/MainActivity.java` `setFullScreen`), Android 개발자 문서 "Hide system bars for immersive mode"(바는 `hide(systemBars())`로 숨긴다, 동작 `BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE`). 고친 판은 컴파일(cargo check)까지 — 실기기에서 바가 숨는지는 아직 확인 못 함.
+  1차 출처로 확인(2026-11-07, Knellroot 0070): cargo-quad-apk d411c8f `src/ops/build.rs` — `library_name = package_name.split(".").last()`, MainActivity의 `System.loadLibrary("LIBRARY_NAME")`를 그것으로 바꾼다. CI 에뮬레이터(API 31 google_apis x86_64, ARM 번역)에 `….knellroot.dev` APK를 깔아 켠 logcat: `UnsatisfiedLinkError: dlopen failed: library "libdev.so" not found`(켜자마자 FATAL). 패키지를 `….dev.knellroot`로 바꾼 APK는 같은 에뮬레이터에서 켜졌다(아래 확인 결과).
   확인 못 함: 디버그 키 서명 APK가 Android 14+ 기기에서 사이드로드되는지(기기 버전 기록이 없다).
 sources:
   - https://github.com/not-fl3/cargo-quad-apk
@@ -28,6 +29,7 @@ sources:
   - https://github.com/not-fl3/miniquad/tree/master/java
   - https://github.com/fornwall/gamepads
   - https://macroquad.rs/articles/android/
+  - https://github.com/ReactiveCircus/android-emulator-runner
   - https://developer.android.com/studio/publish/versioning
   - https://developer.android.com/studio/publish/app-signing
   - https://github.com/github/docs/blob/main/content/actions/reference/workflows-and-actions/dependency-caching.md
@@ -117,6 +119,11 @@ NDK 없이도 `rustup target add aarch64-linux-android && cargo check --target a
   - 해결: `activity_attributes`에 `"android:exported" = "true"`. 이 표의 키·값은 `<activity>` 속성으로 그대로 옮겨진다(`build_attribute_string`).
   - `apksigner verify`·`aapt2 dump badging`·`zipalign -c`는 이 문제를 잡지 못한다. 확인 단계에 `aapt2 dump xmltree <apk> --file AndroidManifest.xml | grep -q android:exported`를 넣어 없으면 실패시킨다.
   - nail-under-the-roots는 v0.1.0~v0.1.4가 모두 이 상태로 나갔고, 사용자가 처음 실기에 설치하려다 알았다.
+- **패키지 이름의 마지막 조각이 네이티브 라이브러리 이름이 된다.** cargo-quad-apk는 `package_name.split(".").last()`를 `MainActivity`의 `System.loadLibrary(…)`에 넣는다. APK 안의 `.so`는 크레이트(바이너리) 이름이다(`lib/arm64-v8a/lib<크레이트>.so`).
+  - 그래서 개발판을 운영판 옆에 깔려고 `io.example.game.dev`처럼 **뒤에** 조각을 붙이면 `libdev.so`를 찾다가 켜자마자 죽는다. 빌드·서명·badging 검사는 모두 통과한다. logcat에는 `UnsatisfiedLinkError: dlopen failed: library "libdev.so" not found`만 남는다.
+  - 붙일 조각은 **앞에** 넣는다: `io.example.dev.game`.
+  - 확인 단계에 "패키지 이름의 마지막 조각 = APK 안의 `lib<이름>.so`"를 넣는다(`aapt2 dump badging`의 `package: name=` → `${PKG##*.}`, `unzip -l | grep lib/arm64-v8a/lib${PKG##*.}.so`).
+  - Knellroot와 nail 모두 `….dev` 개발판이 이 상태였다(Knellroot는 2026-11-07 에뮬레이터 logcat으로 알았다).
 - `gamepads` 크레이트(0.1.7)는 Android에서 `android-winit` feature 없이 **컴파일되지 않는다**. 그 feature는 winit 전용이라 miniquad에 못 쓴다. `[target.'cfg(not(target_os = "android"))'.dependencies]`로 옮기고 코드에 `cfg`를 둔다. Android 게임패드는 miniquad 쪽에서 따로 받는다: 버튼은 miniquad 키코드 표 패치로, 축은 아직 공백([gamepad-and-android-input.md](../reference/macroquad/gamepad-and-android-input.md)).
 - `NDK_HOME`을 안 넘기면 "Please set the path to the Android NDK with the $NDK_HOME environment variable". 러너 변수 이름은 `ANDROID_NDK_HOME`이다.
 - build-tools는 **가장 높은 버전 디렉터리**를 고른다. 러너에 rc 버전이 있으면 그걸 집는다.
@@ -131,6 +138,13 @@ NDK 없이도 `rustup target add aarch64-linux-android && cargo check --target a
 - `MainActivity.java` 컴파일에 deprecation 경고 9개(`setSystemUiVisibility` 등). 에러 없음.
 - 산출물 `nail.apk` 455KB(`classes.dex` + `lib/arm64-v8a/libnail.so`), `zipalign` 검증 통과, `~/.android/debug.keystore`를 keytool로 새로 만들어 apksigner 서명(`nail.apk.idsig` 동봉). 아티팩트 zip 449KB.
 - Android 전용 코드 경로 없이 `cargo check --target aarch64-linux-android`만 통과시킨 상태에서 바로 성공했다. 즉 macroquad 0.4.16 + audio feature는 Android에서 추가 설정 없이 링크된다(quad-snd는 OpenSL ES 백엔드).
+
+## CI 에뮬레이터로 "켜지나"를 보기
+폰에서 "켜자마자 꺼짐"이면 로그가 없어 원인을 모른다. CI에서 에뮬레이터에 깔아 켜고 logcat을 받는다(Knellroot `android-smoke.yml`·`tools/test/android-smoke.sh`).
+- `reactivecircus/android-emulator-runner@v2`, `ubuntu-latest` + KVM 켜기(udev 규칙 한 줄), `api-level: 31`·`arch: x86_64`·`target: google_apis`. arm64만 넣은 APK도 이 이미지의 ARM 번역으로 돈다(2026-11-07 확인 — 깔기 `Success`, 프로세스가 뜬다).
+- 스크립트: `adb install -r -g` → `adb logcat -c` → `adb shell monkey -p <패키지> -c android.intent.category.LAUNCHER 1` → 20초 뒤 `adb shell pidof <패키지>`(살아 있나)·`adb exec-out screencap -p` → 키 입력(`input keyevent 66` = Enter) → 다시 살아 있나·화면 → `adb logcat -d`에서 `panicked|Fatal signal|AndroidRuntime|UnsatisfiedLinkError`를 뽑아 로그에 찍고, 전체를 아티팩트로.
+- 걸리는 시간: 에뮬레이터 부팅 40초 안팎 + 스크립트 1분, 작업 전체 3~4분(APK를 기다리는 시간 빼고).
+- 한계: 소프트웨어 GL(SwiftShader)·`-noaudio`라 GPU·소리 문제는 다르게 나올 수 있다. "켜지나·패닉 줄"을 보는 연기 시험이다.
 
 ## 관련 노트
 - [reference/macroquad/gamepad-and-android-input.md](../reference/macroquad/gamepad-and-android-input.md)
