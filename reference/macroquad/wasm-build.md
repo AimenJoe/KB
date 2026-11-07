@@ -4,7 +4,7 @@ type: reference
 tags: [macroquad, miniquad, rust, wasm, gamedev]
 status: verified
 created: 2026-10-24
-updated: 2026-11-04
+updated: 2026-11-05
 verified: |
   1차 출처로 확인: macroquad 0.4.16 README(빌드 명령, 산출물 경로, index.html 템플릿),
   js/mq_js_bundle.js 소스(프로토콜 version=2, 플러그인 버전, 버전 체크 로직),
@@ -12,7 +12,7 @@ verified: |
   직접 재현(2026-10-24, rustc 1.99.1 stable, macroquad 0.4.16 + audio feature + gamepads 0.1.7): wasm 링크가
   "undefined symbol: audio_init / getGamepads"로 실패하고, `-C link-arg=--import-undefined`로 해결됨. 번들 소스에서
   quad_net 플러그인의 strict 모드 ReferenceError, 전역 wasm_memory로 문자열 바이트 주고받기(2026-10-25 직접 실행), 플러그인 버전 비교가 `!=`(느슨한 비교)임을 확인. 헤드리스 Chromium(Playwright)
-  콘솔로 위 두 가지와 AudioContext 자동재생 경고를 관찰.
+  콘솔로 위 두 가지와 AudioContext 자동재생 경고를 관찰. 로딩 덮개의 흘려 보내는 fetch 감싸기·실패 표시(2026-11-05 knellroot, 헤드리스 직접 실행).
   2차 출처만 있음: 번들 버전 불일치로 게임이 깨진 사례(itch.io devlog), 버전 체계 변경 배경(TWiQ #2).
   Rust 블로그 2026-04-04 "Changes to WebAssembly targets and handling undefined symbols"(wasm 타깃에서 `--allow-undefined` 제거,
   rust-lang/rust#149868; 권장 해법 `#[link(wasm_import_module = "env")]`)는 **이 세션에서 원문 접속이 막혀 검색 결과 요약으로만 봤다.**
@@ -149,10 +149,12 @@ unsafe { nail_save_write(s.as_ptr(), s.len() as u32) }; // JS가 이 범위를 �
 첫 프레임 전까지 macroquad는 아무것도 그리지 않는다(wasm 받기·컴파일 + main의 `load_*().await` 동안 검은 화면).
 - **HTML 덮개**: 캔버스 위 `div`(z-index), 게임 배경색, 스프라이트 시트 한 줄을 CSS `steps()` 애니메이션 + `image-rendering: pixelated`로. 이 시점엔 게임의 언어·폰트가 없으니 **글 없이** 그림과 막대만.
 - **wasm 진행**: 번들 `load()`는 `fetch(path)` → `compileStreaming`. 번들보다 먼저 `window.fetch`를 감싸 `*.wasm`이면 `body.getReader()`로 바이트를 세고, 모은 조각으로 `new Response(new Blob(chunks, {type:"application/wasm"}), {headers:{"Content-Type":"application/wasm"}})`를 돌려준다(compileStreaming은 MIME을 본다).
+  - 흘려 보내는 꼴도 된다(2026-11-05, knellroot 0062, 직접 실행): 조각을 모으지 않고 `new ReadableStream({pull})`이 읽은 조각을 그대로 `enqueue`하며 세고, 원래 헤더를 복사해 `Content-Length`만 지운 `new Response(stream, {status, headers})`를 돌려주면 `compileStreaming`이 받는 동안 컴파일을 그대로 한다(Content-Type이 원래 `application/wasm`이어야 한다). 헤드리스 Chromium에서 64 KB씩 15 ms 간격으로 흘린 2.6 MB에 막대 값 24개가 중간을 지나고 거꾸로 가지 않음.
 - **압축 전송 주의**: gzip/br이면 `Content-Length`(압축 크기)가 읽은 바이트(푼 크기)보다 작다 → `max(Content-Length, 받은 양 × 1.05)`로 나누고 95%에서 멈춘다.
 - **게임 안 준비**: 정수 플러그인(`nail_load_step(done, total)`, `nail_load_ready()`)으로 main이 폰트·그림·소리마다 알린다. `ready`는 **첫 `next_frame().await` 뒤**에 — 그 전에 덮개를 걷으면 검은 화면이 한 번 보인다.
 - 확인(2026-10-25, nail-under-the-roots): Playwright `page.route`로 응답마다 지연을 넣어 느린 회선을 흉내, 막대가 0 → 60 → 68 … 100%로 차고 덮개가 걷힘.
 - **시작 파일은 한꺼번에 받는다**(2026-10-26, nail 0092, 직접 측정): `load_texture(..).await`를 파일마다 차례로 하면 웹에서 파일 수 × 왕복 지연이 쌓인다(44개, 지연 70ms·9Mbps 흉내에서 wasm 뒤 6.1초). 각 `macroquad::file::load_file` 퓨처를 `Box::pin`해 한 `std::future::poll_fn`에서 같이 돌리면(macroquad 실행기는 프레임마다 메인 퓨처를 폴링하므로 깨우개 없이도 돈다) 동시에 요청되어 2.7초. 받은 바이트는 `Texture2D::from_file_with_format`·`Image::from_file_with_format`·`load_ttf_font_from_bytes`·`load_sound_from_bytes`로 만든다. 막대는 받은 파일마다 한 칸(단계 수를 상수로 박으면 한 단계에서 몇 초씩 멈춘다).
+- **실패를 보이게**(2026-11-05, knellroot 0062, 번들 소스 확인 + 직접 실행): 번들 `load()`는 컴파일·`main()` 실패를 `.catch(e => console.error(e))`로만 삼킨다 — 덮개가 90%에서 영원히 멈춘 것처럼 보인다. `console.error`를 감싸 `Error` 인스턴스가 오면 막대를 붉게, 첫 프레임 전 패닉(requestAnimationFrame 안)은 `window` `error` 이벤트로 잡는다. **함정: `error` 듣기를 번들 `<script>`보다 먼저 걸면** 번들이 읽힐 때 나는 quad_net의 strict 모드 `ReferenceError: register_plugin`(무해한 잡음)에 걸려 늘 실패로 보인다 → 번들을 읽은 뒤(`load()` 바로 앞)에 건다.
 - **함정 — 시트 크기를 CSS에 박지 말 것**: `background-size: 384px 384px`처럼 시트 전체 크기를 숫자로 적으면, 게임 쪽에서 시트에 칸을 더할 때(nail: 6칸 → 9칸) 로딩 그림만 가로로 찌그러지고 칸이 어긋난다. 게임 화면은 멀쩡해서 늦게 알아챈다. `background-size: auto <줄 수 × 칸 × 배율>px`처럼 **높이만 정하고 폭은 auto**로 두면 비율이 지켜진다(2026-10-26, 헤드리스로 고치기 전·후 프레임을 찍어 확인).
 
 ## 헤드리스로 웹 빌드 확인 (Playwright)

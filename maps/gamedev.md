@@ -28,6 +28,7 @@ updated: 2026-11-05
 - [시점 전환(쿼터뷰 ↔ 숄더뷰)과 락온 카메라](../concepts/camera-mode-switch-and-lock-on.md) — 게임 규칙 하나 + 리그 둘 + 입력 기준 둘, 기준은 즉시·카메라만 보간, 둘 다 Perspective·FOV 격차 줄이기, 어깨 너머 1/3 구도, 가림은 당기기 → 페이드, Nesky 50 실수
 - [macroquad 3D 렌더링](../reference/macroquad/3d-rendering.md) — Camera3D(기본 z-up·fovy 라디안·깊이 켜짐 — 렌더 타깃엔 깊이 버퍼를 따로), Mesh u16·매 프레임 재업로드·조용히 잘림, 드로콜 갈리는 조건, 기본 셰이더는 normal을 안 읽음, 로더 없음
 - [레트로 3D 모델 파이프라인 — Blockbench → glTF](../reference/assets/retro-3d-models-blockbench-gltf.md) — 상자 + 부위 강체 애니메이션(스키닝 없음), `gltf` 크레이트, 단위 16·y-up·5.0 부호, 상자 둘짜리 파일로 로더부터
+- [3D 도트 룩(t3ssel8r 풍)](../concepts/3d-pixel-art-look.md) — 낮은 해상도 + 정수배, 툰 빛, 선 둘(깊이 = 어두운 가장자리·법선 = 밝은 볼록 모서리), 카메라 픽셀 맞춤(직교에서만), 풀 빌보드, 모델링 체크리스트(면이 또렷한 로우폴리·큰 색 덩어리·볼록 모서리), 원근 카메라와의 충돌
 - [작게 보이는 로우폴리 모델을 읽히게](../concepts/readable-low-poly-models.md) — 깊이 버퍼 먼저(없으면 부위가 엉킴), 외곽선·빛 단계·가장자리 빛, 실루엣·명도, AI 3D·팩의 약관(Hunyuan3D 한국 제외)
 - [AI 3D 메시를 작은 게임용 강체 부위 모델로](../guides/ai-mesh-to-rigid-part-model.md) — Meshy 메시: 정점 합치기 → 줄이기 → 새 UV에 색 굽기 → 면 자리로 부위 자르기 → 기존 뼈·동작, Blender 굽기가 검게 나오는 두 원인
 - [실감나게 귀여운 캐릭터 동작](../concepts/believable-cute-character-motion.md) — 12원칙(Lasseter 1987)을 게임에: 예비는 적 길게·플레이어 짧게, 실감은 끝맺음·덧붙이는 스프링 층(암시적 오일러 식), 부피 지키는 찌그러짐, 작은 화면 과장, 반응 대 자연스러움
@@ -41,6 +42,8 @@ updated: 2026-11-05
 - [저장 슬롯·이어하기·런 중단 저장](../concepts/roguelite-save-slots-and-continue.md) — 기록과 런을 나누기, 슬롯은 기록 단위·설정은 밖, 시작하기/이어하기 → 슬롯 고르기, 옛 저장 = 슬롯 1, 두 번 눌러 지우기, 런 저장은 죽음이 런을 끝내나로 고르기(한 번 쓰는 중단 저장 vs 마지막 체크포인트), 저장 빈도 세 겹(사건·경계 이벤트·끄기 전 — 짧은 주기는 싸움 중을 적어 뺐다)과 같은 글이면 안 쓰기, 쓰기 실패를 알기(되읽기·한 번 알림), 끄는 순간(PC 창 닫기·웹 visibilitychange·fsync)
 
 ## 월드 구조
+- [미니맵 없이 길 알려 주기](../concepts/wayfinding-without-a-minimap.md) — 갈 곳이 빛난다(같은 색 = 갈 길), 화면 밖이면 1초 뒤 가장자리 화살(카메라 뒤면 뒤집기), 목표 글은 사건이 아니라 갈 곳, 싸우는 동안은 비우기
+- [놀이 칸 밖 채우기](../concepts/surroundings-beyond-the-play-area.md) — 걷는 땅 아래 높이 안개(판 겹치기 + 깊이 버퍼), 상태 없는 입자(감아 도는 상자), 하늘 띠·공기 원근 산등성이·실루엣 하나, 흔든 이십면체 잎 무더기·각진 뿌리, 화면 고정 아지랑이·먼 클립 함정
 - [탑다운 모험 구조](../concepts/adventure-field-and-procedural-dungeon.md) — 격자 하나, 카메라 경계 사각형(연속 스크롤 = 큰 경계, 방 밀기 = 경계 바뀜), 방 그래프 던전·잠금, 저장 지점 부활, 보스 뒤 출구는 쓰러진 자리에서 멀리, 장소를 바꾸는 칸은 밟기보다 곁에서 확인 버튼
 - [선형 진행을 갈래 길로 느끼게 하는 지도](../concepts/branching-route-map.md) — 층 + 이어진 구간(엇갈림 없음·합류), 칸 종류가 결과를 바꿈, 다음 한 걸음 + 보스만 보이기(StS 지도·Hades 문)
 - [로그라이트 방이 반복되게 느껴질 때](../concepts/roguelite-room-variety.md) — 모양보다 방마다의 판단: 무리 표·세기 곡선·싸움 종류(물결·매복·버티기)·등장·곁방 보상 표지·손으로 짠 틀(시험이 규칙을 본다)
@@ -67,8 +70,10 @@ updated: 2026-11-05
 - [개발용 시나리오 진입점과 스텝 스크립트 컷씬](../concepts/dev-scenarios-and-scripted-cutscenes.md) — 시나리오 목록 → 월드 구성, JRPG식 대화창, 길게 눌러 건너뛰기, 배우 좌표계·싸움 끝 연타 함정, 일러스트 장면(2배 밀도 한 장 그림·패닝·입자·내레이션, 홀수 배율), 컷씬이 보간을 얼려 플레이어가 미끄러지는 함정, 고친 뒤 확인 세 겹(수정 전 실패하는 시험·헤드리스·실기)
 
 ## 입력·접근성
+- [게임 메뉴의 뼈대 — 장면 스택·줄 표·포커스·누를 자리](../concepts/game-menu-scene-stack-and-focus.md) — 창은 얹고 뒤로 = 꺼내기(닫으면 연 줄로), 목록 화면 = 줄 표 하나(입력·그림 공용, 이름 … 값·◀ 값 ▶·→), 포커스 규칙 표(Xbox 112·Microsoft), `(칸, 뜻)` 목록(먼저 넣은 칸이 이긴다·창 밖 = 닫기·▲▼는 제목 줄), 헤드리스 길이 커서 0을 가정하던 함정
 - [작은 픽셀 HUD 읽히게 하기](../concepts/hud-readability-and-quick-slots.md) — 바탕판·테두리 글자, 게이지 굵게·가득 신호, 퀵 슬롯 자리 고정·저절로 바꾸기 + 깜빡임, 창 밑 HUD 숨기기
 - [컨트롤러 버튼 배치와 다시 붙이기](../concepts/controller-layout-and-remapping.md) — 오른쪽 넷 = 자주 쓰는 넷, 키보드 기본값은 장르 관례로(쿼터뷰 액션 = WASD + 오른손 J·K·L, 플랫포머 = 방향키 + Z·X·C, 메뉴 뒤로는 회피 키 — 키 두 벌은 거둠), 겹치면 맞바꿈, 메뉴 키 고정, 안내는 배치를 따라, 격자 끝에서 옆 탭으로, 되돌릴 수 없는 메뉴 항목은 묻는 창(단추 = 하는 일 이름, 커서는 취소에서)
+- [액션 게임 키보드·마우스 배치](../concepts/keyboard-and-mouse-layout-for-action-games.md) — 소울라이크·Hades·Diablo·PoE 2 기본 키, 마우스의 일은 카메라가 정한다(3인칭 = 카메라·탑다운 = 조준·ARPG = 이동), 왼손은 WASD 둘레에서 빈도 순, 조합키는 패드 직역의 흔적, 프리셋으로 덧붙이기, 스캔코드(miniquad Linux는 글자)
 - [액션 게임 터치 배치](../concepts/touch-action-layout.md) — 공격 둘레 호(자주 쓰는 넷), 상황 버튼은 제 자리에만(쓸 수 없으면 숨김), 합칠 수 있으면 합치기(점프 = 상호작용), 짝 버튼은 캡슐, 배치는 순수 함수 + 시험
 
 ## 판매·비즈니스
@@ -103,7 +108,7 @@ updated: 2026-11-05
   - [0001 빌드는 CI, 호스팅은 Netlify](../decisions/0001-build-rust-wasm-in-github-actions-deploy-via-netlify-cli.md)
 
 ## 아직 없는 것
-- 상태 관리 — 노트가 생기면 추가
+- 컷씬·전환을 포함한 장면 상태 관리(메뉴 쪽은 위 "게임 메뉴의 뼈대") — 노트가 생기면 추가
 
 ## 다른 지도
 - [Rust](rust.md) · [CI/CD와 호스팅](ci-cd-hosting.md)
