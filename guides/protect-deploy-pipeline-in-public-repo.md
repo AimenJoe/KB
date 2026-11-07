@@ -4,8 +4,9 @@ type: guide
 tags: [github, github-actions, ci-cd, security, solo-dev]
 status: draft
 created: 2026-11-04
-updated: 2026-11-04
+updated: 2026-11-07
 verified: |
+  룰셋 가져오기(2026-11-07): 1차 — docs.github.com "Managing rulesets for a repository" 원문의 Importing a ruleset 절(JSON 파일)을 읽음, nail 룰셋 둘을 공개 API로 읽어(우회 목록·필수 검사 `build`·integration 15368) knellroot용 JSON을 같은 꼴로 만듦. 가져오기로 건 결과는 아직 확인 못 함(사장이 건다).
   1차 출처로 확인(2026-11-04, docs.github.com 원문을 curl로 받아 읽음):
   - Deployments and environments: Environment 시크릿은 그 환경을 쓰는 잡만 읽고, 승인이 걸려 있으면 승인 전에는 못 읽는다.
     Deployment branches/tags는 모든 공개 레포에서, Free·Pro·Team 플랜의 required reviewers·wait timer·관리자 우회·사용자 지정 보호 규칙은 공개 레포에서만.
@@ -23,6 +24,7 @@ verified: |
 sources:
   - https://docs.github.com/en/actions/reference/workflows-and-actions/deployments-and-environments
   - https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/available-rules-for-rulesets
+  - https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/managing-rulesets-for-a-repository
 ---
 
 # 공개 레포에서 배포 파이프라인 지키기
@@ -34,6 +36,8 @@ sources:
 1. **배포 잡을 따로 뗀다.** 빌드·시험 잡에는 배포 시크릿을 두지 않고, 산출물을 아티팩트로 넘겨 `publish` 잡만 `environment:`에 들어간다. 갈래마다 환경을 고르려면 `environment: ${{ github.ref == 'refs/heads/main' && 'prod' || 'dev' }}`.
 2. **Environment**(Settings → Environments): Deployment branches = Selected → `main`(운영)·`release/**`(개발판). 운영에는 Required reviewers(본인)를 걸면 배포마다 승인 버튼이 생긴다. 시크릿을 환경에 넣고 **레포 시크릿의 같은 이름은 지운다** — 남겨 두면 다른 갈래·PR 워크플로가 여전히 읽는다(순서: 환경에 넣기 → 한 번 배포 확인 → 레포 것 지우기).
 3. **브랜치 규칙**(Rulesets): 대상 `main`·`release/**`, Restrict updates·Restrict deletions·Block force pushes, 우회 목록 = Repository admin + 쓰는 GitHub App(자동화 봇). "PR 필수"는 혼자 바로 push하는 흐름이면 켜지 않는다.
+   - **룰셋은 JSON으로 레포에 두고 가져오기로 건다**: Settings → Rules → Rulesets → New ruleset ▾ → Import a ruleset(내보낸 JSON = REST 본문과 같은 꼴: `name`·`target`·`enforcement`·`conditions`·`rules`·`bypass_actors`). 레포마다 다른 것은 **필수 검사 이름**(워크플로 잡 이름 — nail `build`, knellroot `build-deploy`, GitHub Actions의 `integration_id` 15368)뿐이라 한 레포의 규칙을 공개 API(`GET /repos/{o}/{r}/rulesets/{id}`)로 읽어 옮기면 된다(knellroot 0092).
+   - 운영 갈래에 PR 필수 + 우회 = 관리자만이면 봇은 PR을 열고 사람이 Merge한다 — "배포는 사람이 정한다"가 약속이 아니라 규칙이 된다. Merge 커밋 뒤 작업 갈래는 main으로 fast-forward 한다.
 4. **CODEOWNERS**: `/.github/ @본인` — PR이 워크플로를 고치면 본인 검토가 걸린다(규칙에서 코드 주인 검토를 켰을 때만 막는 힘이 있다).
 5. **Actions 설정**: 포크 PR 워크플로는 외부 기여자 승인 필요, `GITHUB_TOKEN` 기본 권한은 읽기만(쓰기가 필요한 잡은 `permissions:`에 적는다), Actions의 PR 만들기·승인 끔.
 6. 협업자에게 Write를 주지 않고 기여는 포크 PR로. 계정 2단계 인증.
