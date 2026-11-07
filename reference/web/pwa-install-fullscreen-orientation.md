@@ -4,12 +4,12 @@ type: reference
 tags: [web, pwa, service-worker, manifest, fullscreen, orientation, ios, android, netlify, wasm]
 status: draft
 created: 2026-11-02
-updated: 2026-11-05
+updated: 2026-11-07
 verified: |
   1차 출처로 확인:
   - Chrome의 설치 조건에서 fetch 처리기 요구가 빠진 것(모바일 108·데스크톱 112), 자동 설치 안내(beforeinstallprompt)는 여전히 처리기가 있어야 한다는 것 — Chrome for Developers 블로그.
   - WebKit의 ScreenOrientation lock은 전체 화면 API가 있어야 돈다 — WebKit Bugzilla 257695.
-  - 직접 실행(헤드리스 Chromium, Playwright, 2026-11-02): 매니페스트·아이콘 응답, 서비스 워커 activated, 네트워크를 끊은 두 번째 로드가 캐시로 뜬다, 터치 세로 화면에서 회전 안내가 뜬다. (nail-under-the-roots `tools/test/smoke.js`). 같은 틀을 둘째 게임 knellroot에 옮겨 2026-11-05 다시 통과(`tools/test/pwa.js` — 캐시 이름 = 빌드 아이디, wasm 미리 담김, 오프라인 다시 읽기).
+  - 직접 실행(헤드리스 Chromium, Playwright, 2026-11-02): 매니페스트·아이콘 응답, 서비스 워커 activated, 네트워크를 끊은 두 번째 로드가 캐시로 뜬다, 터치 세로 화면에서 회전 안내가 뜬다. (nail-under-the-roots `tools/test/smoke.js`). 같은 틀을 둘째 게임 knellroot에 옮겨 2026-11-05 다시 통과(`tools/test/pwa.js` — 캐시 이름 = 빌드 아이디, wasm 미리 담김, 오프라인 다시 읽기). 2026-11-07 knellroot 0082: 세로 폰 화면에서 회전 안내가 덮이고, 누르면 잠금 시도 → 헤드리스는 잠금이 안 돼 0.7초 뒤 세로로 계속(`tools/test/touch.js`).
   - 직접 실행(사람, iPhone 실기, 2026-11-02): 홈 화면에 추가한 앱은 Safari 탭과 localStorage가 따로다 — Safari에서 하던 기록이 따라오지 않는다.
   2차 출처(포럼/블로그)만 있음:
   - iPhone Safari에 요소 전체 화면 API가 없다(iPad는 접두어판), orientation.lock 미지원(26.5까지) — caniuse·firt.dev·Apple 포럼.
@@ -56,6 +56,7 @@ sources:
 | iPhone Safari·홈 화면 앱 | 없음 | 없음 | 그 줄을 숨기고 "홈 화면에 추가하면 주소창 없이" 안내 |
 - 지원 여부는 `document.fullscreenEnabled`로 묻고, 지원할 때만 UI를 보인다.
 - 터치 기기(`pointer: coarse`)가 세로면 글 없는 회전 픽토그램을 덮고 게임을 자동 일시정지 — 강제하지 않고 탭하면 그대로 세로로.
+- 회전 안내를 누를 때 전체 화면을 쓸 수 있으면(Android) **전체 화면 + 가로 잠금을 먼저 시도**하고, 잠시(0.7초) 뒤에도 세로면 안내를 걷는다 — 잠금을 거절하는 브라우저(헤드리스 Chromium이 그랬다)에서 플레이어가 안내에 갇히지 않게. 매니페스트 `orientation`은 설치 앱만 따르니, 브라우저 탭의 "가로가 기본"은 이 안내 + 첫 사용자 입력에서의 잠금이 전부다(knellroot 0082).
 
 ### 5. 저장소
 - 웹 기록(localStorage)은 출처마다 따로다. 운영·개발판·PR 주소는 출처가 달라 서로 안 섞인다.
