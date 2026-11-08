@@ -4,7 +4,7 @@ type: reference
 tags: [github-actions, ci-cd, hosting, static-site, fonts]
 status: verified
 created: 2026-10-25
-updated: 2026-11-03
+updated: 2026-11-08
 verified: |
   1차 출처로 확인(2026-10-25):
   - 각 액션 레포의 태그와 action.yml(git fetch로 읽음): configure-pages v6.0.0(2026-03-24, node24, `enablement` 입력은 "GITHUB_TOKEN 말고 다른 토큰이 필요"),
@@ -18,6 +18,8 @@ verified: |
   직접 실행(2026-10-28, 헤드리스 Chromium, 사이트를 /nail-under-the-roots/ 아래로 띄움): 인라인 style의 CSS 변수에 넣은 상대 url()
     (`--sp: url(../img/x.png)`)을 style.css의 `background: var(--sp)`가 쓰면, 페이지가 아니라 style.css 기준으로 풀려
     en/ 페이지가 /img/x.png(사이트 밖)를 요청하고 404. 한국어 페이지(`img/x.png`)는 우연히 맞아 보였다. Firefox·Safari 동작은 확인 못 함.
+  직접 실행(2026-11-08, nail-under-the-roots 0287): 커밋해 둔 서브셋 woff2·`?v=` 해시 줄이 main → 개발 갈래 합치기에서 충돌(글은 다른 곳을 고침).
+    생성물을 빼고 배포 때 `--stamp _site`로 찍게 바꾼 뒤 같은 합치기를 미리 해 보니 충돌 없음, 찍은 해시는 전과 같음. Actions 첫 실행은 이 글을 쓸 때 아직.
   2차/확인 못 함: 비인증 API 요청 제한 "IP당 시간 60회"는 기억에 의존(이 세션에서 docs.github.com 접속이 막혀 원문 미확인).
   GitHub Free에서 공개 레포 Pages가 무료라는 것은 요금 문서 원본(github/docs plans)으로 본 범위까지.
 sources:
@@ -81,6 +83,7 @@ jobs:
 ## 함정
 - **CSS 변수에 상대 `url()`을 넣지 않는다**: `style="--sp: url(../img/a.png)"` + 스타일시트의 `background: var(--sp)`는 페이지 기준이 아니라 그 변수를 쓰는 스타일시트 기준으로 풀린다(Chromium 직접 재현). 페이지가 하위 폴더(`en/`)에 있고 스타일시트는 위에 있으면 그림이 사라진다. 그림 주소는 `background-image: url(...)`처럼 속성에 바로 넣고(문서 기준으로 풀림), 변수에는 칸 수·크기 같은 숫자만. 확인은 Pages와 같은 하위 경로(/<레포>/)로 띄워 404를 모아 본다 — 루트에서 띄우면 `../`가 루트에서 멈춰 버그가 숨는다.
 - **새 HTML + 캐시된 옛 CSS.** Pages는 정적 파일에 짧은 캐시를 준다(몇 분, 정확한 값은 원문 미확인). 페이지 구조를 크게 바꾸면 그동안 새 HTML이 옛 CSS로 그려져, 숨긴 요소(본문 건너뛰기 링크·고정 장식 목록)가 드러나고 배치가 깨진다. 빌드 스크립트가 `style.css?v=<내용 해시>`처럼 CSS·JS(그리고 CSS 안의 글꼴) 주소에 해시를 붙이면, 내용이 바뀔 때 주소도 바뀐다. 글꼴 해시를 CSS에 먼저 넣고 그 CSS로 해시를 잰다.
+- **생성물(글꼴 서브셋·`?v=` 해시)을 커밋하지 않는다**: 해시·서브셋은 원본에서 늘 똑같이 다시 나오는 값인데, 커밋해 두면 페이지 글을 두 갈래(운영 패치·개발판)에서 고칠 때마다 서로 다른 곳을 고쳐도 woff2(바이너리)·해시 줄이 둘 다 바뀌어 합치기마다 충돌한다. 원본만 커밋하고 배포 워크플로가 복사본에 찍는다(`site/` → `_site/` 복사 + 서브셋 + 해시 → `upload-pages-artifact path: _site`). 같은 원본이면 같은 해시라 캐시 동작은 그대로다. 러너의 시스템 pip 대신 `python3 -m venv`에 fonttools·brotli만 깐다.
 - 첫 실행 실패를 고장으로 보지 말 것. 켠 뒤 `workflow_dispatch`로 다시 돌린다.
 - 도트 그림은 `image-rendering: pixelated`를 주지 않으면 브라우저가 흐리게 키운다.
 - 스크린숏에 제3자 에셋 팩 그림이 들어가면, 원본 파일이 아니라도 라이선스 기록과 페이지 크레딧을 남긴다.
