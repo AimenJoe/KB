@@ -12,7 +12,7 @@ verified: |
   - gilrs-core 0.5.15에 iOS 플랫폼 없음(linux·macos·wasm·windows·default) → gamepads 크레이트가 iOS에서 빈 백엔드.
   - 리눅스에서 `cargo check --release --target aarch64-apple-ios` 통과.
   - GitHub Actions macos-latest에서 cargo build --release --target aarch64-apple-ios 성공: Mach-O 64-bit arm64, plutil -lint OK, 13.9MB .ipa(서명 안 함).
-  게임패드(2026-11-10, nail 0287): GameController 직접 폴링을 리눅스 `cargo clippy --target aarch64-apple-ios`로 확인 — 자세한 근거는
+  게임패드(2026-11-10, nail 0288): GameController 직접 폴링을 리눅스 `cargo clippy --target aarch64-apple-ios`로 확인 — 자세한 근거는
   gamepad-and-android-input.md.
   확인 못 함: 실기에서 실행(화면·터치·소리·저장·패드), 서명 후 설치.
   2차 출처만 있음: 서명 없는 앱은 시뮬레이터에서만, 무료 Apple ID 서명 7일·앱 3개(AltStore·SideStore), Developer Program 1년·TestFlight,

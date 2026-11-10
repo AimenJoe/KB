@@ -56,7 +56,7 @@ verified: |
   조작 설정 화면 글자가 바뀌는 것으로 확인. Windows·macOS 이름은 컴파일(clippy)만 — 실제 AZERTY로는 안 해 봤다. MDN getLayoutMap 지원표·MapVirtualKeyW 문서·GLFW glfwGetKeyName은 원문을 이 세션에서 읽지 못했다(learn.microsoft.com 차단, 나머지는 기억) — 출처 목록은 확인할 곳.
   키 자리 표(2026-11-05): miniquad 0.4.11 사본 `native/windows.rs`(HIWORD(lparam) & 0x1FF → keycodes)·`apple/apple_util.rs get_event_keycode`(NSEvent keyCode)·
   `linux_x11/keycodes.rs translate_key`(XGetKeyboardMapping keysym)·mq_js_bundle `into_sapp_keycode(e.code)`를 읽음. 실제 AZERTY 키보드로는 안 해 봤다.
-  iOS 패드(2026-11-10, nail 0287): Apple 문서 GCSupportedGameControllers(사전 키 `ProfileName`, 값 ExtendedGamepad 등)·
+  iOS 패드(2026-11-10, nail 0288): Apple 문서 GCSupportedGameControllers(사전 키 `ProfileName`, 값 ExtendedGamepad 등)·
   Configuring game controllers(Xcode 기능이 GCSupportsControllerUserInteraction = true를 넣음)·preferredSystemGestureState(기본 enabled,
   "드문 경우에만" 끄기, 시스템이 안 따를 수도), SDL `src/joystick/apple/SDL_mfijoystick.m`(연결·끊김 알림 + controllers 목록, 스틱 y 위가 +라
   뒤집음, buttonMenu·buttonOptions는 iOS 13+, 홈은 시스템 몫), objc-rs 0.2.8 소스(msg_send!는 `sel!`·`sel_impl!`을 가져와야 함, aarch64 BOOL = bool),
