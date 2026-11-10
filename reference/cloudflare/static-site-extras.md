@@ -14,8 +14,12 @@ verified: |
   R2 — 내려받기(egress) 요금 없음, 무료 매달 10 GB-month·Class A 100만·Class B 1,000만(Standard만), 이후 $0.015/GB-month.
   Email Sending — 아무 주소로 보내기는 Workers Paid($5/월, 3,000통 포함).
   직접 확인(2026-11-10): GitHub Pages에 붙인 루트·하위 도메인 셋이 프록시되어 응답 헤더에 `server: cloudflare`·`cf-ray`가 있다(curl -I).
+  같은 날 추가: Pages 첫 쪽(2026-08-25) "새 프로젝트는 Workers로", Workers Static Assets Billing and Limitations(2026-11-03) 요청 무료·저장 무료·Range에 200, Pages Direct Upload with CI(2026-09-18) `wrangler pages deploy`.
   확인 못 함: GitHub Pages 원본 앞의 프록시가 Pages의 HTTPS 인증서 갱신과 충돌하는지(이번에는 문제 없었음), Web Analytics를 실제로 켠 결과.
 sources:
+  - https://developers.cloudflare.com/pages/
+  - https://developers.cloudflare.com/workers/static-assets/billing-and-limitations/
+  - https://developers.cloudflare.com/pages/how-to/use-direct-upload-with-continuous-integration/
   - https://developers.cloudflare.com/web-analytics/faq/
   - https://developers.cloudflare.com/web-analytics/limits/
   - https://developers.cloudflare.com/workers/platform/limits/
@@ -39,7 +43,7 @@ sources:
 | 리디렉트 규칙 | `www` → 루트, 짧은 주소 → 상점 페이지 | — | 출시 링크 |
 | Email Routing | 주소별 받기 → 내 메일함 전달 | 주소마다 규칙 + 확인된 메일함 | 연락처 메일([노트](email-routing.md)) |
 | R2 | 매달 10 GB-month·읽기 1,000만 회, **내려받기 무료** | 넘으면 $0.015/GB-month | 큰 바이너리·보도자료 묶음 배포 |
-| Pages / Workers 정적 파일 | 정적 요청 무료·무제한 | **파일 하나 25 MiB**, 버전당 2만 파일(Free) | 사이트 호스팅 옮기기 |
+| Workers 정적 파일(새 프로젝트 권장) / Pages | 정적 요청 무료·무제한, 저장 무료 | **파일 하나 25 MiB**, 버전당 2만 파일(Free), Workers는 Range 요청에도 파일 전체(200) | 사이트 호스팅 옮기기 |
 | Workers | 하루 10만 요청 | CPU 10 ms(Free) | 폼·웹훅·알림 |
 | Email Sending | 내 메일함으로 보내는 알림 | 아무 주소로는 Workers Paid | 거래 메일 |
 
@@ -50,6 +54,7 @@ sources:
 - 분석을 켜면 수집 항목이 늘어난다 — 사이트에 개인정보처리방침이 있으면 **먼저** 고친다. 쿠키가 없다고 수집이 없는 것은 아니다.
 - Free 플랜은 Web Analytics 규칙이 0개라 자동 주입이 **같은 영역의 모든 하위 도메인**에 들어간다(게임 웹판 하위 도메인까지). 원치 않으면 손으로 넣는 방식(manual)으로.
 - 게임 웹 빌드를 Pages/Workers로 옮기기 전에 wasm·음악 같은 큰 파일이 25 MiB를 넘는지 잰다. 넘으면 그 파일만 R2로.
+- Pages 문서 첫 쪽(2026-08-25)이 "새 프로젝트는 Workers로"를 권한다 — 새로 옮긴다면 Workers 정적 파일(`wrangler deploy` + `assets.directory`). Pages는 `wrangler pages deploy <폴더>`(Direct Upload).
 - 이미 Netlify 등 다른 호스트로 CI 배포를 쓰고 있으면 옮기는 것은 배포 파이프라인(시크릿·승인) 전체를 바꾸는 일이다 — 기능 하나 때문에 옮기지 않는다.
 
 ## 관련 노트
