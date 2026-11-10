@@ -75,7 +75,7 @@ updated: 2026-11-07
 ## 입력·접근성
 - [게임 메뉴의 뼈대 — 장면 스택·줄 표·포커스·누를 자리](../concepts/game-menu-scene-stack-and-focus.md) — 창은 얹고 뒤로 = 꺼내기(닫으면 연 줄로), 목록 화면 = 줄 표 하나(입력·그림 공용, 이름 … 값·◀ 값 ▶·→), 포커스 규칙 표(Xbox 112·Microsoft), `(칸, 뜻)` 목록(먼저 넣은 칸이 이긴다·창 밖 = 닫기·▲▼는 제목 줄), 헤드리스 길이 커서 0을 가정하던 함정
 - [작은 픽셀 HUD 읽히게 하기](../concepts/hud-readability-and-quick-slots.md) — 바탕판·테두리 글자, 게이지 굵게·가득 신호, 퀵 슬롯 자리 고정·저절로 바꾸기 + 깜빡임, 창 밑 HUD 숨기기
-- [컨트롤러 버튼 배치와 다시 붙이기](../concepts/controller-layout-and-remapping.md) — 오른쪽 넷 = 자주 쓰는 넷, 키보드 다이아몬드, 겹치면 맞바꿈, 메뉴 키 고정, 안내는 배치를 따라, 격자 끝에서 옆 탭으로, 넘치는 목록은 굴린다(창을 기억·키 커서와 손가락이 따로·가장자리 한 줄 여유·탭은 뗄 때), 되돌릴 수 없는 메뉴 항목은 묻는 창(단추 = 하는 일 이름, 커서는 취소에서)
+- [컨트롤러 버튼 배치와 다시 붙이기](../concepts/controller-layout-and-remapping.md) — 오른쪽 넷 = 자주 쓰는 넷, 키보드 기본값은 장르 관례로(쿼터뷰 액션 = WASD + 오른손 J·K·L, 플랫포머 = 방향키 + Z·X·C, 메뉴 뒤로는 회피 키 — 키 두 벌은 거둠), 겹치면 맞바꿈, 메뉴 키 고정, 안내는 배치를 따라, 격자 끝에서 옆 탭으로, 되돌릴 수 없는 메뉴 항목은 묻는 창(단추 = 하는 일 이름, 커서는 취소에서)
 - [액션 게임 키보드·마우스 배치](../concepts/keyboard-and-mouse-layout-for-action-games.md) — 소울라이크·Hades·Diablo·PoE 2 기본 키, 마우스의 일은 카메라가 정한다(3인칭 = 카메라·탑다운 = 조준·ARPG = 이동), 왼손은 WASD 둘레에서 빈도 순, 조합키는 패드 직역의 흔적, 프리셋으로 덧붙이기, 스캔코드(miniquad Linux는 글자)
 - [액션 게임 터치 배치](../concepts/touch-action-layout.md) — 공격 둘레 호(자주 쓰는 넷), 상황 버튼은 제 자리에만(쓸 수 없으면 숨김), 합칠 수 있으면 합치기(점프 = 상호작용), 짝 버튼은 캡슐, 배치는 순수 함수 + 시험
 
@@ -94,7 +94,7 @@ updated: 2026-11-07
 
 ## macroquad
 - 입력
-  - [게임패드와 Android 입력 현황](../reference/macroquad/gamepad-and-android-input.md) — `gamepads` 크레이트, miniquad Android 백엔드의 공백과 패치 범위, 메뉴 스틱 탐색(히스테리시스)
+  - [게임패드와 Android 입력 현황](../reference/macroquad/gamepad-and-android-input.md) — `gamepads` 크레이트, miniquad Android 백엔드의 공백과 패치 범위, 메뉴 스틱 탐색(히스테리시스), 모바일 웹 실제 키보드(번들은 캔버스·`e.code`만 — 포커스 밖·빈 code를 창 capture에서 채워 넘기기, iPad 웹앱은 touchstart preventDefault가 키를 죽인다), 키는 자리로·이름은 배열 글자로(플랫폼별 표·얻는 API, Linux는 evdev 패치, Xvfb 배열 시험 요령)
 - 렌더링
   - [픽셀 퍼펙트 렌더링](../reference/macroquad/pixel-perfect-rendering.md) — 내부 해상도 320×180, render target, Nearest, 정수 배율
   - [오래 켜면 죽을 때: GPU 메모리가 자라는 원인과 재는 법](../reference/macroquad/gpu-memory-growth.md) — `telemetry::capture_frame`이 텍스처를 흘림, 호출 칸 버퍼는 최댓값을 쥠, WebGL 탐침, Rust 힙 도구
