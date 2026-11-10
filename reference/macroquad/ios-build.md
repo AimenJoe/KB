@@ -22,10 +22,13 @@ verified: |
   게임패드(2026-11-10, nail 0288): GameController 직접 폴링을 리눅스 `cargo clippy --target aarch64-apple-ios`로 확인 — 자세한 근거는
   gamepad-and-android-input.md.
   확인 못 함: 실기에서 실행(화면·터치·소리·저장·패드), 서명 후 설치.
-  2차 출처만 있음: 서명 없는 앱은 시뮬레이터에서만, 무료 Apple ID 서명 7일·앱 3개(AltStore·SideStore), Developer Program 1년·TestFlight,
+  2차 출처만 있음: 서명 없는 앱은 시뮬레이터에서만, 무료 Apple ID 서명 7일·앱 3개(AltStore·SideStore, Sideloadly FAQ), iOS 16+ 개발자 모드(사용 안내 글 여럿 —
+  Apple 문서로는 못 봄), 무료 계정 앱 아이디 한도(10개 — "4일마다"·"한 주"로 글마다 다름), Developer Program 1년·TestFlight,
   공개 레포 macOS 러너 무료(비공개는 분당 과금·배수), CI에서 Xcode 자동 서명이 어렵다(인증서·프로필을 Secrets로 또는 fastlane match), EU 대체 마켓.
   macroquad.rs/articles/ios 문서는 세션에서 접속이 안 되어 못 읽었다.
 sources:
+  - https://sideloadly.io/faq
+  - https://ios.cfw.guide/sideloading-apps
   - https://developer.apple.com/documentation/gamecontroller/handling-input-events
   - https://developer.apple.com/documentation/gamecontroller/gcextendedgamepad
   - https://developer.apple.com/documentation/xcode/configuring-game-controllers
@@ -64,6 +67,11 @@ steps:
   - 아이콘은 에셋 카탈로그 없이 CFBundleIcons → CFBundleIconFiles(`AppIcon60x60` → @2x·@3x 파일)로 지정한다.
 - 아이콘은 투명하면 안 된다(검게 채운다). 1024는 App Store용이다.
 
+### 남에게 나눠 주기(상점 없이)
+- 서명 안 한 `.ipa`를 GitHub Release에 붙이면 받는 사람이 Sideloadly·AltStore로 **자기 Apple ID로** 서명해 깐다 — 만든 쪽은 Apple 계정·비용이 없다(nail 0291). Actions 아티팩트는 로그인이 필요하고 90일 뒤 지워져서 공개 링크로는 못 쓴다.
+- 받는 쪽 짐이 크다(컴퓨터·개발자 모드·7일마다 다시·앱 셋). 페이지에서는 큰 다운로드 버튼보다 안내 칸으로 보내고, 웹판이 있으면 그쪽을 쉬운 길로 먼저 말한다.
+- 릴리스 워크플로가 ipa를 붙이기 전의 Release를 가리키는 링크는 404가 된다 — 페이지 스크립트가 Release의 자산 목록을 보고 없으면 Release 페이지로 보낸다.
+
 ### 앱 안 저장 자리
 - HOME은 샌드박스다. 쓸 수 있는 곳은 `Documents`·`Library`·`tmp` 아래뿐이다. 리눅스식 `~/.local/share`는 안 된다 → macOS와 같은 `~/Library/Application Support/<앱>`.
 
@@ -71,7 +79,7 @@ steps:
 | 길 | 비용 | 기간 | 용도 |
 |---|---|---|---|
 | 서명 없음 | 0 | — | 시뮬레이터만 |
-| 무료 Apple ID + Sideloadly·AltStore·SideStore | 0 | 7일마다 다시 서명, 앱 3개 | 내 기기 시험 |
+| 무료 Apple ID + Sideloadly·AltStore·SideStore | 0 | 7일마다 다시 서명, 앱 3개, iOS 16+는 개발자 모드 | 내 기기 시험 · 남에게 "직접 설치"로 나눠 주기 |
 | Apple Developer Program + CI codesign(.p12·프로필·App Store Connect API 키를 Secrets로) | $99/년 | 1년 | TestFlight·App Store |
 | EU 대체 마켓 | 개발자 계정 필요 | — | EU 안에서만(규칙 재확인) |
 
