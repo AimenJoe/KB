@@ -152,6 +152,9 @@ Android 게임패드 버튼 키코드(공식 문서 확인값): `BUTTON_A 96(0x6
 
 합쳐서 예상(200줄)보다 작았지만(버튼 13줄 + 축 50줄 안팎 + 키 반복 몇 줄) **miniquad 포크를 유지**하게 된다(`PATCHED.md`에 고친 곳 목록, miniquad를 올리면 다시 넣는다). 버튼(1)만 먼저 하고, 아날로그가 필요하다고 느낄 때 축(2)을 하는 순서가 싸다. 왼쪽 스틱은 프레임워크가 D패드 키로 바꿔 주므로 메뉴·이동은 버튼 패치만으로 된다.
 
+## iOS
+gilrs에 iOS가 없어 `gamepads`는 빈 패드다. Android 패치와 같은 꼴(F13~F24 키 + `joystick_axes`)로 miniquad 사본이 Apple GameController를 그리기마다 읽어 넘기면 게임은 Android 길을 그대로 쓴다 — [macroquad iOS 빌드](ios-build.md) "게임패드"(knellroot 0137).
+
 ## 터치 (웹·모바일 브라우저)
 macroquad 0.4.16의 `touches()`는 `Touch { id, phase, position }`를 돌려준다. 실제로 붙여 보고 확인한 함정 두 가지(2026-10-25, Pixel 7 프로필 헤드리스 Chromium과 실기 Android 13 브라우저):
 - **좌표 단위 불일치**: `screen_width()`·`mouse_position()`은 `miniquad::window::dpi_scale()`로 나눈 논리 픽셀을 주지만, `touches()`의 `position`은 **물리 픽셀 그대로**다(src/window.rs, src/input.rs 확인). `high_dpi: true`인 고해상도 폰(DPR 2~3)에서는 터치 좌표가 화면 크기의 2~3배로 들어와 버튼 판정이 전부 빗나간다. `t.position / screen_dpi_scale()`로 맞춘다. DPR 1인 데스크톱·헤드리스에서는 재현되지 않으므로 테스트할 때 `deviceScaleFactor`를 올려야 한다.
