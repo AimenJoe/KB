@@ -18,6 +18,7 @@ verified: |
   - GitHub Actions: windows-latest(MSVC)·macos-latest(arm64 + x86_64 → lipo → 임시 서명, codesign --verify 통과) 빌드 성공.
     ubuntu-22.04는 처음에 실패 — gilrs의 libudev-sys가 `libudev-dev`(pkg-config `libudev`)를 요구.
   - Pillow 12로 .ico(16~256)·.icns(16~1024) 저장(리눅스에서).
+  직접 해 봄(2026-11-05): 리눅스 운영판 `cargo build --release --no-default-features` → 4.9 MB, `ldd`·`strings`로 링크·dlopen 확인. 에셋 크기는 `du`.
   확인 못 함: Windows·Mac 실기에서 실행(화면·소리·패드·전체 화면), Steam 경유 설치의 격리(quarantine) 여부, Steam의 공증 요구.
   2차 출처만 있음: macOS 15(Sequoia)는 격리 표시가 붙은 공증 없는 앱의 첫 실행을 막고 "개인정보 보호 및 보안 → 그래도 열기"로 연다(Eclectic Light).
   Apple 문서: Developer ID 배포는 공증을 받아야 한다(1차, 다만 Steam 경유 규칙은 Valve 문서를 못 찾음).
@@ -59,6 +60,15 @@ macroquad(miniquad)는 Windows·macOS·Linux를 원래 지원해 코드 변경�
 
 - 웹용 오디오(mp3)는 빼고 네이티브용(ogg)만 싣는다 — macroquad 네이티브(quad-snd)는 mp3를 못 푼다.
 - 비공개 에셋 레포를 CI에서 체크아웃해 묶음에 넣는다면 `persist-credentials: false` + `.git` 지우기(토큰이 묶음에 남지 않게).
+
+## 바이너리는 어떻게 생기고, 묶음 크기는 무엇이 정하나
+- **C 라이브러리 없이 전부 Rust.** macroquad 아래의 miniquad가 창·입력·GL을 SDL·GLFW 없이 OS API로 직접 맡고, 글꼴(fontdue)·소리(quad-snd)·그림 디코더도 Rust 크레이트다. cargo가 전부를 **실행 파일 하나에 정적 링크**한다 — 같이 줄 DLL·런타임이 없다.
+- **OS에 원래 있는 것만 쓴다.** 리눅스는 `ldd`에 libc·libm·libasound(소리)·libudev(패드 gilrs)만 보이고, X11·GL은 실행 때 `dlopen`으로 찾는다(바이너리 문자열에 `libGL.so`·`libXi.so`). Windows는 시스템 DLL, macOS는 시스템 프레임워크.
+- **에셋은 바이너리에 넣지 않는 게 기본**이다. 실행 파일 옆 `assets`에서 읽고(위 "에셋 경로"), `include_bytes!`·`include_str!`로 박는 것만 바이너리에 들어간다.
+- **그래서 묶음 크기는 에셋이 정한다.** OS마다 실행 파일만 다르고 에셋은 똑같이 들어가니 세 OS 묶음·APK가 거의 같은 크기가 된다. ogg·png는 이미 압축돼 있어 zip이 거의 못 줄인다. 줄이려면 코드가 아니라 음악(비트레이트·곡 수)을 본다.
+  - 숫자(nail-under-the-roots v0.9.1, 2026-11-05): 리눅스 운영판 실행 파일 4.9 MB(`opt-level = "z"` + `lto = true` + `codegen-units = 1`, 직접 빌드), 묶기 전 에셋 34 MB(CI 로그 `34M stage/assets` — 음악 ogg 27곡 약 31 MB), Release 묶음 Linux 35.3 · Windows 35.0 · macOS 36.8 · APK 36.0 MB.
+  - macOS가 조금 큰 것은 arm64 + x86_64 두 실행 파일을 `lipo`로 합친 겸용이라서. 웹은 같은 그림 + mp3를 따로 받는다(네이티브는 mp3를 못 푼다, 위).
+  - 확인 못 함: Windows·macOS 실행 파일 자체의 크기(묶음 크기로만 미루어 봄).
 
 ## PC에서만 필요한 것
 - 타이틀 "끝내기"(`miniquad::window::order_quit`), 전체 화면 토글(`set_fullscreen`, F11 — 키 배치 밖에 둔다), 다음에 켤 때 기억(설정 칸 → 시작 `conf.fullscreen`), 창 아이콘(`Conf::icon` — 안 주면 miniquad 로고) — 웹·모바일 빌드에서는 숨긴다(`cfg!(not(any(wasm32, android, ios)))`).

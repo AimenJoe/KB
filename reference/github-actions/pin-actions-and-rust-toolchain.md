@@ -4,7 +4,7 @@ type: reference
 tags: [github-actions, ci-cd, security, rust, supply-chain]
 status: draft
 created: 2026-11-04
-updated: 2026-11-04
+updated: 2026-11-05
 verified: |
   1차 출처로 확인(2026-11-04, GitHub docs 원문 저장소의 마크다운을 curl로 받아 읽음):
   - "Secure use reference": 액션 하나가 뚫리면 그 잡의 시크릿·GITHUB_TOKEN에 닿는다. 가장 강한 방법은 워크플로 잠금 파일,
@@ -57,6 +57,7 @@ sources:
 - 로컬 묶은 액션(`uses: ./.github/actions/x`)은 checkout 뒤에만 쓸 수 있다.
 - Dependabot의 `target-branch`를 마일스톤 갈래로 두면 갈래가 바뀔 때 같이 바꿔야 한다(안 바꾸면 없는 갈래로 PR을 못 만든다).
 - cargo 의존성을 Dependabot 올리기에 넣으면 라이선스 고지 파일·복사해 둔 JS 번들·패치한 크레이트처럼 "같이 움직여야 하는 것"이 PR에 안 따라온다 — 그런 레포는 취약점 알림만 켠다.
+- **toml을 넣을 때 워크플로를 하나라도 빠뜨리면** 위 "같은 이름" 문제가 그 워크플로에서만 터진다. 증상: `error[E0463]: can't find crate for 'std'` + "the `x86_64-apple-darwin` target may not be installed" — 호스트 대상(aarch64)은 되고 덧붙인 대상만 실패한다. 로그의 `toolchain '1.99.1-…' is currently in use (overridden by '…/rust-toolchain.toml')`가 증거(nail-under-the-roots v0.9.1, 2026-11-05: 운영 갈래에 옮길 때 PC 빌드 워크플로만 `@stable`로 남아 macOS 겸용 묶음이 빠졌다). 고정을 다른 갈래로 옮기면 `grep -rn 'dtolnay/rust-toolchain@' .github`로 남은 곳이 없는지 본다. 같은 커밋을 다시 실행(re-run)해도 그 커밋의 워크플로로 돌아 똑같이 실패한다.
 - 고정은 액션 코드만 막는다. 러너 이미지·`npx 패키지@메이저`·`curl | sh`는 따로다.
 
 ## 실행 결과

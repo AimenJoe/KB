@@ -4,12 +4,14 @@ type: reference
 tags: [netlify, ci, deploy, hosting]
 status: verified
 created: 2026-10-24
-updated: 2026-10-24
+updated: 2026-11-05
 verified: |
   1차 출처로 확인: Netlify 공식 에이전트 컨텍스트(netlify-deploy, netlify-config, cli-commands, deployment-patterns),
   Netlify 빌드 의존성 문서(rustup/cargo 사전설치, 기본 툴체인 없음, rust-toolchain 파일).
+  netlify-cli 23.15.1 소스·`deploy --help`(2026-11-05): deploy가 기본으로 빌드, `--no-build`로 끔, 빌드 실패 메시지 형식.
   2차 출처만 있음: 스태프의 "서드파티 액션 미지원" 발언(포럼), CLI `Response is not defined` 회귀(포럼),
   `.wasm` Content-Type/캐시 헤더 사례(블로그).
+  확인 못 함: 빌드가 기본이 된 CLI 판, 2026-11-05 빌드 실패의 실제 원인(로그가 안 남음).
 sources:
   - https://docs.netlify.com/cli/get-started/
   - https://docs.netlify.com/build/configure-builds/manage-dependencies/
@@ -50,13 +52,16 @@ Git CD가 연결된 사이트에 CLI로 `--prod` 배포하면, 다음 push 때 N
 export NETLIFY_AUTH_TOKEN=...   # User settings → Applications → Personal access token
 export NETLIFY_SITE_ID=...      # Site configuration → General → Site ID (API ID)
 
-netlify deploy --dir=dist                 # draft (고유 URL)
-netlify deploy --dir=dist --prod          # production
-netlify deploy --dir=dist --alias=pr-12   # pr-12--<site>.netlify.app
-netlify deploy --dir=dist --prod --message="$GIT_SHA"
+netlify deploy --no-build --dir=dist                 # draft (고유 URL)
+netlify deploy --no-build --dir=dist --prod          # production
+netlify deploy --no-build --dir=dist --alias=pr-12   # pr-12--<site>.netlify.app
+netlify deploy --no-build --dir=dist --prod --message="$GIT_SHA"
 ```
 
-- `deploy`는 **빌드를 하지 않는다.** `--build`를 주지 않으면 `--dir`의 파일을 그대로 올린다. CI에서 빌드 단계를 먼저 둔다.
+- **CI가 이미 지은 폴더를 올릴 때는 `--no-build`를 붙인다.** 지금 CLI(23.15.1에서 확인)는 `deploy`가 기본으로 로컬 빌드(`@netlify/build` — 프레임워크 감지·사이트의 빌드 설정·플러그인)를 먼저 돌리고, 올리기도 그 빌드 안에서 한다(`--build is now the default` 경고, `handleBuild`). 빌드 명령이 없어도 이 단계는 돈다.
+  - 그 단계가 실패하면 `--json`에서는 `Error while running build` 한 줄만 남고 이유가 안 찍힌다(빌드 stdout은 `--verbose`일 때만 붙는다). 같은 CLI 판·같은 명령이 한 시간 전에는 됐는데 실패한 사례가 있다(2026-11-05).
+  - `--no-build`면 빌드 없이 곧장 올리기로 간다. `--dir` 안의 `_headers`·`_redirects`는 그대로 적용된다. `--context`는 `--build`일 때만 쓸 수 있다.
+  - 예전 CLI는 `deploy`가 빌드하지 않고 `--build`를 줄 때만 지었다. 기본값이 언제 바뀌었는지는 확인하지 못했다.
 - `--site`에는 사이트 **ID**를 준다. 폴더 경로를 넣는 실수가 흔하다(성공한 척하고 아무것도 안 올라감).
 - 배포는 원자적이다. 모든 파일이 올라간 뒤에 스위치되므로 중간 상태가 없다.
 - 실패한 배포는 발행되지 않으므로 롤백 개념이 없다. 잘못 발행했으면 커밋을 revert해 앞으로 고친다.

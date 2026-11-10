@@ -1,7 +1,7 @@
 ---
 title: 컨트롤러 버튼 배치와 다시 붙이기 — 오른쪽 넷은 자주 쓰는 넷, 메뉴 키는 고정, 안내는 배치를 따라
 type: concept
-tags: [gamedev, input, accessibility, game-design, macroquad]
+tags: [gamedev, input, keyboard, accessibility, game-design, macroquad]
 status: draft
 created: 2026-10-25
 updated: 2026-11-07
@@ -17,6 +17,15 @@ verified: |
   Windows 가이드라인(learn.microsoft.com)은 세션 네트워크에서 열리지 않아 원문 미확인 — "위험한 동작이면 기본 단추는 안전한 쪽"은 그것을 인용한
   2차 자료(GitHub Desktop 설계 문서·AutoCAD 도움말)로만 봤다. 패드 게임에서 커서를 어디에 둘지에 관한 공식 지침은 찾지 못했다(플레이어 불만 글만).
   2차 출처만 있음(2026-11-04 조사): 조준과 같이 쓰는 버튼은 어깨에 — HLD(gog 포럼 유저 보고), Minecraft Dungeons(trueachievements), Enter the Gungeon(twinfinite), Diablo IV 합친 상호작용 불만(icy-veins·Blizzard 포럼), Tunic 공유 버튼(gamepressure). 엄지 충돌 자체는 Knellroot 플레이 피드백(직접).
+  키보드 기본값(2026-11-05, nail-under-the-roots 0278 → 0279 → 0280): 주·보조 키 두 벌(0278)과 방향키 전제(0279)를 구현·시험했다가 거두고
+  0022 배치(WASD + J·K·L·I·Q/E·M)로 되돌림, 메뉴 뒤로 = Esc + 회피 키만 남김(단위 시험). 실제 사람이 해 보는 것은 아직.
+  고정 키와 다시 붙인 키가 부딪히는 두 경우(2026-11-05, nail-under-the-roots PR #12 자동 리뷰가 찾음 → 0283): 이동을 ESDF로 옮기면 E가 위 + 탭 넘기기,
+  회피를 Space에 붙이면 Space가 확인 + 뒤로를 같이 냈다 — 둘 다 단위 시험으로 재현하고 고친 뒤 시험으로 막음. 다른 게임이 어떻게 하는지는 찾아보지 않았다.
+  2차 출처만 있음(2026-11-05 조사, 공략·가이드 표 — 공식 문서 못 찾음): Moonlighter(WASD·J 공격·K 보조·Space/Q 구르기·I·M, 메뉴 J는 개발자 Steam 글),
+  Cult of the Lamb(WASD·K 또는 좌클릭 공격·Space 구르기·E·L — 한 가이드는 C 공격으로 엇갈림), Tunic(Space 회피·상호작용·J/K/L 아이템, 공격 키는 못 찾음),
+  Hades II(표 셋이 일치: 좌클릭·Space·Q·우클릭), Hyper Light Drifter(WASD·좌클릭·Space — 매뉴얼 사본이 깨져 불확실), Death's Door는 키를 못 찾음.
+  플랫포머 쪽: Celeste(방향키 + Z·X·C — 공략·포럼마다 Z/X/C의 뜻이 엇갈림), Hollow Knight(위키가 점프 Z만 확인).
+  XAG 107(learn.microsoft.com)은 세션에서 안 열려 검색 요약으로만 — "다시 붙이기만으로는 부족, WASD·방향키 둘 다" 취지.
   2차 출처만 있음: Hades·Hades II의 기본 배치(X 공격·A 대시·B 캐스트·Y 특수 — 공략 기사·위키 표, 공식 문서 아님).
   굴리는 목록(2026-11-05, Knellroot 0059 — nail 0199의 `ListView`를 가져와 가장자리 여유를 더함): 창(보이는 첫 줄)을 기억하는 방식,
   키 커서 따라가기·끌기·휠·▲▼, 가장자리 한 줄 여유를 직접 구현해 단위 시험과 헤드리스 Chromium(키·휠, 폰 크기 터치 끌기 — CDP
@@ -35,6 +44,17 @@ sources:
   - https://github.com/desktop/desktop/blob/development/docs/technical/button-order.md
   - https://help.autodesk.com/cloudhelp/2015/ENU/AutoCAD-AutoLISP/files/GUID-71616D0C-9B91-4182-9D14-85D0145C2358.htm
   - https://itch.io/post/7757806
+  - https://maxroll.gg/hades-2/guides/hades-2-beginners-guide
+  - https://www.magicgameworld.com/moonlighter-keyboard-controls/
+  - https://steamcommunity.com/app/606150/discussions/0/3463849349660072741
+  - https://blog.hyperx.com/article/12978/cult-of-the-lamb-controls-guide
+  - https://www.ludo.guide/guide/cult-of-the-lamb/controller-keyboard-bindings
+  - https://www.gamenguides.com/tunic-controls-guide-for-pc
+  - https://steamcommunity.com/app/257850/discussions/0/365163686038507911
+  - https://steamcommunity.com/app/504230/discussions/0/1726450077697676244
+  - https://hollowknight.wiki.fextralife.com/Controls
+  - https://www.abratabia.com/game-accessibility/remappable-controls.php
+  - https://itch.io/t/3367967/a-plea-to-developers-dont-only-use-wasd
   - https://devforum.roblox.com/t/gamepad-ui-highlight-improvements/1582185
   - https://bugnet.io/blog/how-to-fix-list-not-scrolling-to-the-selected-item-with-a-gamepad
 ---
@@ -46,9 +66,11 @@ sources:
 
 ## 본문
 - **기본 배치(액션 로그라이트 관례)**: 왼쪽 버튼 = 기본 공격, 아래 = 회피, 오른쪽·위 = 특수·아이템. Hades가 X 공격·A 대시·B 캐스트·Y 특수(2차 출처). 어깨 = 아이템/탭 넘기기, Select = 지도, Start = 메뉴.
-- **키보드는 같은 모양으로**(마우스를 쓰는 배치는 [키보드·마우스 배치](keyboard-and-mouse-layout-for-action-games.md)): 패드의 다이아몬드를 키 다이아몬드(I 위·J 왼쪽·K 아래·L 오른쪽)로 옮기면 패드·키보드 설명이 같은 그림이 된다. 왼손은 WASD.
+- **키보드는 같은 모양으로**(마우스를 쓰는 배치는 [키보드·마우스 배치](keyboard-and-mouse-layout-for-action-games.md)): 패드의 다이아몬드를 키 다이아몬드(I 위·J 왼쪽·K 아래·L 오른쪽)로 옮기면 패드·키보드 설명이 같은 그림이 된다. 왼손은 WASD — 쿼터뷰 액션의 키보드 관례와 같다(아래 "키보드 기본값은 장르 관례로").
 - **배치표 = 동작 → (키 하나, 버튼 하나)**. 저장은 표의 번호(정수)로. 다시 붙일 때 이미 다른 동작이 쓰던 키면 **서로 바꾼다**(빈 동작이 생기지 않는다).
-- **고정할 것**: 이동, 메뉴 열기(Esc/Start), 메뉴 확인·뒤로(Enter/A, Esc/B). 이걸 바꾸게 하면 배치를 망쳤을 때 메뉴로 돌아올 길이 없다. 권고(메뉴까지 전부 바꿀 수 있게)와 부딪히면 "기본값으로"를 메뉴 안에 둔다.
+- **고정할 것**: 메뉴 열기(Esc/Start), 메뉴 확인·뒤로(Enter/A, Esc/B), 그리고 **화살표 이동**. 이걸 바꾸게 하면 배치를 망쳤을 때 메뉴로 돌아올 길이 없다. 권고(메뉴까지 전부 바꿀 수 있게)와 부딪히면 "기본값으로"를 메뉴 안에 둔다.
+- **WASD 이동은 다시 붙인다, 화살표는 늘 둔다**: ESDF·왼손잡이(IJKL로 걷기)·AZERTY를 위해 이동 키 넷도 다시 붙이게 하되, 화살표는 고정으로 남겨 어떻게 붙여도 메뉴를 움직일 길이 있게 한다(설정 화면·안내 글에 안 보여도 된다). 이동 넷과 동작 키를 한 줄의 칸으로 보고 한 키는 한 칸에만 — 겹치면 맞바꾼다. 설정 화면에는 "이동" 한 줄로 두고 확인하면 ↑ ← ↓ → 차례로 받는다(줄 넷보다 창이 덜 길어진다). 패드 이동(스틱·D패드)은 고정(nail-under-the-roots 0283, 단위 시험·헤드리스 확인).
+- **고정 키도 다시 붙인 키와 부딪힌다 — 메뉴의 덧 키는 "다른 칸에 붙으면 양보"**: 메뉴 확인·뒤로에 덧붙인 키(Space·Backspace)나 탭 넘기기처럼 코드에 적은 키는 다시 붙이기의 겹침 검사 밖이라, 사용자가 그 키를 동작에 붙이면 한 번 누름이 두 뜻이 된다(회피 = Space면 메뉴에서 확인 + 뒤로, 이동 = ESDF면 E가 위 + 다음 탭). 고치는 법: 덧 키는 **배치표의 다른 칸이 쓰고 있으면 그 뜻을 놓는다**(Space가 공격 칸이면 확인 그대로, 회피 칸이면 확인에서 빠짐), 탭·쪽 넘기기는 고정 글자 대신 **배치의 아이템 넘기기 키를 따른다**. 시험은 "어떤 키를 어느 칸에 붙여도 한 누름 = 한 메뉴 뜻"으로(nail-under-the-roots 0283).
 - **다시 붙이기 화면**: 위아래로 동작, 좌우로 키보드/패드 칸, 확인 → "누르세요… 5"(시간 제한, Esc로 취소). 확인을 누른 그 프레임의 키가 바로 잡히지 않게 다음 프레임부터 받는다.
 - **안내 글**: "{0} 세 번" 같은 자리표시자에 `prompt(동작)`. 패드를 만지면 패드 이름, 키를 누르면 키 이름(마지막 장치).
 - **조준 스틱과 같이 누를 버튼은 어깨에**: 오른쪽 스틱과 얼굴 버튼(X·A·B·Y)은 같은 엄지라 "겨누면서 누르기"가 안 된다(Knellroot 플레이 피드백, 2026-11-04). 겨누는 동작(원거리·마법)은 어깨·트리거로, 얼굴 버튼의 동작은 자동 조준·이동 방향으로 겨눈다. 트리거로 쏘는 쪽이 장르 관례(Hyper Light Drifter LT 조준·RT 사격, Minecraft Dungeons RT 원거리, Enter the Gungeon — 모두 2차).
@@ -58,6 +80,23 @@ sources:
 - 손이 가장 자주 가는 넷을 같은 손가락 한 개로 오갈 수 있는 자리에 모으면, 회피 → 공격 같은 연계가 엄지 굴리기 하나로 된다. 어깨 버튼은 다른 손가락이라 동시에 누르기는 쉽지만 연타는 어렵다 → 가끔 쓰는 것.
 - 다시 붙이기는 접근성 불만 1위권이다(손 크기·장애·왼손잡이·패드 종류). 하드코딩 키(특히 Esc·WASD)가 흔한 실패로 꼽힌다.
 - 안내 글이 배치를 따라가지 않으면, 바꾼 사람에게 튜토리얼이 거짓말을 한다.
+
+## 키보드 기본값은 장르 관례로 — 쿼터뷰 액션은 WASD + 오른손
+키보드 관례는 **시점과 조준 방식**에 따라 다르다. 다른 장르의 관례를 가져오면 틀린다(아래 "함정").
+
+| 장르 | 이동 | 동작 | 예(2차 자료) |
+|---|---|---|---|
+| 쿼터뷰·탑다운 액션, 마우스 조준 | WASD | 좌클릭 공격 · Space 대시/구르기 · Q·E·우클릭 | Hades II(좌클릭 공격·Space 대시·Q 캐스트·우클릭 특수), Hyper Light Drifter |
+| 쿼터뷰·탑다운 액션, 마우스 없이 | WASD | **오른손 J·K·L**(+ I·M) · Space 구르기 | Moonlighter(J 공격·K 보조·Space/Q 구르기·I 가방·M 지도), Cult of the Lamb(K 공격·Space 구르기·L 저주, 마우스도 됨), Tunic(Space 회피, J/K/L 아이템) |
+| 옆에서 보는 플랫포머 | 방향키 | 왼손 Z·X·C | Celeste, Hollow Knight(게임마다 Z·X·C의 뜻은 다름) |
+
+- **WASD면 동작은 오른손**: 왼손이 이동을 맡으니 J·K·L·I 다이아몬드(패드 오른쪽 넷을 옮긴 꼴)에 자주 쓰는 넷을 둔다. 지도·가방처럼 가끔 쓰는 것은 오른손이 닿는 I·M, 아이템 넘기기는 왼손 Q·E.
+- **이동 키는 WASD·방향키 둘 다 받아도 된다**: 막을 까닭이 없다. 다만 기본 동작 키는 고른 관례의 손에만 둔다 — 방향키로 걷는 사람은 다시 붙이기로.
+- **메뉴의 확인·뒤로는 동작 키의 손에**: 확인 = Enter·Space + 공격 키, 뒤로 = Esc + 회피 키(WASD형이면 J 확인·K 뒤로, 플랫포머형이면 Z 확인·X 취소). 뒤로가 Esc뿐이면 메뉴마다 손을 옮긴다. Moonlighter도 메뉴 고르기가 J다(개발자 글).
+- **하지 말 것 — 동작마다 키 두 벌을 기본으로 깔기**: 두 관례를 다 맞추려 주·보조 키를 기본으로 넣어 봤지만(nail-under-the-roots 0278) 조작 설정 칸·겹침 규칙·안내·저장이 다 두 배가 되어 거뒀다(사장 판단: "best practice도 아니고 복잡해지기만"). 기본값은 한 벌, 나머지는 다시 붙이기.
+- **함정 — 장르가 다른 예를 근거로 쓰기**: 방향키 + Z·X·C를 "2D 액션 관례"로 보고 쿼터뷰 게임 기본값을 바꿨다가(nail 0279) 같은 장르 게임을 찾아보니 모두 WASD라 되돌렸다(0280). 비교 대상은 시점·조준 방식이 같은 게임으로.
+- **옛 저장을 새 기본값으로 옮길 때는 "바꾼 적 없음"만**: 저장된 키가 옛 기본값 그대로면 새 기본값으로, 하나라도 바꿨으면 그대로. 판 표식 칸을 함께 두지 않으면, 사용자가 일부러 옛 기본값을 다시 골라도 다음에 또 바뀐다.
+- **왜**: 기본값은 처음 켠 사람 대부분이 그대로 쓰는 배치라, 그 장르를 해 본 사람의 손이 이미 아는 자리가 가장 싸다. 다른 습관은 다시 붙이기 한 번으로 해결되게 두면 설명·시험·안내가 한 벌로 남는다.
 
 ## 탭 + 격자 메뉴를 좌우로만
 - 탭(상태·가방·설정…) 중 **좌우 이동이 없는 탭은 좌우가 곧 탭 넘기기**, 격자(가방)가 있는 탭은 좌우가 칸 이동이다. 그러면 격자 탭이 막다른 골목이 된다(어깨 버튼만 빠져나가는 길).
