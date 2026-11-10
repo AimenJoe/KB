@@ -84,6 +84,8 @@ steps:
 - 게임 쪽 cfg는 `target_os` 둘을 매번 쓰지 말고 `build.rs`에서 `cargo:rustc-cfg=pad_keys`(+ `cargo::rustc-check-cfg=cfg(pad_keys)`) 하나로.
 - Info.plist에 `GCSupportsControllerUserInteraction`·`GCSupportedGameControllers`(ExtendedGamepad) — Xcode 능력을 손으로.
 - 폴링이라 그리기 사이(1/60초 안)의 아주 짧은 누름은 놓칠 수 있다. 문제가 되면 `valueChangedHandler` 콜백으로.
+- 다른 길(nail 0288): miniquad를 고치지 않고 게임 쪽 모듈이 `objc-rs`(miniquad와 같은 판 — 새 크레이트 없음)로 같은 것을 읽어 순수한 프레임 값 → 동작 함수로 넘긴다(리눅스 시험이 짝을 본다). 입력 구조가 "플랫폼마다 동작을 돌려주는" 게임이면 이쪽, Android처럼 키로 받는 길이 이미 있으면 위 패치 쪽.
+- **두 길 모두 꼭**: (1) 프레임워크 심볼(`GCControllerDidConnectNotification` 등)을 실제로 참조해 링크를 보장하고 CI에서 `otool -L … | grep GameController.framework` — objc-rs `class!`는 클래스를 못 찾으면 panic한다(소스 1차), 빈 `#[link]` 블록만으로는 장담 못 한다. (2) `Class::get`으로 찾아 없으면 패드 없음. (3) 연결·끊김 알림을 한 번 구독(Apple 권장, iOS 15+ 패드 찾기 시작 — 2차). (4) 읽기를 `autoreleasepool`로. (5) 패드 여럿은 합친다.
 
 ## 왜?
 - Xcode 프로젝트를 두지 않으면 레포에 생성물이 없고, 리눅스 개발자도 CI만으로 빌드한다. macroquad가 Objective-C 호출을 코드 안에서 다 하므로 .app은 파일 몇 개로 충분하다.
