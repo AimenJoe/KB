@@ -4,7 +4,7 @@ type: decision
 tags: [rust, wasm, netlify, github-actions, ci, macroquad]
 status: verified
 created: 2026-10-24
-updated: 2026-10-24
+updated: 2026-11-10
 verified: |
   근거 사실은 reference/netlify/deploy-from-ci.md, reference/github-actions/rust-wasm-build.md의 verified 항목 참조.
 sources:
@@ -52,6 +52,10 @@ macroquad 게임을 웹에 올리려 한다. 산출물은 정적 파일 셋(wasm
 ## 재검토 조건
 - Netlify가 Rust 기본 툴체인과 cargo 캐시를 제공하게 되면 1번 재평가.
 - 헤더/미리보기/도메인이 불필요한 소규모 프로젝트면 3번.
+
+## 덧붙임(2026-11-10)
+- Netlify 무료판이 2025-09-04부터 크레딧제로 바뀌었다(그 전 계정은 Legacy로 남음). 크레딧제 무료판은 대역폭 ≈ 15 GB·운영 배포 1회 15크레딧이고, 다 쓰면 팀의 모든 사이트가 멈춘다 — [비교 노트](../reference/netlify/free-plan-limits.md).
+- "빌드는 CI에서, 호스팅은 CLI 업로드로"라는 결정의 뼈대는 호스트가 바뀌어도 같다(Cloudflare Pages도 `wrangler`로 지은 폴더를 올린다). 호스트를 옮기면 새 결정 번호로 남긴다.
 
 ## 관련 노트
 - [guides/macroquad-wasm-netlify-github-actions.md](../guides/macroquad-wasm-netlify-github-actions.md)

@@ -26,6 +26,7 @@ updated: 2026-11-10
 
 ## Netlify
 - [CI에서 netlify-cli로 배포](../reference/netlify/deploy-from-ci.md) — Git CD vs CLI 업로드, 섞으면 덮어쓰기, 헤더/캐시
+- [무료판의 한도 — Legacy와 크레딧제](../reference/netlify/free-plan-limits.md) — 2025-09-04 전 계정은 월 100 GB, 크레딧제는 300크레딧(1 GB = 20·운영 배포 15) ≈ 15 GB, 다 쓰면 팀의 모든 사이트가 멈춤, Cloudflare Pages와 표
 - [정적 WASM 호스팅](../concepts/static-wasm-hosting.md) — 정적 호스트가 제공해야 하는 것
 
 ## Cloudflare
