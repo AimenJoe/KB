@@ -4,7 +4,7 @@ type: guide
 tags: [github, github-actions, ci-cd, security, solo-dev]
 status: draft
 created: 2026-11-04
-updated: 2026-11-07
+updated: 2026-11-10
 verified: |
   룰셋 가져오기(2026-11-07): 1차 — docs.github.com "Managing rulesets for a repository" 원문의 Importing a ruleset 절(JSON 파일)을 읽음, nail 룰셋 둘을 공개 API로 읽어(우회 목록·필수 검사 `build`·integration 15368) knellroot용 JSON을 같은 꼴로 만듦. 가져오기로 건 결과는 아직 확인 못 함(사장이 건다).
   1차 출처로 확인(2026-11-04, docs.github.com 원문을 curl로 받아 읽음):
@@ -53,8 +53,8 @@ sources:
    - **바로 push하는 갈래**(개발판 `release/**`): Restrict **creations**·updates·deletions·Block force pushes, 우회 목록 = Repository admin + 쓰는 GitHub App(자동화 봇). 필수 상태 검사는 걸지 않는다(검사는 push 뒤에 돈다) — 배포 잡이 빌드 잡을 `needs:`로 기다리면 빨간 커밋은 안 나간다.
      - **creations가 빠지면 환경이 뚫린다**: 환경의 Deployment branches가 `release/**` 같은 패턴이면, 그 이름으로 새 갈래를 만들 수 있는 사람은 그 갈래의 워크플로로 환경 시크릿을 읽는다. 운영과 개발에 같은 토큰을 넣었다면 운영 권한까지 — 그래서 패턴 갈래의 "만들기"를 막는 것이 이 규칙의 핵심이다.
    - **PR로만 바뀌는 갈래**(운영 `main`, 혼자 하는 레포): **Require a pull request(Required approvals = 0) + Require status checks(빌드 잡) + Restrict deletions + Block force pushes**, Restrict updates는 **끈다**. 직접 push는 PR 필수가, 빨간 빌드의 Merge는 상태 검사가, 배포는 Environment 승인(2)이 막는다. Merge할 수 있는 사람은 Write 이상뿐이라 협업자가 없으면 본인 혼자다(6).
-   - **룰셋은 JSON으로 레포에 두고 가져오기로 건다**: Settings → Rules → Rulesets → New ruleset ▾ → Import a ruleset(내보낸 JSON = REST 본문과 같은 꼴: `name`·`target`·`enforcement`·`conditions`·`rules`·`bypass_actors`). 레포마다 다른 것은 **필수 검사 이름**(워크플로 잡 이름 — nail `build`, knellroot `build-deploy`, GitHub Actions의 `integration_id` 15368)뿐이라 한 레포의 규칙을 공개 API(`GET /repos/{o}/{r}/rulesets/{id}`)로 읽어 옮기면 된다(knellroot 0092).
-   - PR로 들인 뒤 작업 갈래에 main을 합쳐 잇는다 — Merge 커밋이면 fast-forward로 되지만, **Squash Merge면 커밋이 달라 빨리 감기가 안 된다**(knellroot v0.5.0, 2026-11-10: 트리가 같은 main을 합침 커밋으로 받았다).
+   - **룰셋은 JSON으로 레포에 두고 가져오기로 건다**: Settings → Rules → Rulesets → New ruleset ▾ → Import a ruleset(내보낸 JSON = REST 본문과 같은 꼴: `name`·`target`·`enforcement`·`conditions`·`rules`·`bypass_actors`). 레포마다 다른 것은 **필수 검사 이름**(워크플로 잡 이름 — nail `build`, knellroot `build`(0092에서 nail과 같은 이름으로 맞춤), GitHub Actions의 `integration_id` 15368)뿐이라 한 레포의 규칙을 공개 API(`GET /repos/{o}/{r}/rulesets/{id}`)로 읽어 옮기면 된다(knellroot 0092).
+   - PR로 들인 뒤 작업 갈래에 main을 합쳐 잇는다 — Merge 커밋이면 fast-forward로 되지만, **Squash Merge면 커밋이 달라 빨리 감기가 안 된다**(knellroot v0.5.0, 2026-11-10: 트리가 같은 main을 합침 커밋으로 받았다). 처방: `git diff release/v0.x origin/main`이 비었는지 보고 그 갈래에 `git merge origin/main`(트리 같음), **이미 다음 갈래(`release/v0.(x+1)`)가 있으면 거기엔 `git merge -s ours origin/main`** — 내용은 이미 있고 기록만 잇는다. 안 하면 다음 릴리스 PR에서 같은 줄이 충돌한다(knellroot `docs/release.md` 4단계).
 4. **CODEOWNERS**: `/.github/ @본인` — PR이 워크플로를 고치면 본인 검토가 걸린다(규칙에서 코드 주인 검토를 켰을 때만 막는 힘이 있다).
 5. **Actions 설정**: 포크 PR 워크플로는 외부 기여자 승인 필요, `GITHUB_TOKEN` 기본 권한은 읽기만(쓰기가 필요한 잡은 `permissions:`에 적는다), Actions의 PR 만들기·승인 끔.
 6. 협업자에게 Write를 주지 않고 기여는 포크 PR로. 계정 2단계 인증.

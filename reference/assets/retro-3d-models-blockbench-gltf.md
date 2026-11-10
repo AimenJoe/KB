@@ -4,7 +4,7 @@ type: reference
 tags: [assets, 3d, blockbench, blender, gltf, animation, gamedev, pixel-art]
 status: draft
 created: 2026-11-03
-updated: 2026-11-03
+updated: 2026-11-10
 verified: |
   1차 출처로 확인(2026-11-03):
   - Blockbench 레포 `js/formats/bbmodel.js`: `.bbmodel`은 JSON이고 상위 키는 `meta{format_version "5.0", model_format, box_uv}`·`resolution`·`elements`·`groups`·`outliner`·`textures`·`animations`(있을 때)·`animation_controllers` 등.
@@ -17,6 +17,9 @@ verified: |
   - 애니메이션은 **프레임마다 구워 나온다**(1초 24fps → 회전 키 25개, LINEAR). 안 움직이는 채널은 STEP 키 2개. 본의 쉬는 자세(아래로 향한 본 = X 180°)가 채널 값에 들어 있다.
   - 텍스처는 glb 안에 PNG로(bufferView). 헤드리스 apt Blender는 glTF 내보내기에 `python3-numpy`가 따로 필요했다. 미리보기는 Workbench 렌더(GPU 없이, EGL 경고만)로 찍힌다.
   확인 못 함: 내보낸 glTF에서 그룹이 노드 TRS 애니메이션으로 가는지 아니면 스킨(joints)으로 가는지(가이드는 Defold에서 "skeleton"에 붙이는 것으로 보아 스킨일 수 있다 — 그러면 부위가 강체여도 조인트 하나 = 가중치 1.0이라 CPU 변형이 행렬 하나로 끝난다), 회전 단위(도)와 축 방향, 실제 파일을 열어 본 적 없음.
+  나중에 실제로 간 길(knellroot, 1차 — 결정 기록): Blockbench는 쓰지 않았다 — 첫 모델부터 Blender bpy 스크립트(0019), 이어
+  주인공·적·보스·주민 몸은 Gemini 그림 → Meshy(AI 메시) → 줄이기·색 굽기 → 부위로 잘라 뼈에 붙이는 강체(0038·0060·0132).
+  손으로 쌓은 상자는 "상자 + 면마다 따로 된 법선 = 마인크래프트 인상"으로 판정돼 둥근 덩어리로 갔다(0036·0061). 강체 부위 + 직접 로더는 그대로 썼다.
 sources:
   - https://github.com/JannisX11/blockbench/blob/master/js/formats/bbmodel.js
   - https://www.blockbench.net/wiki/docs/bbmodel
@@ -26,6 +29,8 @@ sources:
 ---
 
 # 레트로 3D 모델 파이프라인 — Blockbench → glTF → 직접 로더
+
+> **실제로 간 길(knellroot)**: Blockbench는 검토만 하고 쓰지 않았다. 모델 원본은 Blender bpy 스크립트, 몸은 AI 메시를 부위 강체로 자른 것이다 — [AI 메시 → 부위 강체 모델](../../guides/ai-mesh-to-rigid-part-model.md). 이 노트에서 그대로 유효한 것은 **부위 강체 + 노드 TRS 애니메이션 + `gltf` 크레이트 직접 로더**와 Blender 절이다.
 
 ## 요약
 "마인크래프트보다 조금만 정교한" 로우폴리 캐릭터는 **상자 몇 개를 부위 트리로 묶고 부위마다 회전 키프레임**을 주면 된다(스키닝 없음). Blockbench(무료, 브라우저/데스크톱)가 바로 그 도구이고, glTF로 내보내면 Rust `gltf` 크레이트가 노드 트리와 애니메이션 채널을 읽어 준다. 로더가 없는 엔진(macroquad)에서는 이 조합이 가장 짧은 길이다. 단, 내보내기 옵션과 축·단위는 **실제 파일 하나로 먼저 확인**해야 한다(2차 출처뿐).
@@ -51,7 +56,7 @@ sources:
 | 대안 | `.bbmodel` JSON 직접 파싱 | 사양이 없고 버전마다 바뀐다(5.0에서 부호 뒤집힘). glTF가 안전 |
 
 ### 프롬프트·AI 생성은?
-2D에서 이미지 모델(나노바나나) 원본을 도트로 옮기던 흐름([이미지 생성 모델로 게임 일러스트](../../guides/image-model-for-game-illustrations.md))의 3D판(Meshy·Tripo 같은 메시 생성)은 삼각형 수천 개의 유기적 메시를 내놓아 **레트로 상자 스타일과 맞지 않고** 라이선스·공개 의무도 따로 봐야 한다. 참고 그림(콘셉트·텍스처 색감)에는 쓰되 메시는 손으로 상자를 쌓는 쪽이 일관된다. AI를 썼으면 어디에 썼는지 숨기지 않는다([판매 규칙](../game-business/selling-an-indie-game-rules-and-numbers.md)).
+처음엔 "AI 메시(Meshy·Tripo)는 삼각형 수천 개의 유기적 메시라 레트로 상자 스타일과 맞지 않으니 메시는 손으로 상자를 쌓는다"고 적었다. **실제로는 반대로 갔다**(knellroot 0036·0038·0061): 상자 모델은 "마인크래프트 인상"으로 판정됐고, 둥근 덩어리가 목표가 되자 AI 메시를 줄이고(정점 600~1,600) 색을 다시 굽고 **부위로 잘라 뼈에 붙이는** 쪽이 더 쌌다 — 스키닝 없는 강체 부위라는 이 노트의 핵심은 그대로다. 방법은 [AI 메시 → 부위 강체 모델](../../guides/ai-mesh-to-rigid-part-model.md). 무료 플랜 결과물의 라이선스(Meshy 무료 = CC BY 4.0, 표기 의무)는 따로 본다. AI를 썼으면 어디에 썼는지 숨기지 않는다([판매 규칙](../game-business/selling-an-indie-game-rules-and-numbers.md)).
 
 ## 왜?
 3D의 비용은 폴리곤이 아니라 **리그와 애니메이션 파이프라인**이다. 상자 + 강체 부위로 제한하면 그 비용이 2D 스프라이트 칸 찍기 수준으로 내려오고, 엔진이 해 줄 일(스키닝 셰이더·본 행렬 팔레트)이 사라져 macroquad를 유지할 수 있다. "조금만 정교하게"는 취향이 아니라 **엔진을 바꾸지 않기 위한 기술 결정**이다.

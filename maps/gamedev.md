@@ -15,7 +15,7 @@ updated: 2026-11-07
 - [1인 개발용 액션 로그라이트 설계 원칙](../concepts/action-roguelite-for-solo-dev.md) — 런 구조 vs 메트로배니아, 탑다운 vs 사이드뷰, 전투감 먼저, 캐릭터=반복 단위, 장기 프로젝트 단계
 - [그림 못 그려도 도트 게임 만들기](../guides/pixel-art-without-an-artist.md) — 에셋 팩 하나 중심, 라이선스 확인, 공개 레포 + 비공개 에셋 레포(토큰·비용·AI 조항), 둥근 지형 굽기, 눈에 띄어야 하는 물체(더하기 빛·움직임), 16×16 공격 동작(들기·치기·거두기, 발 번갈아), 타이틀 키 아트(글 자리 먼저, 이음매 굴리기)
 - [두 번째 게임 프로젝트의 첫날](../guides/second-game-project-day-one.md) — 첫 게임에서 늦게 깔아 비쌌던 규칙 15개를 첫 커밋에(입력 Actions·고정 틱·수치 한 곳·소리 큐·틱 단계·표+테스트·언어별 글·개발 시나리오·흐름 순수 함수·결정 기록·CI·라이선스·안내·이벤트 저장·KB 경계), 가져올 코드와 두고 올 코드
-- [PoC와 Lab](../guides/poc-and-lab-before-content.md) — PoC = 질문·통과 기준·시간 상한·대안, Lab = 게임 안 슬라이더(커서 없이) → 프리셋 A/B → `tuning.rs`로 내보내기, 랩마다 시나리오, Hecker의 튜닝 사다리
+- [PoC와 Lab](../guides/poc-and-lab-before-content.md) — PoC = 질문·통과 기준·시간 상한·대안, Lab = 게임 안 슬라이더(커서 없이) → 프리셋 A/B → `tuning.rs`로 내보내기, 랩마다 시나리오, Hecker의 튜닝 사다리 · 값 얼리기(기본값 스냅숏 시험 — 판정 없이 바뀌지 않게)
 - [게임 화면 색약 점검](../guides/color-vision-check-for-games.md) — 스크린숏을 Machado 행렬(선형 RGB)로 1·2·3형 + 흑백, 알아야 하는 것은 밝기·모양으로 남긴다
 - [작곡가·음향 담당 없이 게임 소리 넣기](../guides/game-audio-without-a-composer.md) — CC0 출처(Kenney·OGA), 숫자로 거르기(길이·밝기·폭·이음매), 표 + 변환 스크립트, 변형·메뉴 소리 한 곳·덕킹, 사람이 고르는 듣기 페이지, 옛 곡·새 곡 둘 다(상황으로 가르기·런마다 번갈아), 환경음 층
 - [인디 게임 공식 페이지](../guides/indie-game-landing-page.md)
@@ -27,10 +27,10 @@ updated: 2026-11-07
 ## 3D·카메라
 - [시점 전환(쿼터뷰 ↔ 숄더뷰)과 락온 카메라](../concepts/camera-mode-switch-and-lock-on.md) — 게임 규칙 하나 + 리그 둘 + 입력 기준 둘, 기준은 즉시·카메라만 보간, 둘 다 Perspective·FOV 격차 줄이기, 어깨 너머 1/3 구도, 가림은 당기기 → 페이드, Nesky 50 실수
 - [macroquad 3D 렌더링](../reference/macroquad/3d-rendering.md) — Camera3D(기본 z-up·fovy 라디안·깊이 켜짐 — 렌더 타깃엔 깊이 버퍼를 따로), Mesh u16·매 프레임 재업로드·조용히 잘림, 드로콜 갈리는 조건, 기본 셰이더는 normal을 안 읽음, 로더 없음
-- [레트로 3D 모델 파이프라인 — Blockbench → glTF](../reference/assets/retro-3d-models-blockbench-gltf.md) — 상자 + 부위 강체 애니메이션(스키닝 없음), `gltf` 크레이트, 단위 16·y-up·5.0 부호, 상자 둘짜리 파일로 로더부터
+- [레트로 3D 모델 파이프라인 — Blockbench → glTF](../reference/assets/retro-3d-models-blockbench-gltf.md) — 상자 + 부위 강체 애니메이션(스키닝 없음), `gltf` 크레이트, 단위 16·y-up·5.0 부호, 상자 둘짜리 파일로 로더부터 (실제로는 Blockbench 대신 Blender bpy + AI 메시 부위 강체로 감 — 아래 AI 메시 가이드)
 - [3D 도트 룩(t3ssel8r 풍)](../concepts/3d-pixel-art-look.md) — 낮은 해상도 + 정수배, 툰 빛, 선 둘(깊이 = 어두운 가장자리·법선 = 밝은 볼록 모서리), 카메라 픽셀 맞춤(직교에서만), 풀 빌보드, 모델링 체크리스트(면이 또렷한 로우폴리·큰 색 덩어리·볼록 모서리), 원근 카메라와의 충돌
 - [작게 보이는 로우폴리 모델을 읽히게](../concepts/readable-low-poly-models.md) — 깊이 버퍼 먼저(없으면 부위가 엉킴), 외곽선·빛 단계·가장자리 빛, 실루엣·명도, AI 3D·팩의 약관(Hunyuan3D 한국 제외)
-- [AI 3D 메시를 작은 게임용 강체 부위 모델로](../guides/ai-mesh-to-rigid-part-model.md) — Meshy 메시: 정점 합치기 → 줄이기 → 새 UV에 색 굽기 → 면 자리로 부위 자르기 → 기존 뼈·동작, Blender 굽기가 검게 나오는 두 원인
+- [AI 3D 메시를 작은 게임용 강체 부위 모델로](../guides/ai-mesh-to-rigid-part-model.md) — Meshy 메시: 정점 합치기 → 줄이기 → 새 UV에 색 굽기 → 면 자리로 부위 자르기 → 기존 뼈·동작, Blender 굽기가 검게 나오는 두 원인 · 비스듬한 부위는 텍스처 색으로 자르기·텍스처에만 있는 눈·자른 뒤 부위마다 법선 재검사·그늘 굽힘 주의
 - [실감나게 귀여운 캐릭터 동작](../concepts/believable-cute-character-motion.md) — 12원칙(Lasseter 1987)을 게임에: 예비는 적 길게·플레이어 짧게, 실감은 끝맺음·덧붙이는 스프링 층(암시적 오일러 식), 부피 지키는 찌그러짐, 작은 화면 과장, 반응 대 자연스러움
 - [어두운 세계의 귀여운 캐릭터](../concepts/cute-characters-in-a-dark-world.md) — 2등신·눈 크고 낮게·입 없음·디테일 넷, "색 = 생명"(살아 있는 것만 파스텔, 침식은 같은 꼴인데 색을 잃음, 세계는 해 질 녘)
 

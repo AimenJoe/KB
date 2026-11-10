@@ -4,7 +4,7 @@ type: guide
 tags: [ci, deploy, github-actions, netlify, android, rust, gamedev]
 status: draft
 created: 2026-10-28
-updated: 2026-11-07
+updated: 2026-11-10
 verified: |
   1차 출처로 확인:
     - 직접 실행(knellroot 0079, 2026-11-07): 개발판 타이틀에 `v0.3.3 dev 9abb60d`가 찍힌 것을 헤드리스 캡처로 봤고, 별칭 주소 build.txt의 SHA와 앞 7자리가 같았다.
@@ -14,6 +14,8 @@ verified: |
     - GitHub API: `releases/latest`와 위 노트의 site.js 필터가 prerelease를 건너뛴다(Release `dev`가 prerelease=true로 잡힘).
   2차 출처(포럼)만 있음:
     - 같은 `--alias`를 다시 쓰면 그 주소가 가장 새 배포를 가리킨다는 답과, 옛 배포에 머문다는 답이 엇갈린다(Netlify Answers). 공식 CLI 문서는 이 세션 네트워크에서 열리지 않았다. 그래서 배포 뒤 확인 단계를 둔다 — 한 번은 새 배포를 가리켰다.
+    - **정정(2026-11-10)**: 위 0193의 `….nail.dev` APK는 지어졌지만 **한 번도 켜지지 않았다** — cargo-quad-apk가 패키지 이름의 마지막 조각(`dev`)을 네이티브 라이브러리 이름으로 써서 `libdev.so`를 찾다 `UnsatisfiedLinkError`(nail 0286, 에뮬레이터 연기 시험 run 42326357635로 재현 → `….dev.nail`로 고친 뒤 run 42326531704 통과). Knellroot도 같았다(`….dev.knellroot`로 고침).
+    - 운영판도 띄워 보기(nail 0277, 2026-11-09): 연기 시험이 개발판만 봐서 운영판(`--no-default-features`) 빌드는 아무도 띄우지 않았다 → smoke가 운영판을 따로 조립해 타이틀까지 띄운다.
   확인 못 함: 별칭 배포의 검색 색인(noindex 헤더가 자동으로 붙는지). 그래서 HTML에 robots 메타를 직접 넣는다.
 sources:
   - https://answers.netlify.com/t/netlify-cli-alias-urls-not-found/17831/6
@@ -36,7 +38,8 @@ sources:
 ### 빌드 기능(Cargo feature)
 - 개발 메뉴·검사 도구를 `dev` 기능 뒤에 두고, 로컬 편의를 위해 `default = ["dev"]`로 두되 **운영 빌드는 CI가 `--no-default-features`**로 짓는다. 갈래는 워크플로 한 단계에서 `GITHUB_REF`로 정해 `$GITHUB_ENV`에 `FEATURES`를 적는다.
 - clippy를 **두 갈래 다** `-D warnings`로 돌린다. 처음 돌리면 `cfg(feature)` 안에서만 쓰이던 것이 죽은 코드로 걸린다(메뉴 장면 변종, 검사용 함수).
-- 연기 시험이 개발 메뉴로 장면에 들어간다면 그 시험만은 개발 빌드로 돈다(나가지 않는 빌드). 그러면 운영 갈래의 시험은 운영 빌드를 보지 않으므로, 같은 SHA가 개발 갈래에서 이미 통과했다면 운영 push 때 다시 돌릴 이유가 거의 없다 — 배포 앞에 둔 시험이면 그만큼 운영 반영이 늦다([연기 시험이 느려질 때](../reference/github-actions/playwright-smoke-test-ci-time.md)).
+- **운영 빌드도 따로 띄운다**(nail 0277): 연기 시험이 개발 메뉴로 장면에 들어가면 그 시험은 개발 빌드만 본다 — 그러면 실제로 나가는 운영 빌드(`--no-default-features`)는 아무도 띄워 보지 않는다. 운영판을 따로 조립해 시나리오 없이 타이틀·PWA까지만이라도 띄운다(개발 갈래에서 먼저 돌아 main에 합치기 전에 걸린다).
+- 개발 시나리오 시험만은 같은 SHA가 개발 갈래에서 이미 통과했다면 운영 push 때 다시 돌릴 이유가 거의 없다 — 배포 앞에 둔 시험이면 그만큼 운영 반영이 늦다([연기 시험이 느려질 때](../reference/github-actions/playwright-smoke-test-ci-time.md)).
 
 ### 따로 열기 — 웹
 - Netlify(CLI 업로드 모델): 같은 사이트에 `netlify deploy --alias=dev`(`--prod` 없이). 주소 `dev--<사이트>.netlify.app`. 오리진이 달라 localStorage가 운영판과 갈린다.
@@ -45,7 +48,7 @@ sources:
 - 개발판 HTML에 `<meta name="robots" content="noindex, nofollow">`와 탭 이름 표시.
 
 ### 따로 깔기 — Android·iOS
-- Android: CI 안에서만 `package_name`을 `….dev`, 이름을 "… dev"로 바꿔 짓는다. 다른 패키지라 운영 앱 옆에 깔리고 앱 폴더도 따로다.
+- Android: CI 안에서만 `package_name`과 이름("… dev")을 바꿔 짓는다. 다른 패키지라 운영 앱 옆에 깔리고 앱 폴더도 따로다. **붙일 조각은 앞에**(`io.example.dev.game`) — cargo-quad-apk는 마지막 조각을 네이티브 라이브러리 이름으로 쓰므로 `io.example.game.dev`는 `libdev.so`를 찾다 켜자마자 죽는다(빌드·서명·badging 검사는 다 지난다, nail 0286). CI에 "마지막 조각 = APK 안의 `lib<조각>.so`" 확인을 넣는다([APK 가이드](macroquad-android-apk-github-actions.md) 함정).
 - **앱 코드에 패키지 이름이 박혀 있으면 깨진다**(예: 기록 폴더 `/data/data/<패키지>/files`). 실행 중 프로세스 이름(`/proc/self/cmdline` 첫 칸 = 패키지)에서 읽고, 아는 이름이 아니면 운영 이름으로.
 - iOS: `CFBundleIdentifier`·표시 이름만 바꿔 아티팩트로.
 
