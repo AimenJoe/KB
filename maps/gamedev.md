@@ -4,7 +4,7 @@ type: map
 tags: [gamedev, macroquad, rust, game-design, pixel-art, game-feel]
 status: verified
 created: 2026-10-24
-updated: 2026-11-07
+updated: 2026-11-10
 ---
 
 # 지도: 게임 개발
@@ -28,7 +28,7 @@ updated: 2026-11-07
 - [시점 전환(쿼터뷰 ↔ 숄더뷰)과 락온 카메라](../concepts/camera-mode-switch-and-lock-on.md) — 게임 규칙 하나 + 리그 둘 + 입력 기준 둘, 기준은 즉시·카메라만 보간, 둘 다 Perspective·FOV 격차 줄이기, 어깨 너머 1/3 구도, 가림은 당기기 → 페이드, Nesky 50 실수
 - [macroquad 3D 렌더링](../reference/macroquad/3d-rendering.md) — Camera3D(기본 z-up·fovy 라디안·깊이 켜짐 — 렌더 타깃엔 깊이 버퍼를 따로), Mesh u16·매 프레임 재업로드·조용히 잘림, 드로콜 갈리는 조건, 기본 셰이더는 normal을 안 읽음, 로더 없음
 - [레트로 3D 모델 파이프라인 — Blockbench → glTF](../reference/assets/retro-3d-models-blockbench-gltf.md) — 상자 + 부위 강체 애니메이션(스키닝 없음), `gltf` 크레이트, 단위 16·y-up·5.0 부호, 상자 둘짜리 파일로 로더부터 (실제로는 Blockbench 대신 Blender bpy + AI 메시 부위 강체로 감 — 아래 AI 메시 가이드)
-- [3D 도트 룩(t3ssel8r 풍)](../concepts/3d-pixel-art-look.md) — 낮은 해상도 + 정수배, 툰 빛, 선 둘(깊이 = 어두운 가장자리·법선 = 밝은 볼록 모서리), 카메라 픽셀 맞춤(직교에서만), 풀 빌보드, 모델링 체크리스트(면이 또렷한 로우폴리·큰 색 덩어리·볼록 모서리), 원근 카메라와의 충돌
+- [3D 도트 룩(t3ssel8r 풍)](../concepts/3d-pixel-art-look.md) — 낮은 해상도 + 정수배, 툰 빛, 선 둘(깊이 = 어두운 가장자리·법선 = 밝은 볼록 모서리), 카메라 픽셀 맞춤(직교에서만), 풀 빌보드, 모델링 체크리스트(면이 또렷한 로우폴리·큰 색 덩어리·볼록 모서리), 원근 카메라와의 충돌 · 소품을 이 룩으로(무늬 상자 대신 깎은 덩어리 쌓기·둥근 몸과 각진 테 가르기·빛나는 꼴은 색 띠·리뷰 표 + 게임 화면 앞·뒤)
 - [작게 보이는 로우폴리 모델을 읽히게](../concepts/readable-low-poly-models.md) — 깊이 버퍼 먼저(없으면 부위가 엉킴), 외곽선·빛 단계·가장자리 빛, 실루엣·명도, AI 3D·팩의 약관(Hunyuan3D 한국 제외)
 - [AI 3D 메시를 작은 게임용 강체 부위 모델로](../guides/ai-mesh-to-rigid-part-model.md) — Meshy 메시: 정점 합치기 → 줄이기 → 새 UV에 색 굽기 → 면 자리로 부위 자르기 → 기존 뼈·동작, Blender 굽기가 검게 나오는 두 원인 · 비스듬한 부위는 텍스처 색으로 자르기·텍스처에만 있는 눈·자른 뒤 부위마다 법선 재검사·그늘 굽힘 주의
 - [실감나게 귀여운 캐릭터 동작](../concepts/believable-cute-character-motion.md) — 12원칙(Lasseter 1987)을 게임에: 예비는 적 길게·플레이어 짧게, 실감은 끝맺음·덧붙이는 스프링 층(암시적 오일러 식), 부피 지키는 찌그러짐, 작은 화면 과장, 반응 대 자연스러움
