@@ -4,7 +4,7 @@ type: map
 tags: [gamedev, macroquad, rust, game-design, pixel-art, game-feel]
 status: verified
 created: 2026-10-24
-updated: 2026-11-05
+updated: 2026-11-10
 ---
 
 # 지도: 게임 개발
@@ -91,7 +91,7 @@ updated: 2026-11-05
 
 ## macroquad
 - 입력
-  - [게임패드와 Android 입력 현황](../reference/macroquad/gamepad-and-android-input.md) — `gamepads` 크레이트, miniquad Android 백엔드의 공백과 패치 범위, 메뉴 스틱 탐색(히스테리시스), 모바일 웹 실제 키보드(번들은 캔버스·`e.code`만 — 포커스 밖·빈 code를 창 capture에서 채워 넘기기, iPad 웹앱은 touchstart preventDefault가 키를 죽인다), 키는 자리로·이름은 배열 글자로(플랫폼별 표·얻는 API, Linux는 evdev 패치, Xvfb 배열 시험 요령)
+  - [게임패드와 Android 입력 현황](../reference/macroquad/gamepad-and-android-input.md) — `gamepads` 크레이트, miniquad Android 백엔드의 공백과 패치 범위, iOS는 엔진 패치 없이 GCController 폴링(objc-rs·알림 구독·nil 거르기·Info.plist 키), 메뉴 스틱 탐색(히스테리시스), 모바일 웹 실제 키보드(번들은 캔버스·`e.code`만 — 포커스 밖·빈 code를 창 capture에서 채워 넘기기, iPad 웹앱은 touchstart preventDefault가 키를 죽인다), 키는 자리로·이름은 배열 글자로(플랫폼별 표·얻는 API, Linux는 evdev 패치, Xvfb 배열 시험 요령)
 - 렌더링
   - [픽셀 퍼펙트 렌더링](../reference/macroquad/pixel-perfect-rendering.md) — 내부 해상도 320×180, render target, Nearest, 정수 배율
   - [오래 켜면 죽을 때: GPU 메모리가 자라는 원인과 재는 법](../reference/macroquad/gpu-memory-growth.md) — `telemetry::capture_frame`이 텍스처를 흘림, 호출 칸 버퍼는 최댓값을 쥠, WebGL 탐침, Rust 힙 도구
@@ -99,7 +99,7 @@ updated: 2026-11-05
 - 빌드·배포
   - [macroquad WASM을 GitHub Actions로 빌드해 Netlify에 배포](../guides/macroquad-wasm-netlify-github-actions.md) — 전체 절차
   - [macroquad를 GitHub Actions에서 Android APK로](../guides/macroquad-android-apk-github-actions.md) — cargo-quad-apk git 고정, 러너 내장 SDK/NDK, gamepads 제외, 서명 키는 Secret에
-  - [macroquad iOS 빌드](../reference/macroquad/ios-build.md) — macOS 러너로 서명 안 한 .ipa, Info.plist 최소 키, 샌드박스 저장 자리, 서명 갈림길(무료 7일 / $99 TestFlight), 패드는 gilrs에 iOS 없음
+  - [macroquad iOS 빌드](../reference/macroquad/ios-build.md) — macOS 러너로 서명 안 한 .ipa, Info.plist 최소 키, 샌드박스 저장 자리, 서명 갈림길(무료 7일 / $99 TestFlight), 패드는 gilrs에 iOS 없음 → GameController 직접
   - [macroquad PC 빌드](../reference/macroquad/desktop-build.md) — Windows·macOS(겸용 .app, lipo 뒤 임시 서명)·Linux(libudev-dev) 묶음, 에셋 경로를 실행 파일 기준으로(데스크톱은 작업 폴더 기준이라 바로가기로 켜면 못 찾는다), 공증
   - [버전 올리기 = 릴리스](../reference/github-actions/release-from-version-bump.md) — 본문 파일이 스위치, CI가 태그·APK·Release
   - [WASM 빌드와 JS 번들](../reference/macroquad/wasm-build.md) — 번들 버전 계약, 에셋 로딩, 정수로 주고받는 내 플러그인(localStorage 설정 저장), 번들을 고치지 않는 로딩 화면

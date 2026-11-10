@@ -4,7 +4,7 @@ type: reference
 tags: [macroquad, miniquad, gamepad, android, ios, input, touch, keyboard, wasm, rust]
 status: verified
 created: 2026-10-24
-updated: 2026-11-05
+updated: 2026-11-10
 verified: |
   1차 출처로 확인: miniquad master의 java/MainActivity.java(onTouch/onKey만 구현, onGenericMotionEvent 없음),
   src/native/android.rs(surfaceOnKeyDown/Up → keycodes::translate_keycode), src/native/android/keycodes.rs(109개 매핑,
@@ -56,7 +56,18 @@ verified: |
   조작 설정 화면 글자가 바뀌는 것으로 확인. Windows·macOS 이름은 컴파일(clippy)만 — 실제 AZERTY로는 안 해 봤다. MDN getLayoutMap 지원표·MapVirtualKeyW 문서·GLFW glfwGetKeyName은 원문을 이 세션에서 읽지 못했다(learn.microsoft.com 차단, 나머지는 기억) — 출처 목록은 확인할 곳.
   키 자리 표(2026-11-05): miniquad 0.4.11 사본 `native/windows.rs`(HIWORD(lparam) & 0x1FF → keycodes)·`apple/apple_util.rs get_event_keycode`(NSEvent keyCode)·
   `linux_x11/keycodes.rs translate_key`(XGetKeyboardMapping keysym)·mq_js_bundle `into_sapp_keycode(e.code)`를 읽음. 실제 AZERTY 키보드로는 안 해 봤다.
+  iOS 패드(2026-11-10, nail 0287): Apple 문서 GCSupportedGameControllers(사전 키 `ProfileName`, 값 ExtendedGamepad 등)·
+  Configuring game controllers(Xcode 기능이 GCSupportsControllerUserInteraction = true를 넣음)·preferredSystemGestureState(기본 enabled,
+  "드문 경우에만" 끄기, 시스템이 안 따를 수도), SDL `src/joystick/apple/SDL_mfijoystick.m`(연결·끊김 알림 + controllers 목록, 스틱 y 위가 +라
+  뒤집음, buttonMenu·buttonOptions는 iOS 13+, 홈은 시스템 몫), objc-rs 0.2.8 소스(msg_send!는 `sel!`·`sel_impl!`을 가져와야 함, aarch64 BOOL = bool),
+  `cargo clippy --release --target aarch64-apple-ios` 통과(리눅스, 링크 없이). 확인 못 함: 링크·실기(패드를 붙인 iPhone·iPad).
+  2차 출처만 있음: iOS 15부터 controllers를 처음 읽거나 알림을 구독할 때 열거를 시작한다(Apple 개발자 포럼 답), App Store 컨트롤러 표시(libGDX 위키).
 sources:
+  - https://developer.apple.com/documentation/xcode/configuring-game-controllers
+  - https://developer.apple.com/documentation/bundleresources/information-property-list/gcsupportedgamecontrollers
+  - https://developer.apple.com/documentation/gamecontroller/gccontrollerelement/preferredsystemgesturestate
+  - https://github.com/libsdl-org/SDL/blob/main/src/joystick/apple/SDL_mfijoystick.m
+  - https://developer.apple.com/forums/thread/691049
   - https://developer.android.com/develop/ui/views/touch-and-input/game-controllers/controller-input
   - https://www.smashingmagazine.com/2012/02/finger-friendly-design-ideal-mobile-touchscreen-target-sizes/
   - https://www.uxpin.com/studio/blog/responsive-design-touch-devices-key-considerations/
@@ -97,6 +108,7 @@ macroquad(0.4.16)/miniquad(0.4.11)에는 게임패드 API가 없다. 데스크�
 |---|---|---|
 | 데스크톱 | `gamepads` 크레이트 → gilrs 0.10 | 동작. 추가 설정 없음 |
 | 웹 | `gamepads` 크레이트(`default-features = false`) → 브라우저 Gamepad API, JS 플러그인 로드 필요 | 동작. 플러그인 JS를 레포에 복사해 배포 |
+| iOS | `gamepads` → gilrs는 빈 백엔드(iOS 없음). Apple GameController(`GCController`)를 직접 폴링 | 원본: 아무것도 안 들어옴. 다리(아래 "iOS")로 버튼·D패드·스틱 둘 |
 | Android | 없음(원본) / `keycodes.rs` 패치 | 원본: **D패드 + 왼쪽 스틱(디지털, Android가 D패드 키로 바꿈)만.** 버튼 전부 버려짐. 패치: 버튼도 키로(+ 축 패치면 아날로그 왼쪽·오른쪽 스틱, HAT) |
 
 ## 데스크톱·웹: `gamepads` 크레이트
@@ -152,6 +164,17 @@ Android 게임패드 버튼 키코드(공식 문서 확인값): `BUTTON_A 96(0x6
 
 합쳐서 예상(200줄)보다 작았지만(버튼 13줄 + 축 50줄 안팎 + 키 반복 몇 줄) **miniquad 포크를 유지**하게 된다(`PATCHED.md`에 고친 곳 목록, miniquad를 올리면 다시 넣는다). 버튼(1)만 먼저 하고, 아날로그가 필요하다고 느낄 때 축(2)을 하는 순서가 싸다. 왼쪽 스틱은 프레임워크가 D패드 키로 바꿔 주므로 메뉴·이동은 버튼 패치만으로 된다.
 
+## iOS: GameController를 프레임마다 읽기
+gilrs에는 iOS 백엔드가 없어 `gamepads`를 iOS 빌드에서 빼고, Apple `GameController` 프레임워크를 게임 쪽에서 직접 읽는다. Android와 달리 **miniquad를 고칠 필요가 없다**: Android는 OS가 이벤트를 밀어 주어 엔진의 이벤트 길(Java → JNI)에 끼워야 했지만, `GCController`는 지금 값을 들고 있어 게임 루프에서 물으면 된다(Apple도 고정 간격 루프면 폴링을 권한다).
+
+- **Objective-C 호출**: miniquad가 Apple에서 이미 쓰는 `objc-rs`(`objc = { package = "objc-rs" }`)를 같은 판으로 iOS 의존성에 더하면 새 크레이트 없이 `msg_send!`를 쓴다(타입이 있는 `objc2-game-controller`도 있지만 objc2 묶음이 딸려 온다). 프레임워크 링크는 `#[link(name = "GameController", kind = "framework")] extern "C" { static GCControllerDidConnectNotification: *mut Object; }` — 상수 하나를 쓰면 링크도 확실해진다.
+- **연결**: `+[GCController controllers]`를 프레임마다 읽고, 처음 한 번 `GCControllerDidConnect/DidDisconnectNotification`을 빈 처리기로 구독한다(`ClassDecl`로 NSObject 하위 클래스 + 메서드 하나). iOS 15부터 프레임워크는 목록을 처음 읽거나 알림을 구독할 때 찾기 시작해 첫 목록이 빌 수 있다 — 매 프레임 다시 읽으면 상관없다.
+- **짝**: `extendedGamepad`(nil이면 확장 프로필 없는 기기 — 거른다)의 `buttonA/B/X/Y`는 자리(A = 아래)다. Start = `buttonMenu`, Select = `buttonOptions`, 스틱 누르기 = `left/rightThumbstickButton`(앞 둘 iOS 13+, 뒤 둘 12.1+ — 최소판을 14로 두면 다 있다), 트리거도 `isPressed`가 있는 버튼. 스틱·D패드는 `GCControllerDirectionPad`(`xAxis`·`yAxis` → `value`, **위가 +y** — 화면 좌표로 뒤집는다, `up/down/left/right` → `isPressed`). 홈 버튼은 시스템 몫(게임 센터·스크린숏)이라 읽지 않는다. `preferredSystemGestureState`로 끌 수 있지만 Apple은 "드문 경우"만 권하고 시스템이 안 따를 수도 있다.
+- **nil 주의**: Objective-C에서 nil에 보낸 메시지는 0을 돌려주지만, `objc` 크레이트의 `msg_send!`는 포인터를 `&*obj`로 바꾸므로 nil이면 Rust 쪽 UB다 — 보내기 전에 null을 거른다.
+- **눌림 에지**: 프레임워크는 지금 상태만 주므로 지난 프레임 값을 들고 견준다. 한 프레임 상태를 순수한 값(버튼 배열·D패드·스틱)으로 만들고 "두 프레임 → 액션" 함수를 두면 리눅스에서도 시험할 수 있다(iOS 코드는 리눅스에서 `cargo clippy --target aarch64-apple-ios`까지만 돈다).
+- **Info.plist**: Xcode의 Game Controllers 기능이 넣는 두 키를 손으로 — `GCSupportsControllerUserInteraction` = true, `GCSupportedGameControllers` = [{`ProfileName`: `ExtendedGamepad`}]. App Store의 컨트롤러 지원 표시 근거(2차).
+- 진동은 `controller.haptics` → Core Haptics 엔진이라 따로 일이 크다.
+
 ## 터치 (웹·모바일 브라우저)
 macroquad 0.4.16의 `touches()`는 `Touch { id, phase, position }`를 돌려준다. 실제로 붙여 보고 확인한 함정 두 가지(2026-10-25, Pixel 7 프로필 헤드리스 Chromium과 실기 Android 13 브라우저):
 - **좌표 단위 불일치**: `screen_width()`·`mouse_position()`은 `miniquad::window::dpi_scale()`로 나눈 논리 픽셀을 주지만, `touches()`의 `position`은 **물리 픽셀 그대로**다(src/window.rs, src/input.rs 확인). `high_dpi: true`인 고해상도 폰(DPR 2~3)에서는 터치 좌표가 화면 크기의 2~3배로 들어와 버튼 판정이 전부 빗나간다. `t.position / screen_dpi_scale()`로 맞춘다. DPR 1인 데스크톱·헤드리스에서는 재현되지 않으므로 테스트할 때 `deviceScaleFactor`를 올려야 한다.
@@ -195,9 +218,10 @@ macroquad 0.4.16의 `touches()`는 `Touch { id, phase, position }`를 돌려준�
 - 데드존을 뺀(0..1로 다시 편) 값에 임계를 건다. 데드존 없이 메뉴 경로를 짜면 스틱 드리프트로 커서가 저절로 움직인다(RetroPie·UE 보고).
 
 ## 설계 함의
-- 코드가 `KeyCode`를 직접 보지 않고 **액션(`Attack`, `Dodge`, `Move(Vec2)`)** 을 보게 입력 레이어를 처음부터 둔다. 키보드·`gamepads`·Android 패치가 전부 이 뒤에 들어간다.
+- 코드가 `KeyCode`를 직접 보지 않고 **액션(`Attack`, `Dodge`, `Move(Vec2)`)** 을 보게 입력 레이어를 처음부터 둔다. 키보드·`gamepads`·Android 패치·iOS GameController가 전부 이 뒤에 들어간다.
 - UI는 커서 없이 동작하게(좌우 이동 + 확인) 처음부터 설계한다.
 
 ## 관련 노트
 - [reference/rust-game-engines/web-android-gamepad-support.md](../rust-game-engines/web-android-gamepad-support.md)
 - [reference/macroquad/wasm-build.md](wasm-build.md)
+- [reference/macroquad/ios-build.md](ios-build.md)
