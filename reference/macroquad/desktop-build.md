@@ -4,8 +4,12 @@ type: reference
 tags: [macroquad, rust, github-actions, release, windows, macos, linux, steam]
 status: draft
 created: 2026-10-29
-updated: 2026-11-05
+updated: 2026-11-10
 verified: |
+  1차(직접 실행, 2026-11-10, knellroot 0135): 모델(build.rs)·소리 wav·글꼴을 모두 `include_bytes!`로 넣은 게임은 리눅스 운영판을 작업 폴더 `/`에서
+  Xvfb로 켜도 타이틀이 뜬다(에셋 경로 찾기 없음, 묶음 = 실행 파일 하나). miniquad 0.4.11 소스: `conf.fullscreen`은 X11(`linux_x11.rs`)·Windows·macOS 모두 시작 때 반영,
+  X11 전체 화면은 창 관리자가 해 줘서 창 관리자 없는 Xvfb에서는 창 크기 그대로(확인 못 함 = 실기 몫). `Conf::icon` 기본은 miniquad 로고.
+  Pillow 12 `.ico` `append_images`로 크기마다 따로 그린 그림을 넣음(16·32가 큰 그림을 줄인 것보다 또렷).
   1차 출처로 확인(2026-10-29, nail-under-the-roots 0240):
   - miniquad 소스 `fs.rs` `load_file_desktop`: 데스크톱은 `File::open(path)` — 경로가 상대면 "지금 작업 폴더" 기준이다.
     macroquad `set_pc_assets_folder`는 그 앞에 접두사만 붙인다(`format!("{pc_assets}/{path}")`).
@@ -39,6 +43,14 @@ macroquad(miniquad)는 Windows·macOS·Linux를 원래 지원해 코드 변경�
   - 둘 다 없으면 `assets`(개발 중 `cargo run`).
 - 저장 자리는 따로: `%APPDATA%`, `~/Library/Application Support`, `$XDG_DATA_HOME` 또는 `~/.local/share`.
 
+### 다른 길 — 에셋을 바이너리에 넣기
+- 그림·모델·소리·글꼴을 `include_bytes!`(또는 `build.rs`가 만든 표)로 실행 파일에 넣으면 **경로 문제 자체가 없다**: 실행 중 디스크를 읽지 않으니 바로가기·Finder·Steam 어디서 켜도 같고, 묶음은 실행 파일 하나 + 고지 파일(knellroot 0135 — 5.9MB, 웹 wasm도 같은 바이너리라 따로 받을 파일이 없다).
+- 대가: 에셋이 크면 실행 파일·wasm이 커지고, 에셋 하나를 바꿔도 다시 컴파일한다. 음악처럼 큰 파일이 많으면 nail처럼 폴더에 두는 편이 낫다.
+- 웹용 mp3·네이티브용 ogg처럼 플랫폼마다 다른 파일이 필요 없는 형식(wav)이면 더 쉽다.
+
+### 창 ✕
+- 기록을 "바뀔 때마다 + 임시 파일에 쓰고 이름 바꾸기"로 쓰는 게임이면 ✕로 꺼도 잃는 것이 없다 — `prevent_quit`가 필요 없다(knellroot 0135). 주기·장면 경계에서만 쓰는 게임은 아래 "PC에서만 필요한 것"대로 붙잡는다.
+
 ## OS마다
 | | 빌드 | 묶음 | 함정 |
 |---|---|---|---|
@@ -59,7 +71,7 @@ macroquad(miniquad)는 Windows·macOS·Linux를 원래 지원해 코드 변경�
   - 확인 못 함: Windows·macOS 실행 파일 자체의 크기(묶음 크기로만 미루어 봄).
 
 ## PC에서만 필요한 것
-- 타이틀 "끝내기"(`miniquad::window::order_quit`), 전체 화면 토글(`set_fullscreen`, F11) — 웹·모바일 빌드에서는 숨긴다(`cfg!(not(any(wasm32, android, ios)))`).
+- 타이틀 "끝내기"(`miniquad::window::order_quit`), 전체 화면 토글(`set_fullscreen`, F11 — 키 배치 밖에 둔다), 다음에 켤 때 기억(설정 칸 → 시작 `conf.fullscreen`), 창 아이콘(`Conf::icon` — 안 주면 miniquad 로고) — 웹·모바일 빌드에서는 숨긴다(`cfg!(not(any(wasm32, android, ios)))`).
 - 창 ✕로 닫을 때 저장: `prevent_quit()`로 닫기를 붙잡고 `is_quit_requested()`가 오면 런을 적은 뒤 `order_quit()`(nail 0264). 안 하면 ✕가 저장 없이 끝낸다.
 
 ## 비용·서명

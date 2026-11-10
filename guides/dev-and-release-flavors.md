@@ -4,9 +4,10 @@ type: guide
 tags: [ci, deploy, github-actions, netlify, android, rust, gamedev]
 status: draft
 created: 2026-10-28
-updated: 2026-11-04
+updated: 2026-11-07
 verified: |
   1차 출처로 확인:
+    - 직접 실행(knellroot 0079, 2026-11-07): 개발판 타이틀에 `v0.3.3 dev 9abb60d`가 찍힌 것을 헤드리스 캡처로 봤고, 별칭 주소 build.txt의 SHA와 앞 7자리가 같았다.
     - 직접 실행(nail-under-the-roots 0227, 2026-10-28): release/v0.6에 쌓인 고침·그림을 main에 합쳐 v0.5.1로 냈다(release·deploy-web·build-android·pages·build-ios·smoke-web 모두 성공, Release에 APK).
     - 직접 실행(nail-under-the-roots 0193, 2026-10-28): release/v0.5 push에서 Netlify `--alias=dev` 배포 뒤 별칭 주소의 build.txt가 그 커밋 SHA였다(deploy-web 157·159 성공). 같은 push의 build-android가 패키지 `io.github.aimenjoe.nail.dev`, 이름 "Naïl dev"인 APK를 지어(aapt2 badging) 미리 보기 Release `dev`에 올렸다(351). main은 `--no-default-features`로 지었고 APK가 개발 판보다 작았다(17 968 002 vs 17 984 386 바이트).
     - cargo-quad-apk 소스(rev d411c8f): `package_name`으로 Java 패키지 경로·`TARGET_PACKAGE_NAME`·JNI 함수 이름(`Java_<패키지>`)을 함께 짓는다. `build` 명령은 cargo의 `--features`/`--no-default-features`를 받는다(`arg_features`, `compile_options`).
@@ -40,6 +41,7 @@ sources:
 ### 따로 열기 — 웹
 - Netlify(CLI 업로드 모델): 같은 사이트에 `netlify deploy --alias=dev`(`--prod` 없이). 주소 `dev--<사이트>.netlify.app`. 오리진이 달라 localStorage가 운영판과 갈린다.
 - 배포 뒤 확인: `dist/build.txt`에 커밋 SHA를 써 두고, 별칭 주소에서 읽어 비교 — 다르면 CI 실패. `--json` 출력의 `deploy_url`이 별칭 주소다.
+- **개발판은 화면에 커밋 해시를 쓴다**(사장 판정, knellroot 0079): 버전만 같으면 "지금 보는 게 새 빌드인가"를 말할 수 없다. 타이틀 버전 옆에 짧은 해시(`v0.3.3 dev 9abb60d`). `build.rs`가 CI의 `GITHUB_SHA`(없으면 `git rev-parse`)를 컴파일 환경 변수로 넘긴다. 운영판은 버전만.
 - 개발판 HTML에 `<meta name="robots" content="noindex, nofollow">`와 탭 이름 표시.
 
 ### 따로 깔기 — Android·iOS

@@ -164,15 +164,14 @@ Android 게임패드 버튼 키코드(공식 문서 확인값): `BUTTON_A 96(0x6
 
 합쳐서 예상(200줄)보다 작았지만(버튼 13줄 + 축 50줄 안팎 + 키 반복 몇 줄) **miniquad 포크를 유지**하게 된다(`PATCHED.md`에 고친 곳 목록, miniquad를 올리면 다시 넣는다). 버튼(1)만 먼저 하고, 아날로그가 필요하다고 느낄 때 축(2)을 하는 순서가 싸다. 왼쪽 스틱은 프레임워크가 D패드 키로 바꿔 주므로 메뉴·이동은 버튼 패치만으로 된다.
 
-## iOS: GameController를 프레임마다 읽기
-gilrs에는 iOS 백엔드가 없어 `gamepads`를 iOS 빌드에서 빼고, Apple `GameController` 프레임워크를 게임 쪽에서 직접 읽는다. Android와 달리 **miniquad를 고칠 필요가 없다**: Android는 OS가 이벤트를 밀어 주어 엔진의 이벤트 길(Java → JNI)에 끼워야 했지만, `GCController`는 지금 값을 들고 있어 게임 루프에서 물으면 된다(Apple도 고정 간격 루프면 폴링을 권한다).
+## iOS
+gilrs에 iOS가 없어 `gamepads`는 빈 패드다(iOS 빌드에서 뺀다). Apple `GameController`를 게임 루프에서 폴링해 잇는다 — Android와 달리 OS가 이벤트를 밀어 주지 않고 프레임워크가 지금 값을 들고 있어서다(Apple도 고정 간격 루프면 폴링을 권한다). 다리를 놓는 두 길(miniquad 사본이 F13~F24 키 + `joystick_axes`로 넘기기 — knellroot 0137 / 게임 쪽 모듈이 `objc-rs`로 읽어 동작으로 — nail 0288)과 두 길 모두 꼭 할 것(링크 보장·`Class::get`·연결 알림·autoreleasepool·합치기·Info.plist 키)은 [macroquad iOS 빌드](ios-build.md) "게임패드". 여기는 API 쪽 사실:
 
-- **Objective-C 호출**: miniquad가 Apple에서 이미 쓰는 `objc-rs`(`objc = { package = "objc-rs" }`)를 같은 판으로 iOS 의존성에 더하면 새 크레이트 없이 `msg_send!`를 쓴다(타입이 있는 `objc2-game-controller`도 있지만 objc2 묶음이 딸려 온다). 프레임워크 링크는 `#[link(name = "GameController", kind = "framework")] extern "C" { static GCControllerDidConnectNotification: *mut Object; }` — 상수 하나를 쓰면 링크도 확실해진다.
-- **연결**: `+[GCController controllers]`를 프레임마다 읽고, 처음 한 번 `GCControllerDidConnect/DidDisconnectNotification`을 빈 처리기로 구독한다(`ClassDecl`로 NSObject 하위 클래스 + 메서드 하나). iOS 15부터 프레임워크는 목록을 처음 읽거나 알림을 구독할 때 찾기 시작해 첫 목록이 빌 수 있다 — 매 프레임 다시 읽으면 상관없다.
-- **짝**: `extendedGamepad`(nil이면 확장 프로필 없는 기기 — 거른다)의 `buttonA/B/X/Y`는 자리(A = 아래)다. Start = `buttonMenu`, Select = `buttonOptions`, 스틱 누르기 = `left/rightThumbstickButton`(앞 둘 iOS 13+, 뒤 둘 12.1+ — 최소판을 14로 두면 다 있다), 트리거도 `isPressed`가 있는 버튼. 스틱·D패드는 `GCControllerDirectionPad`(`xAxis`·`yAxis` → `value`, **위가 +y** — 화면 좌표로 뒤집는다, `up/down/left/right` → `isPressed`). 홈 버튼은 시스템 몫(게임 센터·스크린숏)이라 읽지 않는다. `preferredSystemGestureState`로 끌 수 있지만 Apple은 "드문 경우"만 권하고 시스템이 안 따를 수도 있다.
+- **짝**: `extendedGamepad`(nil이면 확장 프로필 없는 기기 — 거른다)의 `buttonA/B/X/Y`는 자리(A = 아래)다. Start = `buttonMenu`, Select = `buttonOptions`, 스틱 누르기 = `left/rightThumbstickButton`(앞 둘 iOS 13+, 뒤 둘 12.1+ — 최소판을 14로 두면 다 있다, 그래도 옛 패드는 nil일 수 있다), 트리거도 `isPressed`가 있는 버튼. 스틱·D패드는 `GCControllerDirectionPad`(`xAxis`·`yAxis` → `value`, **위가 +y** — 화면 좌표로 뒤집는다, `up/down/left/right` → `isPressed`).
+- **홈 버튼**은 시스템 몫(게임 센터·스크린숏)이라 읽지 않는다. `preferredSystemGestureState`로 끌 수 있지만 Apple은 "드문 경우"만 권하고 시스템이 안 따를 수도 있다.
 - **nil 주의**: Objective-C에서 nil에 보낸 메시지는 0을 돌려주지만, `objc` 크레이트의 `msg_send!`는 포인터를 `&*obj`로 바꾸므로 nil이면 Rust 쪽 UB다 — 보내기 전에 null을 거른다.
-- **눌림 에지**: 프레임워크는 지금 상태만 주므로 지난 프레임 값을 들고 견준다. 한 프레임 상태를 순수한 값(버튼 배열·D패드·스틱)으로 만들고 "두 프레임 → 액션" 함수를 두면 리눅스에서도 시험할 수 있다(iOS 코드는 리눅스에서 `cargo clippy --target aarch64-apple-ios`까지만 돈다).
-- **Info.plist**: Xcode의 Game Controllers 기능이 넣는 두 키를 손으로 — `GCSupportsControllerUserInteraction` = true, `GCSupportedGameControllers` = [{`ProfileName`: `ExtendedGamepad`}]. App Store의 컨트롤러 지원 표시 근거(2차).
+- **눌림 에지**: 프레임워크는 지금 상태만 주므로 지난 프레임 값을 들고 견준다. 게임 쪽 길이면 한 프레임 상태를 순수한 값(버튼 배열·D패드·스틱)으로 만들고 "두 프레임 → 액션" 함수를 두어 리눅스에서도 시험한다(iOS 코드는 리눅스에서 `cargo clippy --target aarch64-apple-ios`까지만 돈다).
+- **연결**: iOS 15부터 프레임워크는 `controllers`를 처음 읽거나 알림을 구독할 때 찾기 시작해 첫 목록이 빌 수 있다 — 매 프레임 다시 읽으면 상관없다. 알림 처리기는 비워도 된다(`ClassDecl`로 NSObject 하위 클래스 + 메서드 하나).
 - 진동은 `controller.haptics` → Core Haptics 엔진이라 따로 일이 크다.
 
 ## 터치 (웹·모바일 브라우저)
