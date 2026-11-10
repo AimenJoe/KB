@@ -1,10 +1,10 @@
 ---
 title: "지도: CI/CD와 호스팅"
 type: map
-tags: [ci, deploy, hosting, github-actions, netlify]
+tags: [ci, deploy, hosting, github-actions, netlify, cloudflare]
 status: verified
 created: 2026-10-24
-updated: 2026-11-04
+updated: 2026-11-10
 ---
 
 # 지도: CI/CD와 호스팅
@@ -27,6 +27,10 @@ updated: 2026-11-04
 ## Netlify
 - [CI에서 netlify-cli로 배포](../reference/netlify/deploy-from-ci.md) — Git CD vs CLI 업로드, 섞으면 덮어쓰기, 헤더/캐시
 - [정적 WASM 호스팅](../concepts/static-wasm-hosting.md) — 정적 호스트가 제공해야 하는 것
+
+## Cloudflare
+- [Email Routing — 도메인 메일 받기](../reference/cloudflare/email-routing.md) — MX·SPF만으론 부족, 주소마다 규칙 + 확인된 메일함, `550 5.1.1 Address does not exist`(RCPT 단계) = 규칙 없음, 보내기는 따로(Email Sending은 Workers Paid)
+- [정적 사이트 운영에 쓰기](../reference/cloudflare/static-site-extras.md) — 프록시 뒤 엣지 통계·쿠키 없는 Web Analytics(Free는 하위 도메인 전체에 주입)·리디렉트, R2 내려받기 무료, Pages/Workers 파일 25 MiB
 
 ## 웹 앱(PWA)
 - [웹 게임을 PWA로](../reference/web/pwa-install-fullscreen-orientation.md) — 매니페스트·빌드 SHA 캐시 서비스 워커(skipWaiting 없음)·no-cache 헤더, 전체 화면·가로 잠금은 Android/데스크톱만, iPhone 홈 화면 앱은 저장소가 따로
