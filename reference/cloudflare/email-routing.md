@@ -6,7 +6,8 @@ status: verified
 created: 2026-11-10
 updated: 2026-11-10
 verified: |
-  1차 출처로 확인(2026-11-10, Cloudflare 공식 문서 검색): 받은 메일의 처리 순서(SMTP 받기 → SPF·DKIM·DMARC·ARC 검사 → 받는 주소를 라우팅 규칙과 맞춤,
+  1차 출처로 확인(2026-11-10, Cloudflare 공식 문서 — 검색 색인으로 찾고 라이브 페이지 `…/index.md`를 받아 아래 숫자·문장을 대조함.
+  페이지 최종 수정: email-lifecycle 2026-09-16, email-routing-addresses 2026-10-15, pricing 2026-06-09, send-emails 2026-06-25, Email Service 첫 쪽 2026-10-15): 받은 메일의 처리 순서(SMTP 받기 → SPF·DKIM·DMARC·ARC 검사 → 받는 주소를 라우팅 규칙과 맞춤,
   맞는 규칙이 없으면 catch-all이 켜져 있을 때만 적용 → 동작: 메일로 전달·Worker·버림), 전달은 확인된 destination address로만 가고
   확인 전에는 그 주소를 가리키는 규칙이 꺼져 있다, Email Routing(받기)은 Workers Free·Paid 둘 다 무제한,
   Email Sending(보내기)은 2026-04-16 공개 베타 — 아무 주소로 보내려면 Workers Paid(월 3,000통 포함, 이후 1,000통당 $0.35),

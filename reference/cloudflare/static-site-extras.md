@@ -6,7 +6,8 @@ status: draft
 created: 2026-11-10
 updated: 2026-11-10
 verified: |
-  1차 출처로 확인(2026-11-10, Cloudflare 공식 문서 검색):
+  1차 출처로 확인(2026-11-10, Cloudflare 공식 문서 — 검색 색인으로 찾고 라이브 페이지 `…/index.md`를 받아 숫자를 대조함.
+  페이지 최종 수정: web-analytics/faq 2026-07-14, web-analytics/limits 2026-08-12, workers/platform/limits 2026-10-29, pages/platform/limits 2026-09-05, pages/functions/pricing 2026-09-08, r2/pricing 2026-10-30):
   Web Analytics — 쿠키 없이 브라우저 비컨으로 Core Web Vitals·방문을 잰다, 프록시(주황 구름)된 사이트는 응답에 자동 주입(Free 플랜은 규칙 0개라 그 영역의 모든 하위 도메인에),
   DNS만(회색 구름)이면 손으로 스크립트, `Cache-Control: no-transform`이면 자동 주입이 안 된다, 비컨은 광고 차단기에 막힐 수 있고 엣지 통계(대시보드 Analytics)는 막히지 않는다.
   Workers/Pages 정적 파일 — 파일 하나 25 MiB, 버전당 파일 2만(Free)·10만(Paid), 정적 파일 요청은 무료·무제한, Workers Free 하루 10만 요청·CPU 10ms.
