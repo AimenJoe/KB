@@ -4,7 +4,7 @@ type: reference
 tags: [github-actions, ci-cd, security, rust, supply-chain]
 status: draft
 created: 2026-11-04
-updated: 2026-11-05
+updated: 2026-11-12
 verified: |
   1차 출처로 확인(2026-11-04, GitHub docs 원문 저장소의 마크다운을 curl로 받아 읽음):
   - "Secure use reference": 액션 하나가 뚫리면 그 잡의 시크릿·GITHUB_TOKEN에 닿는다. 가장 강한 방법은 워크플로 잠금 파일,
@@ -19,6 +19,9 @@ verified: |
   - netlify-cli 23.15.1 소스(npm 패키지): `deploy --json`의 출력에 `--prod`일 때만 `url`(사이트 주소)이 붙는다. 그 밖에는 `deploy_url`.
   직접 해 봄(nail-under-the-roots, 2026-11-04): 액션 11종을 SHA + `# v태그` 주석으로 바꾸고, Rust를 `rust-toolchain.toml`의 1.99.1로,
   dtolnay(master SHA + `toolchain` 입력)·rust-cache를 묶은 액션 하나로 — 결과는 아래 "실행 결과".
+  직접 겪음(knellroot, 2026-11-12 — 고정하지 않은 쪽의 값): `rust-toolchain.toml`이 `channel = "stable"` + 액션 `@stable`인 레포에서, Rust 1.100.0이 나온 뒤
+  첫 push의 deploy-web이 clippy에서 깨졌다(`needless_bool` — 43초 만에, 그 커밋이 건드리지 않은 파일). 로컬은 1.99.1이라 같은 검사를 통과한 뒤였다.
+  `rustup update stable` 뒤 로컬에서 하나가 더 나왔다(`needless_range_loop`). 둘을 고쳐 통과 — 개발판 배포는 그 사이 한 번 걸렀다.
   확인 못 함: 잠금 파일 기능을 무료 공개 레포에서 지금 쓸 수 있는지(문서가 기능 플래그 아래), Dependabot이 `# master` 주석의 SHA를 어떻게 올리는지.
 sources:
   - https://docs.github.com/en/actions/reference/security/secure-use
@@ -53,6 +56,7 @@ sources:
 고정의 목적은 "리뷰한 코드가 실행되는 코드"가 되게 하는 것이다. 태그·`stable`은 리뷰한 뒤에도 바뀐다. SHA·버전 숫자는 바뀌지 않고, 바꿀 때는 커밋(PR)으로 보인다 — 그래서 변경이 기록되고 되돌릴 수 있다. 대가는 올리기 수고인데, 그것은 Dependabot·toml 한 줄로 줄인다.
 
 ## 함정
+- 고정하지 않으면(`stable`) **Rust가 새로 나온 날의 첫 push가 그 커밋과 무관한 clippy 지적으로 깨진다** — 그리고 로컬은 옛 버전이라 "로컬에서는 통과했는데"가 된다(knellroot 2026-11-12, 1.99.1 → 1.100.0). 고정하지 않을 거라면 push 전 검사 목록의 맨 앞에 `rustup update stable`을 둔다. 실패가 빌드 전(1분 안)이고 손댄 적 없는 파일을 가리키면 이것부터 의심한다.
 - dtolnay/rust-toolchain의 `@stable`·`@1.89.0` 갈래 커밋은 master 역사 밖이라 SHA로 고정하면 사라질 수 있다 — master의 SHA + `toolchain` 입력.
 - 로컬 묶은 액션(`uses: ./.github/actions/x`)은 checkout 뒤에만 쓸 수 있다.
 - Dependabot의 `target-branch`를 마일스톤 갈래로 두면 갈래가 바뀔 때 같이 바꿔야 한다(안 바꾸면 없는 갈래로 PR을 못 만든다).
