@@ -4,7 +4,7 @@ type: guide
 tags: [gamedev, epic, rust, release, achievements, github-actions]
 status: draft
 created: 2026-11-04
-updated: 2026-11-06
+updated: 2026-11-13
 verified: |
   1차 출처로 확인(2026-11-04, dev.epicgames.com 원문을 헤드리스 브라우저로 읽음 — store.epicgames.com은 봇 확인 창에 막힘):
   - EOS "Log In with an Epic Games Account"(Connect): Auth 로그인 → EOS_Auth_CopyIdToken → EOS_Connect_Login(EOS_ECT_EPIC_ID_TOKEN) →
@@ -23,6 +23,8 @@ verified: |
   2026-11-05 더함(dev.epicgames.com 원문, 헤드리스 브라우저): 클라이언트 정책 종류(Client & Client Policy Reference·Guide),
     EAS 신청 단계(Get Started with Epic Account Services), 브랜드 검토의 도메인 확인(Brand Review Process·Domain Verification), Epic Games ID 제공자는 설정 불필요(Identity Provider Management).
     직접 봄: 포털의 제품 설정 화면(제품·Live 샌드박스·Live 배포 아이디가 상품을 만들면 바로 생기고, 클라이언트는 따로 만든다).
+  2026-11-13 바로잡음(Domain Verification 원문을 검색 요약으로 읽음 — dev.epicgames.com 직접 접속은 세션에서 막힘): 최상위 도메인 승인 = 하위 도메인 자동 승인(전엔 반대로 적었다),
+    도메인 확인과 브랜드 검토의 주소 꼴을 맞춘다, 메일용 하위 도메인은 따로 확인.
   2차 출처만 있음: 런처 인자 이름 `-AUTH_PASSWORD=<교환 코드>`(포럼·gist — 원문 참조 문서 "Auth Interface Reference > Epic Games Launcher"는 못 읽음).
   확인 못 함: EOS 로컬 언어 코드 꼴(zh-Hans·pt-BR 등), EGS 업적(XP) 일괄 올리기 템플릿, BuildPatchTool의 macOS 앱 실행 경로 꼴.
 sources:
@@ -75,7 +77,7 @@ Steam처럼 **Cargo 기능 하나**(`epic`, Windows만)로 가르고, 없으면 
 1. 조직·상품 만들기 → 제품 설정에 제품 ID·Live 샌드박스·Live 배포가 생긴다. 클라이언트는 없다.
 2. **클라이언트 정책** → **클라이언트**. 미리 정의된 정책은 Peer2Peer·TrustedServer·GameClient·`GameClient /w UnlockAchievements`. 업적만 여는 게임이면 마지막 것, 또는 사용자 지정(Achievements의 `unlockAchievementForLocalUser`·`findAchievementDefinitions`·`findAchievementsForLocalUser` — 문서는 운영판에 사용자 지정을 권한다). 정책 없이도 인증은 되지만 업적은 `EOS_ClientPolicyMissingAction`. TrustedServer 자격은 공개 빌드에 넣지 않는다.
 3. 교환 코드 로그인(`EOS_Auth_Login`)은 **Epic Account Services**라 EAS 신청이 따로 있다: 약관 → 브랜드 설정(앱 웹사이트·개인정보처리방침 URL·128px 로고) → 권한(Basic Profile은 필수) → 연결된 클라이언트 → 브랜드 검토. **검토를 통과하기 전에는 조직 밖 사용자가 로그인할 수 없다.**
-4. 앱 웹사이트는 조직 설정 → Domains에서 **DNS TXT 레코드로 소유를 확인한 도메인**이어야 하고, 사이트에 조직 이름·제품 이름과 소개가 있어야 한다(PEGI 12 이하 내용). 하위 도메인이 통과하면 상위 도메인도 통과로 본다.
+4. 앱 웹사이트는 조직 설정 → Domains에서 **DNS TXT 레코드로 소유를 확인한 도메인**이어야 하고, 사이트에 조직 이름·제품 이름과 소개가 있어야 한다(PEGI 12 이하 내용). **최상위(apex) 도메인이 승인되면 하위 도메인도 자동 승인**이다(반대가 아니다 — 2026-11-13 바로잡음). 메일 알림에 하위 도메인을 쓰면 그것은 따로 확인. 도메인 확인과 브랜드 검토에는 **같은 꼴의 주소**를 넣는다(`foo.com`으로 확인했으면 브랜드 검토에도 `foo.com`). 사이트에 상품·퍼블리셔 소개가 없으면 반려된다(포럼 사례).
 5. "Epic Games" ID 제공자(Connect)는 포털 설정이 필요 없다.
 
 ## 왜?
