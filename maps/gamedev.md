@@ -4,7 +4,7 @@ type: map
 tags: [gamedev, macroquad, rust, game-design, pixel-art, game-feel]
 status: verified
 created: 2026-10-24
-updated: 2026-11-10
+updated: 2026-11-14
 ---
 
 # 지도: 게임 개발
@@ -82,6 +82,7 @@ updated: 2026-11-10
 ## 판매·비즈니스
 - [Rust 게임을 Steam에 붙이기](../guides/steam-release-for-rust-games.md) — Cargo 기능 하나로 PC만·연결 없으면 그냥 켜기, SDK 재배포 파일은 크레이트가 복사(커밋 안 함), 업적 = 목표 목록에서 고른 표(API 이름 고정·숨김·등록표는 시험이 만든다·아이콘은 있는 그림에서), Auto-Cloud, 빌더 계정 + config.vdf + beta까지만 자동, macOS 공증은 필수 아님(2차), 가격 바닥 $0.99, Deck 글자 9px·패드 글자만
 - [Rust 게임을 Epic Games Store에 붙이기](../guides/epic-games-store-for-rust-games.md) — Cargo 기능 epic(Windows만), 런처 교환 코드 → Epic 계정 → ID 토큰 → EOS Connect(처음이면 사용자 만들기) → 업적, eos-sys 바인딩에 업적 함수가 없어 직접 extern, EOS 일괄 CSV 두 장 + 아이콘 zip, Epic 상점 XP 합 1,000(5~200·5의 배수, 올린 뒤 못 바꿈), BuildPatchTool UploadBinary
+- [Epic Games Store 검토 통과와 출시](../guides/epic-games-store-review-and-release.md) — 반려 사유별 고치기(푸터·캐러셀 영어로만, 지원 링크에 GitHub 금지, Epic ID, slug는 처음 이름으로 굳음 → 비공개 토론), EAS(브랜드 = 동의 창 얼굴, 방침에 Epic이 하는 일을 쓰지 않기, 오퍼에 연결), Dev → Stage → 검토 → Live, 정해진 출시일이 없으면 "출시 예정"
 - [인디 게임을 팔 때의 규칙과 숫자](../reference/game-business/selling-an-indie-game-rules-and-numbers.md) — Steam Direct·Coming Soon 2주·Next Fest 게임당 한 번·AI 공개(Pre/Live-Generated)·원천징수(한국 저작권 10%), 위시리스트 전환·AI 표시 게임의 성과, Play(한국 15%)·Android 개발자 확인·Apple·itch, Gemini 약관, 한국 비영리 등급 면제
 
 ## 다국어

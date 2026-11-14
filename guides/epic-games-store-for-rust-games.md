@@ -96,6 +96,7 @@ Steam처럼 **Cargo 기능 하나**(`epic`, Windows만)로 가르고, 없으면 
 - Epic 상점 페이지 문서(store.epicgames.com)는 봇 확인에 막히는 일이 있다 — dev.epicgames.com 문서가 같은 내용을 더 자세히 가진다.
 
 ## 관련 노트
+- [Epic Games Store 검토 통과와 출시](epic-games-store-review-and-release.md) — 포털 쪽: 반려 사유별 고치기, EAS 브랜드 검토, Dev → Stage → Live
 - [Rust 게임을 Steam에 붙이기](steam-release-for-rust-games.md)
 - [인디 게임을 팔 때의 규칙과 숫자 — Epic 표](../reference/game-business/selling-an-indie-game-rules-and-numbers.md)
 - [공개 레포에서 배포 파이프라인 지키기](protect-deploy-pipeline-in-public-repo.md)
