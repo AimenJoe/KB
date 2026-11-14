@@ -1,0 +1,79 @@
+---
+title: 무기 강화 설계 — 갇힘(매몰 비용)·재료의 수·체감되는 단·보이는 변화
+type: concept
+tags: [gamedev, game-design, combat, loot, progression]
+status: draft
+created: 2026-11-14
+updated: 2026-11-14
+verified: |
+  1차 출처로 확인: 없음 — 이 노트는 아직 구현 전 조사다(Knellroot v0.6.1 W1 무기 강화 인터뷰 준비, 2026-11-14). 만든 뒤 1차 결과를 덧붙인다.
+  2차 출처(위키·공략·개발자 블로그·포럼)만 있음:
+  - Hollow Knight 못: 기본 5 → 9 → 13 → 17 → 21(단마다 +4, 끝에서 4.2배 — 팬 위키 표, 여러 출처가 같은 값). 첫 단은 돈만, 그 뒤는 돈 + 창백한 광석(지도에 정해진 수만 있다). 단마다 못의 이름이 바뀐다(Old → Sharpened → Channelled → Coiled → Pure). 광석 비용은 출처마다 다르게 적혀 있다(2·3개 등 — 확인 못 함). 마법은 못 강화를 따르지 않는 따로의 줄. 플레이어 글에는 "강화가 생각보다 약하다"는 말과 "보스에게 맞는 대 수가 거의 반으로 준다"는 말이 함께 있다.
+  - Elden Ring: 보통 무기 +25(보통 돌, 단마다 드는 돌이 는다)와 특별 무기 +10(침울한 돌, 적게 들지만 드물다) 두 줄. 두 줄이 서로의 재료를 빼앗지 않아 특별 무기 하나를 따로 키울 수 있다(공략 글). 보통 돌이 모자라 무기를 바꾸기 어렵다는 불만(GamesRadar 의견 글), 확장판에서 재료가 곡선을 따라잡게 했다는 평.
+  - Dark Souls 3: 조각 → 큰 조각 → 덩이 → 판으로 +10, 보스 무기는 비늘·판으로 +5. 강화는 바탕 피해와 능력치 보정을 같이 올린다(사용자 설명 — 단마다의 퍼센트는 확인 못 함).
+  - Hades: 판 안의 망치(임시) + 판 밖의 무기 양상(Aspect, 영구 — 무기 4양상 × 5단, 티탄의 피). 첫 양상은 싸고(5) 나머지는 비싸다(15 안팎), 다 올리려면 306. 강한 양상은 이야기·시련으로 열린다.
+  - 갇힘: 무기마다 따로 강화하고 재료가 모자라면 쌓은 강화가 아까워 다른 무기를 못 고른다(Elden Ring 설계 비평 블로그 — 본문은 못 열었고 검색 요약만, 보스마다 재료를 풀어 여러 무기를 같은 단까지 올린 뒤 고르게 하자는 제안). BioShock·Ratchet & Clank에서 "아끼는 하나만 끝까지 올리고 나머지는 거의 안 쓴다"는 관찰(분석 글·포럼).
+  - 대안 넷(인디 개발자 블로그, 무기 30개·단 넷): 같은 무기를 또 주워야 오른다(깔끔하지만 겹칠 확률 6%로 답답) · 새로 주운 무기가 바꾼 무기의 단을 이어받는다(실험을 부르지만 주고받기로 둘 다 올리는 꼼수) · 겹침 확률을 올린다(다 올린 것만 또 나온다) · "지금 든 무기를 올리는 조커" 줍는 것.
+  - 강제로 바꾸게 하는 것(BotW 무기 부서짐)은 실험을 부르려 했지만 플레이어가 크게 싫어했다(Digital Trends).
+sources:
+  - https://www.hollowknight.wiki/w/Damage_Values_and_Enemy_Health_(Hollow_Knight)
+  - https://hollowknight.wiki.fextralife.com/Coiled+Nail
+  - https://steamcommunity.com/app/367520/discussions/0/1319961618828291215
+  - https://eldenring.wiki.fextralife.com/Somber+Smithing+Stones
+  - https://eldenring.wiki.gg/wiki/Smithing_Stones
+  - https://www.gamesradar.com/games/action-rpg/elden-ring-shadow-of-the-erdtree-makes-one-change-to-weapon-upgrading-thats-so-good-i-want-fromsoftware-to-patch-it-into-the-base-game-immediately
+  - https://darksouls3.wiki.fextralife.com/Upgrades
+  - https://www.gamesradar.com/hades-weapon-upgrades
+  - https://www.rpgsite.net/feature/10254-hades-infernal-arms-weapon-aspects-guideevery-weapon-aspect-and-upgrade-unlock
+  - https://accordion-star-leya.squarespace.com/blog/design-thoughts-elden-rings-weapon-upgrade-economy
+  - https://gamedev.net/blogs/entry/2263828-weapon-upgrade-system-designs-and-limitations/
+  - https://gamedeveloper.com/design/ammo-systems-and-bioshock
+  - https://www.digitaltrends.com/gaming/elden-ring-botw-weapon-degradation/
+---
+
+# 무기 강화 설계
+
+## 요약
+무기 강화는 네 가지를 먼저 정한다: **① 무기를 바꿀 자유를 지키나**(강화가 무기마다 따로면 쌓은 것이 아까워 하나에 갇힌다), **② 재료는 정해진 수인가 무한인가**(정해진 수면 보스마다 내 힘을 예측할 수 있다), **③ 한 단이 체감되나**(맞히는 대 수가 줄어야 느낀다), **④ 오른 것이 보이나**(이름·꼴·빛이 바뀐다). 무기가 적고 저마다 쓰임이 다른 게임은 갇힘을 줄이는 쪽(하나의 단을 나눠 쓰기·되돌리기·이어받기)이 맞다.
+
+## 본문
+
+### ① 갇힘 — 무기마다 따로 올리면 생기는 일
+- 재료가 모자라고 무기마다 따로 오르면, 쌓은 강화가 클수록 새 무기를 집어 들지 않는다 — 아끼는 하나만 끝까지 올리고 나머지는 상자 속에 남는다(여러 게임의 관찰, 2차).
+- 덜어 내는 꼴:
+  - **하나의 단**: 무기가 하나뿐이거나(Hollow Knight 못), 모든 무기가 같은 단을 쓴다 — 갇힘이 없다. 대신 "이 무기를 키웠다"는 애착이 옅다.
+  - **두 줄**: 많은 무기는 흔한 재료, 특별한 소수는 드문 재료(Elden Ring) — 특별한 무기 하나를 주력과 따로 키울 수 있다.
+  - **되돌리기·옮기기**: 쉼터에서 강화를 거둬 다른 무기에(값을 받고) — 기술 판의 되돌리기와 같은 꼴.
+  - **이어받기**: 새로 얻은 무기가 지금의 단(또는 한 단 아래)에서 시작한다 — 실험을 부르지만, 주고받기로 둘 다 올리는 꼼수를 막아야 한다.
+  - **보스마다 재료를 풀기**: 여러 무기를 같은 단까지 올린 뒤 고르게 한다(비평 블로그의 제안).
+- 강제로 바꾸게 하는 장치(부서짐)는 실험을 부르기보다 짜증을 부른다 — 자유를 지키는 쪽이 낫다.
+
+### ② 재료 — 정해진 수의 장점
+- 지도에 놓인 정해진 수의 재료(Hollow Knight 광석)는 **탐험의 보상이 곧 힘**이 되고, 설계자는 각 보스 앞의 최대 단을 셀 수 있다 — 싸움 모의·난이도 문턱을 계산할 수 있다.
+- 무한 재료(가게·되풀이 사냥)는 갈아서 넘을 길을 주지만, 갈기가 곧 정답이 되기 쉽다.
+- 화폐가 이미 둘이면(몸 = 잔불, 기술 = 점수) 셋째 화폐는 화면과 머릿속을 무겁게 한다 — 새 재료는 "줍는 물건"으로 두고 값은 있는 화폐로(Hollow Knight: 돈 + 광석).
+
+### ③ 한 단이 체감되게 — 대 수의 문턱
+- 피해가 조금 올라도 **같은 적을 쓰러뜨리는 대 수가 그대로면 느끼지 못한다**(Hollow Knight 강화가 "약하다"는 글과 "보스에게 대 수가 반으로"라는 글이 함께 있는 까닭 — 잡몹은 대 수가 그대로, 보스는 크게 준다). 단의 값은 흔한 적의 체력에서 **대 수가 하나 줄어드는 값**에 맞춘다.
+- 단 수는 적게·한 단을 크게(Hollow Knight 4단, Hades 5단)가 촘촘한 +25보다 작은 게임에 맞다.
+- 첫 단은 싸고 가깝게(Hollow Knight 첫 단 = 돈만, Hades 첫 양상 = 5) — 장치를 일찍 보여 준다.
+
+### ④ 오른 것이 보이게
+- 단마다 이름이 바뀐다(Old → Pure Nail), 강한 단은 이야기·시련으로 연다(Hades). 숫자만 오르는 강화보다 기억에 남는다.
+- 3D 무기라면 날의 빛·테·결이 단마다 조금씩 — 판정 크기를 키워 보이게 하지 않는다(그림이 판정보다 크면 손이 속는다).
+
+## 왜?
+강화는 "성장"과 "고르는 재미"가 부딪치는 자리다. 성장은 쌓일수록 좋고, 고르기는 쌓인 것이 없을수록 자유롭다. 무기마다 따로 쌓으면 성장이 고르기를 먹는다. 그래서 먼저 "이 게임에서 무기 고르기가 얼마나 중요한가"를 정하고, 그만큼 갇힘을 덜어 낸다. 한 단의 크기를 대 수로 재는 까닭은 플레이어가 숫자가 아니라 **몇 번 휘둘렀나**로 강해짐을 느끼기 때문이다.
+
+## 함정
+- 강화로 판정 창(패링·회피 무적)을 넓히면 성장이 실력을 대신한다 — 강화는 피해·자세 같은 "결과"만.
+- 단마다의 값을 보스 체력에만 맞추면 잡몹에서는 아무것도 안 바뀐다(위 ③).
+- 이어받기에는 주고받기 꼼수 — 이어받는 것은 "가진 것 가운데 가장 높은 단 −1" 같은 꼴로.
+- 정해진 수의 재료를 지도 앞쪽에 몰면 초반이 너무 쉬워진다 — 재료의 자리로 곡선을 짠다.
+- 수치를 출처마다 다르게 적는 위키가 많다 — 남의 게임의 값은 모양(단 수·비율)만 빌린다.
+
+## 관련 노트
+- [능력치·장비 설계](action-rpg-stats-and-equipment.md) — 무기는 모양·장신구는 수치·성장은 영구
+- [영구 성장 해금을 계획할 수 있게](meta-progression-unlock-planning.md) — 칸·합계·모자람이 보이게
+- [로그라이트 회복과 화폐](roguelite-healing-and-currency.md) — 화폐를 늘리지 않는 쪽
+- [혼자 만드는 액션 로그라이트](action-roguelite-for-solo-dev.md)
