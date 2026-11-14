@@ -4,8 +4,12 @@ type: reference
 tags: [macroquad, rust, gamedev, 3d, rendering, camera]
 status: verified
 created: 2026-11-03
-updated: 2026-11-10
+updated: 2026-11-14
 verified: |
+  1차(소스 + 직접 실행, 2026-11-14, knellroot 0186, macroquad 0.4.16·miniquad 0.4.11 웹): `get_internal_gl().flush()` 뒤 `get_active_render_pass`·
+  `get_projection_matrix`로 같은 패스·투영에 miniquad 고정 버퍼(Immutable)를 그려 구운 지형의 85%(정원: 바닥 72k + 고정 175k 정점)를 상주시켰다.
+  같은 장면 스크린숏이 같고(그림자·풀 흔들림·외곽선), 헤드리스 Chromium(SwiftShader)에서 프레임마다 올리는 정점 351k → 104k, 우리 코드 CPU 30~35 → 13~16ms,
+  `leak.js` 70초 버퍼 수 평평. **실기기(GPU) 숫자는 아직 없다** — SwiftShader는 GPU를 CPU로 흉내 내 업로드 몫이 기기와 다르다.
   1차(직접 구현·헤드리스 실행, 2026-11-10, knellroot 0142, macroquad 0.4.16 웹): 사용자 재질의 정점 셰이더에 `attribute vec4 normal;`을 적으면 `Vertex.normal`(Vec4)이
   그대로 들어온다 — xyz에 면 법선, **w에 정점마다의 값**(흔들림 몫)을 실어 한 번 구운 지형 메시의 풀 끝·잎·불꽃만 움직였다(멈춘 장면 0.5초 간격 스크린숏에서 그 화소만 달라짐).
   기본 셰이더는 이 칸을 읽지 않는다(아래 소스 확인과 같은 줄기). 폰·핸드헬드에서의 비용은 재지 않았다.
@@ -63,9 +67,20 @@ macroquad의 3D는 **"카메라 행렬 + 즉시 모드 삼각형"** 까지다. `
 
 ### 메시와 배치
 - `Mesh`는 `Vec<Vertex>` + `Vec<u16>` 인덱스 + 텍스처 하나. 정점 65,536개 넘는 메시는 쪼갠다.
-- **GPU에 머무는 메시는 없다.** 매 프레임 모든 정점이 다시 올라간다. 그래서 CPU에서 정점을 변형(부위별 회전, 스키닝)해 보내도 추가 비용이 거의 없다 — 모델 행렬을 바꾸는 것(`gl.push_model_matrix`)은 드로콜을 가르지만, 정점을 미리 월드 좌표로 바꿔 한 텍스처로 보내면 **한 드로콜**이다. 레트로 3D에서는 "아틀라스 텍스처 하나 + CPU 변형 + 한 배치"가 정석이다.
+- **GPU에 머무는 메시는 없다.** 매 프레임 모든 정점이 다시 올라간다(움직이지 않는 지형도 — 아래 "섞어 쓰기"). 그래서 CPU에서 정점을 변형(부위별 회전, 스키닝)해 보내도 추가 비용이 거의 없다 — 모델 행렬을 바꾸는 것(`gl.push_model_matrix`)은 드로콜을 가르지만, 정점을 미리 월드 좌표로 바꿔 한 텍스처로 보내면 **한 드로콜**이다. 레트로 3D에서는 "아틀라스 텍스처 하나 + CPU 변형 + 한 배치"가 정석이다.
 - 한 번의 `geometry()`가 용량을 넘으면 **에러 없이 잘린다**. 큰 지형 메시는 청크로 나누고, 용량은 `gl_set_drawcall_buffer_capacity`(숨김 함수)로 올릴 수 있다.
 - 새 드로콜이 갈리는 조건(텍스처·모델 행렬·파이프라인·유니폼)을 알고 그리기 순서를 정하면 드로콜 수가 수십 → 몇 개가 된다.
+
+### 섞어 쓰기: 움직이지 않는 것만 miniquad 고정 버퍼로
+- macroquad를 버리지 않고 그 아래 miniquad를 직접 부른다: `unsafe { get_internal_gl() }` → `.flush()`(쌓인 macroquad 그리기를 지금 카메라로
+  먼저 보낸다) → `quad_gl.get_active_render_pass()`·`quad_gl.get_projection_matrix()`로 **같은 렌더 패스·같은 투영**을 얻어 `quad_context`에
+  `begin_pass(pass, PassAction::Nothing)` → 우리 파이프라인·`BufferUsage::Immutable` 버퍼로 그린다 → `end_render_pass()`.
+  깊이 버퍼는 렌더 타깃 것을 그대로 쓰니 macroquad로 그린 몸들과 서로 가린다.
+- 정점 형식은 macroquad `Vertex`(위치 Float3·`texcoord` Float2·`color0` Byte4·`normal` Float4 = 40바이트) 그대로 올리고, 셰이더는
+  원래 macroquad 재질의 GLSL을 **같은 상수로** 함께 쓴다(유니폼 `Projection`·`Model`은 우리가 채운다 — `Model`은 단위).
+  텍스처는 `Texture2D::raw_miniquad_id()`, 1×1 흰 텍스처를 하나 두고 텍스처 없는 덩어리에 쓴다.
+- 지형을 다시 구우면 옛 버퍼를 `delete_buffer`로 지운다 — 안 그러면 GPU 메모리가 자란다([GPU 메모리](gpu-memory-growth.md)).
+- 덩어리마다 투명도가 바뀌는 것(가리면 옅어지는 벽)은 배치에 남겨 둔다 — 고정 버퍼로 옮기면 덩어리 수만큼 그리기 호출이 는다.
 
 ### 조명·재질
 - 기본 셰이더는 `color × texture`뿐. `normal`은 정점에 실려 가지만 **셰이더가 안 읽는다**. 램버트 한 줄이라도 `load_material`(커스텀 GLSL, WebGL1 = GLSL ES 1.0)로 쓴다. 2D에서 더하기 빛(`light_material`)을 쓰던 방식과 같다.
