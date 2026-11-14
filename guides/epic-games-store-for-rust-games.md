@@ -23,11 +23,13 @@ verified: |
   2026-11-05 더함(dev.epicgames.com 원문, 헤드리스 브라우저): 클라이언트 정책 종류(Client & Client Policy Reference·Guide),
     EAS 신청 단계(Get Started with Epic Account Services), 브랜드 검토의 도메인 확인(Brand Review Process·Domain Verification), Epic Games ID 제공자는 설정 불필요(Identity Provider Management).
     직접 봄: 포털의 제품 설정 화면(제품·Live 샌드박스·Live 배포 아이디가 상품을 만들면 바로 생기고, 클라이언트는 따로 만든다).
+  2026-11-13 더함(Brand Review Intro 원문 — 사용자가 붙여 준 한국어판, 실제 반려 사유): 개인정보처리방침은 Epic이 하는 일을 주장하지 않는다.
   2026-11-13 바로잡음(Domain Verification 원문을 검색 요약으로 읽음 — dev.epicgames.com 직접 접속은 세션에서 막힘): 최상위 도메인 승인 = 하위 도메인 자동 승인(전엔 반대로 적었다),
     도메인 확인과 브랜드 검토의 주소 꼴을 맞춘다, 메일용 하위 도메인은 따로 확인.
   2차 출처만 있음: 런처 인자 이름 `-AUTH_PASSWORD=<교환 코드>`(포럼·gist — 원문 참조 문서 "Auth Interface Reference > Epic Games Launcher"는 못 읽음).
   확인 못 함: EOS 로컬 언어 코드 꼴(zh-Hans·pt-BR 등), EGS 업적(XP) 일괄 올리기 템플릿, BuildPatchTool의 macOS 앱 실행 경로 꼴.
 sources:
+  - https://dev.epicgames.com/docs/epic-online-services/accounts-and-social/eos-epic-account-services/brand-review/brand-review-intro
   - https://dev.epicgames.com/docs/epic-online-services/eos-fundamentals/connect-interface/connect-guide/log-in-with-an-epic-games-account
   - https://dev.epicgames.com/docs/epic-online-services/accounts-and-social/eos-epic-account-services/auth-interface/integrate-a-third-party-launcher-with-egs
   - https://dev.epicgames.com/docs/epic-games-store/services/epic-achievements/achievements-setup
@@ -89,6 +91,7 @@ Steam처럼 **Cargo 기능 하나**(`epic`, Windows만)로 가르고, 없으면 
 - macOS 판은 EOS 오버레이가 없어 업적 의무가 면제 — 같은 기능을 macOS에서 켜도 연결 코드는 빈 손이게(cfg windows).
 - 개발자 포털의 제품 이름·EAS 애플리케이션 이름 칸은 특수 문자(`ï`·`:` 같은 것)를 받지 않는다(사용자가 직접 겪음, 2026-11-05 — 허용 문자 목록은 원문에서 못 찾음). `Naïl: Under the Roots` → `Nail Under the Roots`처럼 영문·숫자·공백으로. 상점 페이지 제목은 따로 정한다.
 - `<사용자>.github.io` 같은 남의 도메인은 DNS TXT를 넣을 수 없어 EAS 브랜드 검토의 도메인 확인을 못 한다 — 자체 도메인을 사서 같은 페이지를 사용자 지정 도메인으로 띄운다(확인한 사례는 없음, 문서 조건에서 따져 본 것).
+- **EAS 브랜드 검토의 개인정보처리방침에 Epic이 하는 일을 쓰지 않는다.** "Epic이 계정 식별자·프로필을 처리한다"·"처리 주체: Epic" 같은 줄로 반려됐다(2026-11-13, 사유 "개인정보처리방침에서는 에픽의 정책에 대해 설명합니다"). 평가 기준: 방침은 "에픽게임즈가 하는 일과 하지 않는 일에 대해 주장해서는 안 된다" — 게임이 하는 일(무엇을 받아 어디에 두는지)만 적고 Epic 계정은 Epic 방침 링크로 넘긴다. 같은 기준: 직접 URL·공개·데이터 보호 연락처·처리 대상과 공유·보관과 열람·삭제 방법.
 - 포털 "헤더 파일의 크리덴셜 사용"은 아이디를 소스에 박는 방식 — 공개 레포면 쓰지 말고 빌드 때 환경 변수로.
 - Epic 상점 페이지 문서(store.epicgames.com)는 봇 확인에 막히는 일이 있다 — dev.epicgames.com 문서가 같은 내용을 더 자세히 가진다.
 
