@@ -4,7 +4,7 @@ type: map
 tags: [gamedev, macroquad, rust, game-design, pixel-art, game-feel]
 status: verified
 created: 2026-10-24
-updated: 2026-11-10
+updated: 2026-11-14
 ---
 
 # 지도: 게임 개발
@@ -54,6 +54,7 @@ updated: 2026-11-10
 ## 게임 루프·전투감
 - [고정 타임스텝 게임 루프와 히트스톱](../concepts/fixed-timestep-and-hitstop.md) — 누적기 루프, 입력 래치, 보간, 히트스톱은 로직 시계만, trauma² 흔들림, 피해와 맞은 반응 가르기(독구름·장판은 넉백·히트스톱 없이)
 - [공격 타이밍 패링](../concepts/timing-parry.md) — 버튼 없이 스윙 첫 창 + 앞쪽, 회피 = 안전·패링 = 이득, 거울(막는 보스: 튕기고 반격, 아래·필살기로 뚫기)
+- [떼싸움 핵앤슬래시 로그라이트](../concepts/horde-hack-and-slash-roguelite.md) — 무쌍 + 로그라이트(Tears of Metal·Warriors: Abyss): 떼 = 잔디·장수 = 벽, 표장 계열은 효과형, 군대는 보이는 결과·런의 성장 축, 떼 속 가독성, 수십 vs 수백(인스턴싱·흐름장·대부분 서 있기)
 - [모든 행동에 재사용 대기](../concepts/action-reuse-gating.md) — 동작 시간·대기·게이지·쓰는 시간을 행동마다 고르기, 회복 = 먹는 시간 + 시작부터 대기, 패링 창 = 열린 순간부터 대기·성공하면 해제
 - [필살기의 임팩트](../concepts/special-move-impact.md) — 시동 정지(슈퍼 플래시), 화면 한 폭 거리, 넉백 > 속도로 끌고 가기, 소리 하나, 빠른 돌진 겨누기(시동 동안만 콘 안의 적 쪽으로 + 점선)
 - [근접 평타·모으기 공격의 손맛](../concepts/melee-light-and-charged-attack-feel.md) — 평타는 누르는 순간(모으기 때문에 떼는 순간에 묶지 않기), 작은 타격의 층(히트스톱 사다리·피격자 진동·카메라 킥·공격자 확인, trauma²는 작은 타격을 0으로), 모으기는 같은 시간의 콤보보다 세야(자세 깨기·벽 쿵), 박자 콤보는 반응 시간 밖의 템포 + 몸에서 닫히는 고리 + 창 전 입력은 박자에 스냅
