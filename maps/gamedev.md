@@ -86,6 +86,8 @@ updated: 2026-11-14
 ## 판매·비즈니스
 - [Rust 게임을 Steam에 붙이기](../guides/steam-release-for-rust-games.md) — Cargo 기능 하나로 PC만·연결 없으면 그냥 켜기, SDK 재배포 파일은 크레이트가 복사(커밋 안 함), 업적 = 목표 목록에서 고른 표(API 이름 고정·숨김·등록표는 시험이 만든다·아이콘은 있는 그림에서), Auto-Cloud, 빌더 계정 + config.vdf + beta까지만 자동, macOS 공증은 필수 아님(2차), 가격 바닥 $0.99, Deck 글자 9px·패드 글자만
 - [Rust 게임을 Epic Games Store에 붙이기](../guides/epic-games-store-for-rust-games.md) — Cargo 기능 epic(Windows만), 런처 교환 코드 → Epic 계정 → ID 토큰 → EOS Connect(처음이면 사용자 만들기) → 업적, eos-sys 바인딩에 업적 함수가 없어 직접 extern, EOS 일괄 CSV 두 장 + 아이콘 zip, Epic 상점 XP 합 1,000(5~200·5의 배수, 올린 뒤 못 바꿈), BuildPatchTool UploadBinary
+- [웹 빌드로 상점 영상 만들기](../guides/game-trailer-from-web-build.md) — 가짜 시계로 칸 찍기 + 오디오 함수를 감싸 효과음을 기록대로 다시 섞기(녹음은 칸과 안 맞는다), 장면마다 게임 곡(비율은 게임 그대로·loudnorm), 영어 화면, 정수배 1920×1080, 자동 조종 장면 고르기 함정, 원본은 비공개 Release 첨부
+- [Epic Games Store 검토 통과와 출시](../guides/epic-games-store-review-and-release.md) — 반려 사유별 고치기(푸터·캐러셀 영어로만, 지원 링크에 GitHub 금지, Epic ID, slug는 처음 이름으로 굳음 → 비공개 토론), EAS(브랜드 = 동의 창 얼굴, 방침에 Epic이 하는 일을 쓰지 않기, 오퍼에 연결), Dev → Stage → 검토 → Live, 정해진 출시일이 없으면 "출시 예정"
 - [인디 게임을 팔 때의 규칙과 숫자](../reference/game-business/selling-an-indie-game-rules-and-numbers.md) — Steam Direct·Coming Soon 2주·Next Fest 게임당 한 번·AI 공개(Pre/Live-Generated)·원천징수(한국 저작권 10%), 위시리스트 전환·AI 표시 게임의 성과, Play(한국 15%)·Android 개발자 확인·Apple·itch, Gemini 약관, 한국 비영리 등급 면제
 
 ## 다국어
@@ -98,7 +100,7 @@ updated: 2026-11-14
 
 ## macroquad
 - 입력
-  - [게임패드와 Android 입력 현황](../reference/macroquad/gamepad-and-android-input.md) — `gamepads` 크레이트, miniquad Android 백엔드의 공백과 패치 범위, 메뉴 스틱 탐색(히스테리시스), 모바일 웹 실제 키보드(번들은 캔버스·`e.code`만 — 포커스 밖·빈 code를 창 capture에서 채워 넘기기, iPad 웹앱은 touchstart preventDefault가 키를 죽인다), 키는 자리로·이름은 배열 글자로(플랫폼별 표·얻는 API, Linux는 evdev 패치, Xvfb 배열 시험 요령)
+  - [게임패드와 Android 입력 현황](../reference/macroquad/gamepad-and-android-input.md) — `gamepads` 크레이트, miniquad Android 백엔드의 공백과 패치 범위, iOS는 엔진 패치 없이 GCController 폴링(objc-rs·알림 구독·nil 거르기·Info.plist 키), 메뉴 스틱 탐색(히스테리시스), 모바일 웹 실제 키보드(번들은 캔버스·`e.code`만 — 포커스 밖·빈 code를 창 capture에서 채워 넘기기, iPad 웹앱은 touchstart preventDefault가 키를 죽인다), 키는 자리로·이름은 배열 글자로(플랫폼별 표·얻는 API, Linux는 evdev 패치, Xvfb 배열 시험 요령)
 - 렌더링
   - [픽셀 퍼펙트 렌더링](../reference/macroquad/pixel-perfect-rendering.md) — 내부 해상도 320×180, render target, Nearest, 정수 배율
   - [오래 켜면 죽을 때: GPU 메모리가 자라는 원인과 재는 법](../reference/macroquad/gpu-memory-growth.md) — `telemetry::capture_frame`이 텍스처를 흘림, 호출 칸 버퍼는 최댓값을 쥠, WebGL 탐침, Rust 힙 도구
@@ -106,7 +108,7 @@ updated: 2026-11-14
 - 빌드·배포
   - [macroquad WASM을 GitHub Actions로 빌드해 Netlify에 배포](../guides/macroquad-wasm-netlify-github-actions.md) — 전체 절차
   - [macroquad를 GitHub Actions에서 Android APK로](../guides/macroquad-android-apk-github-actions.md) — cargo-quad-apk git 고정, 러너 내장 SDK/NDK, gamepads 제외, 서명 키는 Secret에
-  - [macroquad iOS 빌드](../reference/macroquad/ios-build.md) — macOS 러너로 서명 안 한 .ipa, Info.plist 최소 키, 샌드박스 저장 자리, 서명 갈림길(무료 7일 / $99 TestFlight), 패드는 gilrs에 iOS 없음
+  - [macroquad iOS 빌드](../reference/macroquad/ios-build.md) — macOS 러너로 서명 안 한 .ipa, Info.plist 최소 키, 샌드박스 저장 자리, 서명 갈림길(무료 7일 / $99 TestFlight), 패드는 gilrs에 iOS 없음 → GameController 직접
   - [macroquad PC 빌드](../reference/macroquad/desktop-build.md) — Windows·macOS(겸용 .app, lipo 뒤 임시 서명)·Linux(libudev-dev) 묶음, 에셋 경로를 실행 파일 기준으로(데스크톱은 작업 폴더 기준이라 바로가기로 켜면 못 찾는다), 공증
   - [버전 올리기 = 릴리스](../reference/github-actions/release-from-version-bump.md) — 본문 파일이 스위치, CI가 태그·APK·Release
   - [WASM 빌드와 JS 번들](../reference/macroquad/wasm-build.md) — 번들 버전 계약, 에셋 로딩, 정수로 주고받는 내 플러그인(localStorage 설정 저장), 번들을 고치지 않는 로딩 화면
