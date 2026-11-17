@@ -39,6 +39,7 @@ updated: 2026-11-14
 ## 보상·경제
 - [회복과 화폐 드롭](../concepts/roguelite-healing-and-currency.md) — 깎인 만큼 확률 + 불운 보정, 자석·줍기 지연·오르는 소리, 메타 화폐 맡기기(쉼터 자동)·둘 중 하나 영구 기술·살 수 있을 때 쓰는 곳이 빛나기
 - [능력치·장비 설계](../concepts/action-rpg-stats-and-equipment.md) — 무기는 모양·장신구는 수치·성장은 영구, 공격 속도 = 시계 배율, 큰 회복 = 목숨
+- [가방의 한도와 바닥에 떨어지는 아이템](../concepts/inventory-limits-and-ground-loot.md) — 한도의 일 셋(긴장·정리·상한), 가득이면 바닥에 남긴다, 줍는 재미(모델·등급의 빛), 정리·지키기
 - [무기 강화 설계](../concepts/weapon-upgrade-design.md) — 무기마다 따로 올리면 갇힌다(하나의 단·두 줄·되돌리기·이어받기), 정해진 수의 재료, 한 단 = 대 수가 하나 준다, 오른 것이 보이게
 - [로그라이트 저널(목표 목록)](../concepts/roguelite-journal-goals.md) — 평소 플레이를 런을 넘는 목표로, 앞 목표 뒤에 펼쳐짐, 받기 보상(재화·힘 아닌 것·옆으로), 진행은 기록에서 계산
 - [영구 성장 해금을 계획할 수 있게](../concepts/meta-progression-unlock-planning.md) — 다 보이는 칸·칸마다 그림·밝기 네 단, 잠긴 칸까지의 칸 수·합계·모자람, 목표 핀(길 표시·메뉴에서도), 캐릭터 사이 같은 꼴(고유 재주 한 칸), 탭이 넘치면 창 + ◀▶
