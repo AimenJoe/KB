@@ -4,10 +4,13 @@ type: reference
 tags: [github-actions, rust, wasm, ci]
 status: verified
 created: 2026-10-24
-updated: 2026-11-03
+updated: 2026-11-10
 verified: |
   1차 출처로 확인: dtolnay/rust-toolchain의 `targets` 입력, actions-rust-lang/setup-rust-toolchain의 `target` 입력과 rust-cache 기본 내장,
   macroquad 자체 CI의 wasm32 매트릭스.
+  README 다시 읽음(2026-11-10): dtolnay/rust-toolchain은 툴체인을 **@rev(또는 `toolchain` 입력)로만** 고르고 rust-toolchain 파일 얘기가 없다.
+  actions-rust-lang/setup-rust-toolchain은 `toolchain` 입력이 없으면 툴체인 파일의 것을 다 깔고, 입력의 `target`·`components`는 그 위에 더 깐다.
+  직접 겪음(nail 0277·v0.9.1): `dtolnay@stable` + toml `1.99.1`에서 액션의 targets가 `stable`에 깔리고 cargo는 1.99.1을 써서 E0463(macOS 묶음).
   2차 출처만 있음: 없음.
 sources:
   - https://github.com/dtolnay/rust-toolchain
@@ -40,7 +43,9 @@ sources:
 | `actions-rs/toolchain` | `target` | 없음. **아카이브됨**, 신규 사용 비권장 (macroquad 자체 CI는 아직 이걸 쓴다) |
 
 ### 툴체인 고정
-`rust-toolchain.toml`을 레포에 두면 로컬과 CI가 같은 버전을 쓴다. 액션은 이 파일을 존중한다.
+`rust-toolchain.toml`을 레포에 두면 로컬과 CI가 같은 버전을 쓴다 — **단, 액션이 이 파일을 읽느냐는 액션마다 다르다.**
+- `dtolnay/rust-toolchain`은 **읽지 않는다**(@rev 또는 `toolchain:` 입력으로 고른다). toml이 `1.99.1`인데 `@stable`을 쓰면 액션은 stable에 `targets`를 깔고, cargo는 rustup을 통해 1.99.1을 따로 받아 쓰므로 그 타깃이 없다 → `error[E0463]: can't find crate for 'std'`. **`toolchain:` 입력에 toml과 같은 이름**을 넘긴다([액션·Rust 고정](pin-actions-and-rust-toolchain.md)).
+- `actions-rust-lang/setup-rust-toolchain`은 `toolchain`을 비우면 파일을 따른다(입력의 `target`은 그 위에 더 깐다).
 ```toml
 [toolchain]
 channel = "1.99.1"   # "stable"이면 새 버전마다 새 clippy 경고가 -D warnings를 깬다

@@ -4,7 +4,7 @@ type: reference
 tags: [web, pwa, service-worker, manifest, fullscreen, orientation, ios, android, netlify, wasm]
 status: draft
 created: 2026-11-02
-updated: 2026-11-07
+updated: 2026-11-14
 verified: |
   2026-11-05 더함: localStorage·서비스 워커 캐시가 출처(scheme+host+port)마다 따로라는 것은 웹 표준의 동일 출처 규칙(MDN Web Storage·Same-origin policy) — 옮겨 본 실험은 하지 않음.
   1차 출처로 확인:
@@ -12,7 +12,12 @@ verified: |
   - WebKit의 ScreenOrientation lock은 전체 화면 API가 있어야 돈다 — WebKit Bugzilla 257695.
   - 직접 실행(헤드리스 Chromium, Playwright, 2026-11-02): 매니페스트·아이콘 응답, 서비스 워커 activated, 네트워크를 끊은 두 번째 로드가 캐시로 뜬다, 터치 세로 화면에서 회전 안내가 뜬다. (nail-under-the-roots `tools/test/smoke.js`). 같은 틀을 둘째 게임 knellroot에 옮겨 2026-11-05 다시 통과(`tools/test/pwa.js` — 캐시 이름 = 빌드 아이디, wasm 미리 담김, 오프라인 다시 읽기). 2026-11-07 knellroot 0082: 세로 폰 화면에서 회전 안내가 덮이고, 누르면 잠금 시도 → 헤드리스는 잠금이 안 돼 0.7초 뒤 세로로 계속(`tools/test/touch.js`).
   - 직접 실행(사람, iPhone 실기, 2026-11-02): 홈 화면에 추가한 앱은 Safari 탭과 localStorage가 따로다 — Safari에서 하던 기록이 따라오지 않는다.
+  - 직접 실행(헤드리스 Chromium, 2026-11-14, knellroot 0187): 번들 처리기를 떼고 세로 → 가로로 바꾸면(늦은 resize와 같은 결과) 그리기 크기가
+    1170×2532로 남아 2532×1170 상자에 눌려 그려진다(사장이 폰에서 본 증상과 같은 모양). 다시 재는 감시를 두면 1.5초 안에 맞고 꽉 찬다. 실기에서 다시 본 것은 아직.
   2차 출처(포럼/블로그)만 있음:
+  - 회전 때 resize가 레이아웃 전에 와서 clientWidth·getBoundingClientRect가 옛 값 — iOS Safari 10.3 이후(Hackernoon 글), Firefox Android(Mozilla 버그 1689188·861463),
+    해법으로 지연 재측정·ResizeObserver·visualViewport(포럼·QuirksMode).
+
   - iPhone Safari에 요소 전체 화면 API가 없다(iPad는 접두어판), orientation.lock 미지원(26.5까지) — caniuse·firt.dev·Apple 포럼.
   - Android Chrome에서 전체 화면 안의 orientation.lock('landscape')가 되고, 설치 앱이 매니페스트 orientation을 따른다.
   확인 못 함:
@@ -24,6 +29,9 @@ sources:
   - https://caniuse.com/screen-orientation
   - https://firt.dev/notes/pwa-ios/
   - https://developer.apple.com/forums/thread/133248
+  - https://hackernoon.com/onresize-event-broken-in-mobile-safari-d8469027bf4d
+  - https://bugzilla.mozilla.org/show_bug.cgi?id=1689188
+  - https://www.quirksmode.org/blog/archives/2013/11/orientationchan.html
 ---
 
 # 웹 게임을 PWA로: 설치·오프라인·전체 화면·가로 잠금
@@ -57,6 +65,10 @@ sources:
 | iPhone Safari·홈 화면 앱 | 없음 | 없음 | 그 줄을 숨기고 "홈 화면에 추가하면 주소창 없이" 안내 |
 - 지원 여부는 `document.fullscreenEnabled`로 묻고, 지원할 때만 UI를 보인다.
 - 터치 기기(`pointer: coarse`)가 세로면 글 없는 회전 픽토그램을 덮고 게임을 자동 일시정지 — 강제하지 않고 탭하면 그대로 세로로.
+- **돌린 뒤 캔버스 크기를 다시 잰다.** miniquad 번들은 `window.onresize` 때 한 번만 `clientWidth × dpr`을 읽어 그리기 크기를 정하는데,
+  폰은 회전·전체 화면 때 resize를 레이아웃이 끝나기 전에 보내기도 해 옛 방향 크기가 박힌다 → 가로 상자에 세로 그림이 눌려 "꽉 차지 않고
+  일그러진다"(가끔). 번들을 고치지 않고 페이지에서 resize·orientationchange·fullscreenchange·visualViewport resize 뒤 몇 번(50~1200ms)과
+  `ResizeObserver`로 다시 재서, 그리기 크기 ≠ 상자 × dpr이면 번들 처리기를 다시 부른다(knellroot 0187).
 - 회전 안내를 누를 때 전체 화면을 쓸 수 있으면(Android) **전체 화면 + 가로 잠금을 먼저 시도**하고, 잠시(0.7초) 뒤에도 세로면 안내를 걷는다 — 잠금을 거절하는 브라우저(헤드리스 Chromium이 그랬다)에서 플레이어가 안내에 갇히지 않게. 매니페스트 `orientation`은 설치 앱만 따르니, 브라우저 탭의 "가로가 기본"은 이 안내 + 첫 사용자 입력에서의 잠금이 전부다(knellroot 0082).
 
 ### 5. 저장소
