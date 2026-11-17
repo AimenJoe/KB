@@ -88,6 +88,7 @@ sources:
 - 스크린숏의 HUD 언어는 하나뿐이다. 다른 언어 페이지에서는 그렇다고 받아들이거나 언어별로 찍는다.
 
 ## 관련 노트
+- [웹 빌드로 상점 영상 만들기](game-trailer-from-web-build.md) — 같은 칸 찍기에 효과음(기록대로 다시 섞기)·장면별 음악을 더한 상점 영상
 - [GitHub Pages에 정적 페이지 올리기](../reference/github-actions/pages-static-site.md) — 배포·릴리스에서 읽는 값·글꼴 줄이기
 - [그림 못 그려도 도트 게임 만들기](pixel-art-without-an-artist.md) — 에셋 크레딧·타이틀 키 아트
 - [작곡가·음향 담당 없이 게임 소리 넣기](game-audio-without-a-composer.md) — 음악 크레딧

@@ -78,6 +78,7 @@ Epic 검토는 상품이 아니라 **손님이 보는 겉면**을 본다: 영어
 - 비공개 토론은 공개 게시판에 "게시"되지 않는다(Pending = 답 대기로 보임). 답이 늦어도 새로 만들지 말고 같은 케이스에 덧붙인다.
 
 ## 관련 노트
+- [웹 빌드로 상점 영상 만들기](game-trailer-from-web-build.md) — 캐러셀 영상(영어 화면, 효과음·음악)
 - [Rust 게임을 Epic Games Store에 붙이기](epic-games-store-for-rust-games.md) — 코드·SDK·업적 표·BuildPatchTool
 - [인디 게임을 팔 때의 규칙과 숫자 — Epic 표](../reference/game-business/selling-an-indie-game-rules-and-numbers.md)
 - [작은 게임 다국어 구조](small-game-localization.md)
