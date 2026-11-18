@@ -4,7 +4,7 @@ type: reference
 tags: [macroquad, rust, gamedev, 3d, rendering, camera]
 status: verified
 created: 2026-11-03
-updated: 2026-11-14
+updated: 2026-11-18
 verified: |
   1차(소스 + 직접 실행, 2026-11-14, knellroot 0186, macroquad 0.4.16·miniquad 0.4.11 웹): `get_internal_gl().flush()` 뒤 `get_active_render_pass`·
   `get_projection_matrix`로 같은 패스·투영에 miniquad 고정 버퍼(Immutable)를 그려 구운 지형의 85%(정원: 바닥 72k + 고정 175k 정점)를 상주시켰다.
@@ -38,6 +38,9 @@ verified: |
   렌더 타깃 깊이(2026-11-04, 0.4.16 `texture.rs` 소스 + knellroot 0033 헤드리스 스크린숏): `render_target(w, h)` = `RenderTargetParams::default()` = **`depth: false`**.
     `Camera3D`가 깊이 시험을 켜도 붙은 깊이 버퍼가 없으면 시험이 없는 것과 같아 **그린 순서로만 덮인다**(모델 부위 상자·벽이 엉킴) — `render_target_ex(.., RenderTargetParams { depth: true, .. })`로 고쳐 확인.
     파이프라인 컬링: macroquad 기본 파이프라인은 `cull_face` 기본값(Nothing), 커스텀 `load_material`의 `PipelineParams { cull_face, .. }`는 miniquad `set_cull_face`로 그대로 먹는다(소스). 렌더 타깃 + y-up Camera3D + glTF(반시계 앞면)에서 키운 상자의 앞면을 버리는 것은 `CullFace::Front`(스크린숏).
+  반투명과 깊이(2026-11-18, 0.4.16 `quad_gl.rs` 소스 + knellroot 0220): `Camera3D`가 쓰는 `TRIANGLES_DEPTH_PIPELINE`은 `depth_write: true` + `LessOrEqual` +
+    SourceAlpha 섞기 — 반투명 면도 깊이를 쓴다. 빛기둥을 배우보다 먼저 그렸더니 그 안의 몸이 사라졌다 → 단단한 것 → 배우 → 반투명 차례로 고침
+    (LearnOpenGL Blending의 "불투명 먼저, 반투명은 멀리서 가까이"와 같은 결론).
   2차 출처만 있음: 없음. 확인 못 함: 실제 기본 max_vertices/max_indices 값, `draw_mesh` 수백 개(적 20마리 × 부위 6)일 때의 프레임 비용(측정 전), WebGL1에서 깊이 버퍼 정밀도.
 sources:
   - https://github.com/not-fl3/macroquad/blob/master/src/models.rs
@@ -104,6 +107,8 @@ macroquad의 3D는 **"카메라 행렬 + 즉시 모드 삼각형"** 까지다. `
 macroquad는 2D 즉시 모드 라이브러리에 3D 카메라를 얹은 것이다. 모든 그리기가 "정점 배열을 매 프레임 배치해 올리기"라서 상태를 가진 GPU 자원(VBO에 상주하는 메시, 본 행렬 유니폼 배열)이 없다. 그 단순함이 웹 번들 400KB와 빠른 컴파일의 대가다. 이 전제를 알고 설계하면(작은 메시, 아틀라스, CPU 변형) 3D도 무리 없이 돌고, 모르고 Unity식으로 짜면(메시마다 드로콜·머티리얼) 드로콜이 폭발한다.
 
 ## 함정
+- **반투명도 깊이를 쓴다**(기본 3D 파이프라인 `depth_write: true` + 알파 섞기): 빛기둥·빛무리 같은 반투명을 배우보다 먼저 그리면 그 뒤·안의 몸이 깊이 시험에 걸려
+  사라진다. 차례를 단단한 것 → 배우 → 반투명으로(반투명끼리는 멀리서 가까이), 아니면 `MaterialParams.pipeline_params`에 `depth_write: false`를 준 재질.
 - **`render_target()`에는 깊이 버퍼가 없다.** 3D를 저해상도 타깃에 그리면 깊이 시험이 조용히 사라지고 그린 순서로만 덮인다 — 상자 모델이 "속이 비치거나 엉켜" 보이고 벽이 얇은 판처럼 겹친다. 오류도 경고도 없어서 화풍 문제로 착각하기 쉽다(knellroot는 첫 스테이지까지 모르고 왔다). 3D 타깃은 처음부터 `render_target_ex(.., depth: true)`.
 - `Camera3D::default()`의 z-up. 2D 머리로 y-up을 가정하고 `position (0,10,-10)`을 주면 세상이 옆으로 눕는다.
 - 렌더 타깃에 3D를 그릴 때 `aspect`를 빼먹으면 화면 비율로 찌그러진다.

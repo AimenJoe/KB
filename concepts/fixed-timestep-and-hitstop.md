@@ -4,7 +4,7 @@ type: concept
 tags: [gamedev, game-feel, input, rust]
 status: draft
 created: 2026-10-24
-updated: 2026-11-13
+updated: 2026-11-18
 verified: |
   1차(2026-11-13, Knellroot 0173 직접 구현·단위 시험): 카메라 리그를 틱 사이에 보간(`view`) — 120Hz를 흉내 낸 시험에서 걷는 캐릭터의 화면 자리가 서고(폭 < 0.001 NDC), 보간하지 않은 리그로는 흔들린다. 실기 판정은 전.
   직접 실행(2026-11-04, Knellroot 0056): RB 쥐고 있음을 take()에서 넘기지 않아 헤드리스 웹에서 모으기가 안 들어감 → carry()로 넘기니 모으기·모은 탄이 나감.
@@ -52,6 +52,9 @@ render(&world, alpha);                   // pos = prev.lerp(cur, alpha)
 - 틱마다 `take()`: `pending`을 돌려주고 비운다. 축은 최신 값.
 - 게임 로직은 `Actions` 구조체만 본다. 키보드·패드 번역은 이 레이어 안에서 끝낸다.
 - **"쥐고 있음"(상태)은 `take()`가 비우지 말고 다음 틱으로 넘긴다** — 축과 같은 갈래(Knellroot 0056): 새 "쥐는 버튼"을 더하며 `take()`의 넘길 목록에 빠뜨려, 한 프레임에 틱이 둘 이상이면 둘째 틱부터 놓은 것으로 읽혀 모으기가 끊겼다. 단위 시험은 월드에 `Actions`를 바로 넣어 못 잡았고 헤드리스 화면에서 드러났다 → 넘길 것을 순수 함수(`carry`) 하나로 두고 시험한다.
+- **쥔 상태를 지난 래치와 OR할 때는 "틱이 아직 안 가져갔을 때만"**(Knellroot 0217, 시험 `a_drag_survives_two_ticks_in_a_frame_and_ends_after_release`):
+  끄는 중 같은 상태는 한 프레임의 둘째 틱에도 넘겨야 하지만(안 그러면 띠가 깜빡인다), 틱이 이미 가져간 지난 값까지 OR하면 손을 뗀 뒤에도 한 프레임 남는다 —
+  `taken` 깃발(틱이 take() 했나)로 가른다.
 
 ### 히트스톱
 - 명중 순간 `hitstop = max(hitstop, n초)`. 틱 머리에서 `hitstop > 0`이면 `hitstop -= DT`만 하고 **로직을 건너뛴다**.
