@@ -10,7 +10,7 @@ verified: |
   js/mq_js_bundle.js 소스(프로토콜 version=2, 플러그인 버전, 버전 체크 로직),
   Cargo.toml(macroquad 0.4.16 → miniquad =0.4.11 고정), .github/workflows/rust.yml.
   소스 확인 + 직접 재현(2026-11-18, knellroot): macroquad 0.4.16 `src/lib.rs`의 `keys_pressed: HashSet`(key_down_event가 넣고 프레임 끝에 비움).
-  CI 실패 두 번(같은 시험·같은 자리)을 CDP CPU 스로틀 5배로 로컬에서 재현(네 번에 한 번꼴), 누를 때마다 rAF 둘을 기다리게 고친 뒤 같은 5배에서 두 번 통과. 확인 못 함: 고친 뒤 CI에서 여러 번 돌려 본 결과.
+  CI 실패 두 번(같은 시험·같은 자리)을 CDP CPU 스로틀 5배로 로컬에서 재현(네 번에 한 번꼴), 누를 때마다 rAF 둘을 기다리게 고친 뒤 5배·8배에서 각 두 번 통과(8배에서 고치기 전 것은 첫 판에 같은 FAIL), 고친 뒤 CI 한 번 통과. 확인 못 함: CI에서 여러 번 돌려 본 결과.
   직접 재현(2026-10-24, rustc 1.99.1 stable, macroquad 0.4.16 + audio feature + gamepads 0.1.7): wasm 링크가
   "undefined symbol: audio_init / getGamepads"로 실패하고, `-C link-arg=--import-undefined`로 해결됨. 번들 소스에서
   quad_net 플러그인의 strict 모드 ReferenceError, 전역 wasm_memory로 문자열 바이트 주고받기(2026-10-25 직접 실행), 플러그인 버전 비교가 `!=`(느슨한 비교)임을 확인. 헤드리스 Chromium(Playwright)
