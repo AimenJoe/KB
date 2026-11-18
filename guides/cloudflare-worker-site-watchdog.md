@@ -15,7 +15,9 @@ verified: |
   직접 해 봄(2026-11-18, beardworks-ops): Node 22 `node --test` 18 통과, 실제 사이트·GitHub로 점검 22건 정상, wrangler 4.156.2 `deploy --dry-run`(13.8 KiB),
   `wrangler dev --test-scheduled`(workerd)에서 fetch 경로·cron·메일 바인딩 호출까지 확인. 클라우드 출구 IP에서 익명 GitHub API가 `API rate limit exceeded`(남은 횟수 0)로 막혔다.
   직접 겪음(2026-11-19): 점검 Worker에 와일드카드 route(`*.beardworks.io/*` 꼴, 언제 생겼는지 모름)가 걸려 같은 영역의 하위 도메인 페이지 전체가 그 Worker의 404가 됐는데,
-  점검은 정상이라고 했다 — 같은 Worker의 route에 맞는 하위 요청은 원본으로 간다고 보이나(Worker가 자기를 다시 부르지 않게) 문서 문장은 확인 못 함.
+  점검은 정상이라고 했다. 까닭은 1차 출처로 확인(2026-11-19): Workers Routing — "Routes cannot be the target of a same-zone fetch() call", 같은 영역의 fetch는 route의 Worker를 건너뛰고
+  원본으로 간다(Custom Domain은 예외). Compatibility flags — `global_fetch_strictly_public`을 켜면 "requests to a Worker's own zone will loop back to the front door … treated like a request from the Internet".
+  직접 해 봄(2026-11-19): 플래그 없이 점검이 nail `/play/`(Worker `web-game`의 route)를 GitHub Pages에서 찾아 404·503, 플래그를 켠 뒤 23건 중 그 오류 0.
   Workers 정적 파일은 HEAD 응답에 `content-length`가 없다(curl -I, 2026-11-19) — "크기 0"으로 잘못 알렸다.
   확인 못 함: 실제 배포 뒤 메일 도착·Custom Domain 인증서 시간, `secret bulk`가 배포 전 Worker에도 되는지(그래서 배포 뒤에 넣는다).
 sources:
@@ -65,7 +67,7 @@ sources:
 - 메일을 "매일 보고"로 만들면 읽지 않게 된다 — 문제 + 주간 살아 있음만.
 - 점검 대상 갈래 이름을 박아 두면 마일스톤이 바뀔 때 조용히 옛 갈래를 본다.
 - 무료판 Cron은 계정당 5개 — 점검을 Worker마다 따로 만들지 말고 하나에 모은다.
-- **점검 Worker가 같은 영역의 페이지를 부르면 "밖에서 보이는 것"과 다를 수 있다.** 점검 Worker에 와일드카드 route가 걸려 하위 도메인 전체를 가로챘을 때(방문자는 404) 점검은 원본(GitHub Pages)을 받아 정상이라고 했다. Worker에 route를 손으로 더하지 말고(설정 파일에 있는 것만 — wrangler는 대시보드에서 더한 route를 지워 주지 않는다), 영역의 **Workers Routes** 목록을 때때로 본다. 중요한 페이지는 다른 출처(예: CI 러너)에서도 한 번 본다.
+- **점검 Worker가 같은 영역의 페이지를 부르면 "밖에서 보이는 것"과 다르다 — `compatibility_flags: ["global_fetch_strictly_public"]`을 켠다.** 기본은 같은 영역(같은 도메인 아래)으로의 `fetch()`가 다른 Worker의 **route**를 건너뛰고 원본으로 간다. 그래서 다른 Worker가 route로 내는 경로(예: `/play/`)는 404로 보이고, 반대로 와일드카드 route가 하위 도메인 전체를 가로챘을 때(방문자는 404) 점검은 원본(GitHub Pages)을 받아 정상이라고 했다. 플래그를 켜면 점검 요청이 인터넷에서 온 것처럼 정문으로 들어가 방문자와 같은 것을 본다(보안 설정·봇 차단도 그대로 받는다 — Bot Fight Mode가 켜져 있으면 막힐 수 있다). Worker에 route를 손으로 더하지 말고(설정 파일에 있는 것만 — wrangler는 대시보드에서 더한 route를 지워 주지 않는다), 영역의 **Workers Routes** 목록을 때때로 본다. 중요한 페이지는 다른 출처(예: CI 러너)에서도 한 번 본다.
 - 파일 크기를 HEAD의 `content-length`로 보면 Cloudflare Workers 정적 파일에서는 늘 0이다(헤더를 안 준다) — 길이가 없으면 GET으로 받아 잰다.
 
 ## 관련 노트
