@@ -4,8 +4,11 @@ type: reference
 tags: [web, pwa, service-worker, manifest, fullscreen, orientation, ios, android, netlify, wasm]
 status: draft
 created: 2026-11-02
-updated: 2026-11-14
+updated: 2026-11-19
 verified: |
+  2026-11-19 더함(직접 해 봄, nail 0294): 옛 출처의 넘김 페이지가 localStorage를 base64url JSON으로 `새주소#…`에 실어 `location.replace` → 새 페이지가 게임보다 먼저(동기) 받아 넣고
+  `history.replaceState`로 # 뒤를 지운다 — 헤드리스 Chromium에서 두 출처를 흉내 낸 시험 셋과 실제 주소(Netlify → Cloudflare)에서 기록이 넘어오는 것을 확인. 크기 한도는 재지 않았다(기록 수 KB).
+  iframe으로 옛 출처 저장소를 읽는 길은 저장소 분할(Chrome·Safari) 때문에 쓰지 않았다 — 직접 시험하지는 않음.
   2026-11-05 더함: localStorage·서비스 워커 캐시가 출처(scheme+host+port)마다 따로라는 것은 웹 표준의 동일 출처 규칙(MDN Web Storage·Same-origin policy) — 옮겨 본 실험은 하지 않음.
   1차 출처로 확인:
   - Chrome의 설치 조건에서 fetch 처리기 요구가 빠진 것(모바일 108·데스크톱 112), 자동 설치 안내(beforeinstallprompt)는 여전히 처리기가 있어야 한다는 것 — Chrome for Developers 블로그.
@@ -82,6 +85,9 @@ sources:
 
 ## 함정
 - **웹 게임의 주소(도메인)를 옮기지 않는다.** localStorage 기록·설치한 PWA·서비스 워커 캐시는 출처(scheme+host+port)마다 따로라, 새 도메인으로 옮기면 기존 플레이어에게는 기록이 사라진 것처럼 보인다. 회사·소개 페이지만 새 도메인으로 두고 게임은 처음 주소에 남기거나, 옮겨야 하면 기록 내보내기·가져오기를 먼저 만든다.
+  - 처음부터 **내 도메인 아래**(예: `game.example.com/play/`)에 두면 뒤의 호스팅을 바꿔도 출처가 그대로다. `*.netlify.app`·`*.pages.dev` 같은 호스트 주소는 그 호스트에 묶인 출처다.
+  - 옮길 때의 한 가지 길: 옛 출처에 **넘김 페이지** — 그 출처의 저장소를 읽어 새 주소의 `#` 뒤에 실어 보내고(`#` 뒤는 서버로 가지 않는다), 새 페이지가 앱보다 먼저 받아 넣는다. 새 주소에 기록이 이미 있으면 덮지 않는다(섞이면 슬롯이 짝이 안 맞는다). 넘김 페이지에서 옛 서비스 워커·캐시도 걷는다. 홈 화면에 설치한 iPhone 앱은 저장소가 Safari와 따로라 그 앱으로 한 번 열어야 넘어간다.
+- 서비스 워커가 `index.html`을 따로 담지 않는다 — 호스트가 `index.html`을 `./`로 돌려보내면(Cloudflare Workers 정적 파일의 307) 그 리디렉트 응답을 페이지 이동에 쓸 때 브라우저가 거절해 오프라인 실행이 깨진다. 페이지는 `./` 하나로 담는다.
 - 서비스 워커를 PR·임시 주소에 걸면 그 출처에 옛 캐시가 남아 "고쳤는데 안 바뀐다"가 된다.
 - `index.html`을 캐시 먼저로 두면 새 배포가 한 번 늦게 보인다(네트워크 먼저로).
 - 헤드리스 시험에서 오프라인 재로드는 `context.setOffline(true)` 뒤 `reload`로 본다 — 워커가 activated 된 다음에.

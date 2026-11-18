@@ -4,7 +4,7 @@ type: reference
 tags: [cloudflare, hosting, analytics, dns]
 status: draft
 created: 2026-11-10
-updated: 2026-11-10
+updated: 2026-11-19
 verified: |
   1차 출처로 확인(2026-11-10, Cloudflare 공식 문서 — 검색 색인으로 찾고 라이브 페이지 `…/index.md`를 받아 숫자를 대조함.
   페이지 최종 수정: web-analytics/faq 2026-07-14, web-analytics/limits 2026-08-12, workers/platform/limits 2026-10-29, pages/platform/limits 2026-09-05, pages/functions/pricing 2026-09-08, r2/pricing 2026-10-30):
@@ -55,6 +55,8 @@ sources:
 - Free 플랜은 Web Analytics 규칙이 0개라 자동 주입이 **같은 영역의 모든 하위 도메인**에 들어간다(게임 웹판 하위 도메인까지). 원치 않으면 손으로 넣는 방식(manual)으로.
 - 게임 웹 빌드를 Pages/Workers로 옮기기 전에 wasm·음악 같은 큰 파일이 25 MiB를 넘는지 잰다. 넘으면 그 파일만 R2로.
 - Pages 문서 첫 쪽(2026-08-25)이 "새 프로젝트는 Workers로"를 권한다 — 새로 옮긴다면 Workers 정적 파일(`wrangler deploy` + `assets.directory`). Pages는 `wrangler pages deploy <폴더>`(Direct Upload).
+- **하위 경로에 게임만 얹기**(2026-11-11 나옴, Wrangler 4.148+): Workers 정적 파일의 `assets.base_path: "/play"` + route `host/play`·`host/play/*` — 빌드 폴더는 그대로 두고 같은 호스트의 나머지(GitHub Pages 등)는 원래대로. `_headers` 경로는 공개 경로 전체(`/play/sw.js`)로 쓴다. Wrangler가 "Will match assets: dist/play"라고 경고하지만 `base_path`를 셈하지 않은 경고다(4.156.2 `wrangler dev`에서 `/play/`가 맞게 나옴). `/play`는 `/play/`로 307, `/play/index.html`도 `/play/`로 307. HEAD 응답에는 `content-length`가 없다. ([Serving a subdirectory](https://developers.cloudflare.com/workers/static-assets/routing/advanced/serving-a-subdirectory/), 직접 배포 2026-11-18 nail)
+- 영역의 Workers route는 **가장 구체적인 패턴이 이긴다** — 다른 Worker의 와일드카드(`*.example.com/*`)가 걸려 있으면 하위 경로 route만 살아 있고 나머지 페이지는 그 Worker로 간다(2026-11-19, 공식 페이지 둘이 404). 대시보드 영역 → **Workers Routes**에서 전체 목록을 본다.
 - 이미 Netlify 등 다른 호스트로 CI 배포를 쓰고 있으면 옮기는 것은 배포 파이프라인(시크릿·승인) 전체를 바꾸는 일이다 — 기능 하나 때문에 옮기지 않는다.
 
 ## 관련 노트

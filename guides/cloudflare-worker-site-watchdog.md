@@ -4,7 +4,7 @@ type: guide
 tags: [cloudflare, ci, github-actions, hosting]
 status: draft
 created: 2026-11-18
-updated: 2026-11-18
+updated: 2026-11-19
 verified: |
   1차 출처로 확인(2026-11-18, Cloudflare·GitHub 라이브 문서를 받아 읽음):
   Email Sending Workers API(최종 수정 2026-11-17) — `env.EMAIL.send({ from, to, subject, text })`, 바인딩 `send_email`(제한 속성 `destination_address`·`allowed_destination_addresses`·`allowed_sender_addresses`,
@@ -14,6 +14,9 @@ verified: |
   wrangler commands — `secret bulk <JSON>`, `deploy --dry-run --outdir`. GitHub 문서 — 익명 REST 한도는 IP당 시간 60회.
   직접 해 봄(2026-11-18, beardworks-ops): Node 22 `node --test` 18 통과, 실제 사이트·GitHub로 점검 22건 정상, wrangler 4.156.2 `deploy --dry-run`(13.8 KiB),
   `wrangler dev --test-scheduled`(workerd)에서 fetch 경로·cron·메일 바인딩 호출까지 확인. 클라우드 출구 IP에서 익명 GitHub API가 `API rate limit exceeded`(남은 횟수 0)로 막혔다.
+  직접 겪음(2026-11-19): 점검 Worker에 와일드카드 route(`*.beardworks.io/*` 꼴, 언제 생겼는지 모름)가 걸려 같은 영역의 하위 도메인 페이지 전체가 그 Worker의 404가 됐는데,
+  점검은 정상이라고 했다 — 같은 Worker의 route에 맞는 하위 요청은 원본으로 간다고 보이나(Worker가 자기를 다시 부르지 않게) 문서 문장은 확인 못 함.
+  Workers 정적 파일은 HEAD 응답에 `content-length`가 없다(curl -I, 2026-11-19) — "크기 0"으로 잘못 알렸다.
   확인 못 함: 실제 배포 뒤 메일 도착·Custom Domain 인증서 시간, `secret bulk`가 배포 전 Worker에도 되는지(그래서 배포 뒤에 넣는다).
 sources:
   - https://developers.cloudflare.com/email-service/api/send-emails/workers-api/
@@ -62,6 +65,8 @@ sources:
 - 메일을 "매일 보고"로 만들면 읽지 않게 된다 — 문제 + 주간 살아 있음만.
 - 점검 대상 갈래 이름을 박아 두면 마일스톤이 바뀔 때 조용히 옛 갈래를 본다.
 - 무료판 Cron은 계정당 5개 — 점검을 Worker마다 따로 만들지 말고 하나에 모은다.
+- **점검 Worker가 같은 영역의 페이지를 부르면 "밖에서 보이는 것"과 다를 수 있다.** 점검 Worker에 와일드카드 route가 걸려 하위 도메인 전체를 가로챘을 때(방문자는 404) 점검은 원본(GitHub Pages)을 받아 정상이라고 했다. Worker에 route를 손으로 더하지 말고(설정 파일에 있는 것만 — wrangler는 대시보드에서 더한 route를 지워 주지 않는다), 영역의 **Workers Routes** 목록을 때때로 본다. 중요한 페이지는 다른 출처(예: CI 러너)에서도 한 번 본다.
+- 파일 크기를 HEAD의 `content-length`로 보면 Cloudflare Workers 정적 파일에서는 늘 0이다(헤더를 안 준다) — 길이가 없으면 GET으로 받아 잰다.
 
 ## 관련 노트
 - [Cloudflare Email Routing](../reference/cloudflare/email-routing.md)
