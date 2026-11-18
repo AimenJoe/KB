@@ -4,11 +4,13 @@ type: reference
 tags: [macroquad, miniquad, rust, wasm, gamedev]
 status: verified
 created: 2026-10-24
-updated: 2026-11-05
+updated: 2026-11-18
 verified: |
   1차 출처로 확인: macroquad 0.4.16 README(빌드 명령, 산출물 경로, index.html 템플릿),
   js/mq_js_bundle.js 소스(프로토콜 version=2, 플러그인 버전, 버전 체크 로직),
   Cargo.toml(macroquad 0.4.16 → miniquad =0.4.11 고정), .github/workflows/rust.yml.
+  소스 확인 + 직접 재현(2026-11-18, knellroot): macroquad 0.4.16 `src/lib.rs`의 `keys_pressed: HashSet`(key_down_event가 넣고 프레임 끝에 비움).
+  CI 실패 두 번(같은 시험·같은 자리)을 CDP CPU 스로틀 5배로 로컬에서 재현(네 번에 한 번꼴), 누를 때마다 rAF 둘을 기다리게 고친 뒤 같은 5배에서 두 번 통과. 확인 못 함: 고친 뒤 CI에서 여러 번 돌려 본 결과.
   직접 재현(2026-10-24, rustc 1.99.1 stable, macroquad 0.4.16 + audio feature + gamepads 0.1.7): wasm 링크가
   "undefined symbol: audio_init / getGamepads"로 실패하고, `-C link-arg=--import-undefined`로 해결됨. 번들 소스에서
   quad_net 플러그인의 strict 모드 ReferenceError, 전역 wasm_memory로 문자열 바이트 주고받기(2026-10-25 직접 실행), 플러그인 버전 비교가 `!=`(느슨한 비교)임을 확인. 헤드리스 Chromium(Playwright)
@@ -170,6 +172,12 @@ await page.focus('#glcanvas'); await page.keyboard.press('j');   // 입력도 �
 await page.screenshot({ path: 'web.png' });
 ```
 - CI에서 돌릴 때 설치가 느리면(`--with-deps`가 받는 apt 글꼴, 같은 커밋 두 번 시험): [연기 시험이 느려질 때](../github-actions/playwright-smoke-test-ci-time.md).
+- **키를 누른 뒤에는 시간이 아니라 프레임을 기다린다**(2026-11-18, knellroot 0233 뒤 CI): macroquad의 "이번 프레임에 눌림"은 `HashSet`이고
+  프레임 끝에 비운다(0.4.16 `src/lib.rs` `keys_pressed` — `key_down_event`가 넣고 `end_frame`이 비운다) → **한 프레임에 같은 키가 두 번 오면
+  한 번**, 서로 다른 키의 순서도 남지 않는다. `keyboard.press(k)` + `waitForTimeout(80)`은 로컬에서는 늘 통과하지만 느린 CI 러너에서는
+  가끔 두 누름이 한 프레임에 들어간다 — 메뉴에서 ↑ 두 번이 한 번이 되어 다른 칸을 고르고, 시험이 엉뚱한 곳에서 실패한다(같은 자리에서
+  두 번, 하루 걸러). CDP `Emulation.setCPUThrottlingRate` 5~8배로 로컬에서 재현된다. 누를 때마다
+  `await page.evaluate(() => new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r))))`로 게임 루프(rAF)가 두 번 돌기를 기다린다.
 - 기대하는 콘솔: `Plugin sapp_jsutils is present in JS bundle, but is not used`(정상), AudioContext 자동재생 경고(정상, 첫 클릭에 번들이 resume하며 "fix"를 찍음). `ReferenceError: register_plugin is not defined`(mq_js_bundle.js 안, 2026-10-26 확인)도 원래 난다: 번들에 든 quad-net 웹소켓 플러그인이 엄격 모드에서 선언 없이 전역 `register_plugin`에 대입한다. 그 플러그인을 안 쓰면 무해하다. `Version mismatch`·`version mismatch`·`Missed function`이 있으면 번들/플러그인/링크 문제.
 
 ## 에셋 로딩
