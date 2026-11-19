@@ -4,8 +4,9 @@ type: reference
 tags: [macroquad, miniquad, rust, wasm, gamedev]
 status: verified
 created: 2026-10-24
-updated: 2026-11-18
+updated: 2026-11-19
 verified: |
+  1차(직접 실행, 2026-11-19, knellroot save.js): 장면 이름을 적는 가져오기 함수 + waitForFunction으로 바꾼 뒤, CPU 10배 느리게 한 실행에서 옛 스크립트가 숨기던 자리(새 판이 열림)를 새 스크립트가 바로 잡았고, 전제(플레이 시간이 적힌 기록)를 기다리게 고친 뒤 보통·10배 두 번 모두 통과.
   1차 출처로 확인: macroquad 0.4.16 README(빌드 명령, 산출물 경로, index.html 템플릿),
   js/mq_js_bundle.js 소스(프로토콜 version=2, 플러그인 버전, 버전 체크 로직),
   Cargo.toml(macroquad 0.4.16 → miniquad =0.4.11 고정), .github/workflows/rust.yml.
@@ -178,6 +179,13 @@ await page.screenshot({ path: 'web.png' });
   가끔 두 누름이 한 프레임에 들어간다 — 메뉴에서 ↑ 두 번이 한 번이 되어 다른 칸을 고르고, 시험이 엉뚱한 곳에서 실패한다(같은 자리에서
   두 번, 하루 걸러). CDP `Emulation.setCPUThrottlingRate` 5~8배로 로컬에서 재현된다. 누를 때마다
   `await page.evaluate(() => new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r))))`로 게임 루프(rAF)가 두 번 돌기를 기다린다.
+- **장면이 바뀌는 누름 뒤에는 시간이 아니라 상태를 기다린다**(2026-11-19, knellroot `save.js` — 같은 자리 네 번째 실패 뒤): CI 소프트웨어 GL은
+  10 fps 안팎이라 `waitForTimeout(300)`이 몇 프레임인지 정해지지 않는다. 게임이 맨 위 장면이 바뀐 프레임에 JS 가져오기 함수 하나로
+  `window.knellScene = "<Scene의 Debug>"`를 적게 하고(`importObject.env`에 함수를 더하면 wasm이 부를 수 있다 — 글은 `wasm_memory`에서 읽는다),
+  시험은 `page.waitForFunction(w => window.knellScene.startsWith(w))`로 기다린다. 못 오면 **지금 장면을 말하며** 멈추게 하면 실패가 진단이 된다:
+  느린 CPU(`setCPUThrottlingRate` 10배)에서 "덮어쓰기 묻는 창 대신 새 판"으로 바로 잡혔고, 원인은 키 처리가 아니라 **시험의 전제**였다 —
+  슬롯 창은 플레이 시간 1초 이상인 슬롯만 기록으로 보는데, 벽시계 2~3초로는 느린 러너에서 게임 시간이 1초를 못 채워 그 슬롯이 빈 슬롯이 되고
+  커서 셈(↑↑)이 엉뚱한 칸에 닿았다. 게임 시간에 기대는 전제(쌓인 시간·저장된 기록)는 저장소를 폴링해 확인한 뒤 다음 걸음으로.
 - 기대하는 콘솔: `Plugin sapp_jsutils is present in JS bundle, but is not used`(정상), AudioContext 자동재생 경고(정상, 첫 클릭에 번들이 resume하며 "fix"를 찍음). `ReferenceError: register_plugin is not defined`(mq_js_bundle.js 안, 2026-10-26 확인)도 원래 난다: 번들에 든 quad-net 웹소켓 플러그인이 엄격 모드에서 선언 없이 전역 `register_plugin`에 대입한다. 그 플러그인을 안 쓰면 무해하다. `Version mismatch`·`version mismatch`·`Missed function`이 있으면 번들/플러그인/링크 문제.
 
 ## 에셋 로딩
