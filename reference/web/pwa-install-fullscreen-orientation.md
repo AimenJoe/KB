@@ -8,8 +8,10 @@ updated: 2026-11-19
 verified: |
   1차(직접 실행, 2026-11-19, nail 0296): 헤드리스 Chromium 844×390 DPR 3 — 로딩 중 작은 높이를 박은 뒤 창 크기 이벤트 없이 레이아웃만 키웠을 때 다시 재기가 없는 페이지는 버퍼가 남고 있는 페이지는 따라왔다. iPhone 실기 확인은 아직(사장이 증상을 봄, 고친 뒤는 미확인).
   2026-11-19 더함(knellroot 0252, 헤드리스 재현 — 1차): 안전 영역을 × devicePixelRatio로 건네면 폰에서 버튼이 가운데로 몰린다 — CSS px 그대로.
-  2026-11-19 더함(knellroot 0253 · nail 0297 — 2차만): iOS 홈 화면 앱 가로 시작의 아래 띠 = 상태 막대만큼 짧은 뷰포트 높이, 처방 100lvh — GitHub 이슈·PR의
-  현장 보고(openchamber #2287, toilet-pi #15, busssss #23)뿐이고 WebKit 공식 문서는 못 찾았다. 실기 확인 전.
+  2026-11-19 더함(knellroot 0253 · nail 0297): iOS 홈 화면 앱 가로 시작의 아래 띠 = 상태 막대만큼 짧은 뷰포트 높이, 처방 100lvh + 모자라면 화면 높이로.
+  1차(실기): 고치기 전 iPhone 녹화(1284×2778)에서 가로의 아래 141px = 47pt가 그려지지 않았고 position:fixed; inset:0 로딩 덮개도 같은 자리에서 끊겼다,
+  고친 빌드에서 사장이 "수정된 것 확인"(Knellroot). 원인 설명은 2차(GitHub 이슈·PR 현장 보고 openchamber #2287, toilet-pi #15, busssss #23 —
+  WebKit 공식 문서는 못 찾았다). nail은 같은 고침, 실기 확인 전.
   2026-11-19 더함(knellroot, 사장 iPhone 실기 스크린숏 + 헤드리스): `viewport-fit=cover`가 없는 페이지를 iPhone Safari 가로로 열면 노치 쪽 좌우와 아래(홈 막대)가 페이지 바탕색 띠로 남고
   캔버스가 그 안쪽만 쓴다(사장 화면에서 본 모양). cover를 켜면 캔버스가 화면 전체 — 헤드리스 Chromium에서 캔버스 844×390 = 창 전체 확인. 안전 영역 값은 숨긴 요소의
   `padding: env(safe-area-inset-*)`를 `getComputedStyle`로 읽어 게임에 넘긴다 — Chromium 데스크톱의 env()는 0이라 padding을 덮어 흉내만 냈다, iPhone에서 읽힌 값은 아직 확인 못 함.
@@ -111,8 +113,8 @@ sources:
   숨긴 요소의 `padding: env(safe-area-inset-top) … ` 을 `getComputedStyle`로 읽어(돌릴 때마다 다시) **CSS px 그대로** 건넨다 — macroquad의
   `screen_width()`는 캔버스 화소를 dpi로 나눈 CSS px다. devicePixelRatio를 곱해 건넸더니 폰(배율 2.6~3)에서 비키는 폭이 2~3배가 되어 터치 버튼·HUD가
   가운데로 몰렸다(knellroot 0252, 헤드리스 915×412 배율 2.625 + 가로 홈 32px로 재현: 84 → 고친 뒤 32).
-- **iOS 홈 화면 앱을 가로로 켜면 아래에 띠**(2차 — 현장 보고 여럿, 실기 확인 전): `black-translucent` + `viewport-fit=cover`에서 WebKit은 화면 맨 위부터
-  그리지만 높이(`100%`·`innerHeight`·`dvh`)를 상태 막대만큼 뺀 값으로 준다. 캔버스 다시 재기(위)는 그리기 크기를 **상자**에 맞출 뿐이라 상자가 짧으면
+- **iOS 홈 화면 앱을 가로로 켜면 아래에 띠**(고침은 실기 확인 — Knellroot, 원인 설명은 현장 보고): `black-translucent` + `viewport-fit=cover`에서 WebKit은 화면 맨 위부터
+  그리지만 높이(`100%`·`innerHeight`·`dvh`)를 상태 막대만큼 뺀 값으로 준다(iPhone 13 Pro Max 녹화: 47pt — `position: fixed; inset: 0`인 덮개도 같이 짧다). 캔버스 다시 재기(위)는 그리기 크기를 **상자**에 맞출 뿐이라 상자가 짧으면
   못 고친다. 처방: iOS 홈 화면 앱에서만(`@supports (-webkit-touch-callout: none)` + `display-mode: standalone`) `html, body, canvas { height: 100lvh }`,
   그리고 `navigator.standalone`일 때 상자 높이가 화면의 짧은 변(가로)보다 모자라면 px로 늘린다(knellroot 0253 · nail 0297). 메타 태그를 바꾸면 홈 화면에
   다시 추가해야 한다는 보고가 있어 메타는 그대로 두었다.
