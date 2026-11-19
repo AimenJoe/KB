@@ -17,7 +17,7 @@ verified: |
   직접 겪음(2026-11-19): 점검 Worker에 와일드카드 route(`*.beardworks.io/*` 꼴)가 걸려 같은 영역의 하위 도메인 페이지 전체가 그 Worker의 404가 됐다 —
   점검 메일은 2026-11-18 07:17 KST에 이미 그 404 넷을 알렸다(받은 메일로 확인, 2026-11-19). 같은 영역 fetch에 대해 1차 출처로 확인(2026-11-19): Workers Routing — "Routes cannot be the target of a same-zone fetch() call", 같은 영역의 fetch는 route의 Worker를 건너뛰고
   원본으로 간다(Custom Domain은 예외). Compatibility flags — `global_fetch_strictly_public`을 켜면 "requests to a Worker's own zone will loop back to the front door … treated like a request from the Internet".
-  직접 해 봄(2026-11-19): 플래그 없이 점검이 nail `/play/`(Worker `web-game`의 route)를 GitHub Pages에서 찾아 404·503, 플래그를 켠 뒤 23건 중 그 오류 0.
+  직접 해 봄(2026-11-19): 플래그 없이 점검이 nail `/play/`(Worker `web-game-nail`의 route)를 GitHub Pages에서 찾아 404·503, 플래그를 켠 뒤 23건 중 그 오류 0.
   Workers 정적 파일은 HEAD 응답에 `content-length`가 없다(curl -I, 2026-11-19) — "크기 0"으로 잘못 알렸다.
   확인 못 함: 실제 배포 뒤 메일 도착·Custom Domain 인증서 시간, `secret bulk`가 배포 전 Worker에도 되는지(그래서 배포 뒤에 넣는다).
 sources:
