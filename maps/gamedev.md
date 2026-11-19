@@ -111,7 +111,7 @@ updated: 2026-11-18
   - [글자 그리기 비용과 브라우저 프레임레이트](../reference/macroquad/text-rendering-and-browser-frame-rate.md) — 아틀라스 통째 올리기, 픽셀 폰트는 원래 크기로 굽고 정수배, 미리 굽기, WebGL 안티에일리어싱 끄기, Safari 저전력 30fps
 - 빌드·배포
   - [macroquad WASM을 GitHub Actions로 빌드해 Netlify에 배포](../guides/macroquad-wasm-netlify-github-actions.md) — 전체 절차
-  - [macroquad를 GitHub Actions에서 Android APK로](../guides/macroquad-android-apk-github-actions.md) — cargo-quad-apk git 고정, 러너 내장 SDK/NDK, gamepads 제외, 서명 키는 Secret에
+  - [macroquad를 GitHub Actions에서 Android APK로](../guides/macroquad-android-apk-github-actions.md) — cargo-quad-apk git 고정, 러너 내장 SDK/NDK, gamepads 제외, 서명 키는 Secret에, Google Play용 AAB는 APK를 aapt2 proto + bundletool로 바꿔서(16KB 정렬 검사)
   - [macroquad iOS 빌드](../reference/macroquad/ios-build.md) — macOS 러너로 서명 안 한 .ipa, Info.plist 최소 키, 샌드박스 저장 자리, 서명 갈림길(무료 7일 / $99 TestFlight), 패드는 gilrs에 iOS 없음 → GameController 직접
   - [macroquad PC 빌드](../reference/macroquad/desktop-build.md) — Windows·macOS(겸용 .app, lipo 뒤 임시 서명)·Linux(libudev-dev) 묶음, 에셋 경로를 실행 파일 기준으로(데스크톱은 작업 폴더 기준이라 바로가기로 켜면 못 찾는다), 공증
   - [버전 올리기 = 릴리스](../reference/github-actions/release-from-version-bump.md) — 본문 파일이 스위치, CI가 태그·APK·Release
