@@ -6,6 +6,9 @@ status: draft
 created: 2026-11-02
 updated: 2026-11-19
 verified: |
+  2026-11-19 더함(knellroot, 사장 iPhone 실기 스크린숏 + 헤드리스): `viewport-fit=cover`가 없는 페이지를 iPhone Safari 가로로 열면 노치 쪽 좌우와 아래(홈 막대)가 페이지 바탕색 띠로 남고
+  캔버스가 그 안쪽만 쓴다(사장 화면에서 본 모양). cover를 켜면 캔버스가 화면 전체 — 헤드리스 Chromium에서 캔버스 844×390 = 창 전체 확인. 안전 영역 값은 숨긴 요소의
+  `padding: env(safe-area-inset-*)`를 `getComputedStyle`로 읽어 게임에 넘긴다 — Chromium 데스크톱의 env()는 0이라 padding을 덮어 흉내만 냈다, iPhone에서 읽힌 값은 아직 확인 못 함.
   2026-11-19 더함(직접 해 봄, nail 0294): 옛 출처의 넘김 페이지가 localStorage를 base64url JSON으로 `새주소#…`에 실어 `location.replace` → 새 페이지가 게임보다 먼저(동기) 받아 넣고
   `history.replaceState`로 # 뒤를 지운다 — 헤드리스 Chromium에서 두 출처를 흉내 낸 시험 셋과 실제 주소(Netlify → Cloudflare)에서 기록이 넘어오는 것을 확인. 크기 한도는 재지 않았다(기록 수 KB).
   iframe으로 옛 출처 저장소를 읽는 길은 저장소 분할(Chrome·Safari) 때문에 쓰지 않았다 — 직접 시험하지는 않음.
@@ -92,6 +95,9 @@ sources:
 - `index.html`을 캐시 먼저로 두면 새 배포가 한 번 늦게 보인다(네트워크 먼저로).
 - 헤드리스 시험에서 오프라인 재로드는 `context.setOffline(true)` 뒤 `reload`로 본다 — 워커가 activated 된 다음에.
 - 매니페스트 `display: fullscreen`만으로는 iPhone에서 주소창이 사라지지 않는다(홈 화면 앱일 때만).
+- **iPhone 가로에서 검은 띠**: `<meta name="viewport" …>`에 `viewport-fit=cover`가 없으면 노치 쪽과 홈 막대 자리가 페이지 바탕으로 남는다. cover를 켜면 캔버스는 화면을 다 쓰지만
+  그 자리(노치·둥근 모서리)에 놓인 터치 버튼은 손가락이 닿기 어렵다 — 안전 영역 값을 게임에 넘겨 버튼·HUD만 안쪽으로 비킨다. 캔버스 게임은 CSS `env()`를 직접 못 쓰니
+  숨긴 요소의 `padding: env(safe-area-inset-top) … ` 을 `getComputedStyle`로 읽어(돌릴 때마다 다시) 캔버스 화소(× devicePixelRatio)로 건넨다.
 
 ## 관련 노트
 - [CI에서 netlify-cli로 배포](../netlify/deploy-from-ci.md) — 헤더·캐시

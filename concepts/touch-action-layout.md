@@ -41,7 +41,8 @@ verified: |
   2차 출처만 있음: Diablo Immortal(공격이 가장 크고 둘레에 스킬, 끌어 조준), Wild Rift(스킬 넷, 끌면 조준 스틱, 버튼마다 크기·자리 바꾸기),
   Brawl Stars(탭 = 가장 가까운 적에게 자동, 끌기 = 조준, 떼면 나감, 가운데로 되돌리면 취소 — 팬 위키·안내 글, Supercell 원문은 못 찾음), Dead Cells 모바일(버튼 자리·크기, 쓸어 회피, 자동 공격), Fez(Vita, 쓸어 세계 돌리기),
   Hoober 2013(한 손 쥠 49% — 관찰 연구, 가로 게임 쥠에는 바로 못 씀). "버튼 수가 복잡도"라는 개발자 말은 출처 미확인.
-  확인 못 함: iPhone 가로 safe-area 값과 macroquad 웹에서 `env(safe-area-inset-*)` 읽기, 엄지 크기의 1차 연구.
+  2026-11-19 knellroot: macroquad 웹에서 `env(safe-area-inset-*)`는 숨긴 요소의 padding으로 읽어 넘긴다(구현·헤드리스 흉내만 — `reference/web/pwa-install-fullscreen-orientation.md` 함정).
+  확인 못 함: iPhone 가로에서 실제로 읽힌 safe-area 값, 엄지 크기의 1차 연구.
 sources:
   - https://dev.epicgames.com/documentation/en-us/fortnite/designing-for-mobile-in-fortnite
   - https://www.gamespot.com/articles/call-of-duty-warzone-mobile-best-settings-for-controller-and-touchscreen/1100-6522056/
