@@ -7,6 +7,9 @@ created: 2026-11-02
 updated: 2026-11-19
 verified: |
   1차(직접 실행, 2026-11-19, nail 0296): 헤드리스 Chromium 844×390 DPR 3 — 로딩 중 작은 높이를 박은 뒤 창 크기 이벤트 없이 레이아웃만 키웠을 때 다시 재기가 없는 페이지는 버퍼가 남고 있는 페이지는 따라왔다. iPhone 실기 확인은 아직(사장이 증상을 봄, 고친 뒤는 미확인).
+  2026-11-19 더함(knellroot 0252, 헤드리스 재현 — 1차): 안전 영역을 × devicePixelRatio로 건네면 폰에서 버튼이 가운데로 몰린다 — CSS px 그대로.
+  2026-11-19 더함(knellroot 0253 · nail 0297 — 2차만): iOS 홈 화면 앱 가로 시작의 아래 띠 = 상태 막대만큼 짧은 뷰포트 높이, 처방 100lvh — GitHub 이슈·PR의
+  현장 보고(openchamber #2287, toilet-pi #15, busssss #23)뿐이고 WebKit 공식 문서는 못 찾았다. 실기 확인 전.
   2026-11-19 더함(knellroot, 사장 iPhone 실기 스크린숏 + 헤드리스): `viewport-fit=cover`가 없는 페이지를 iPhone Safari 가로로 열면 노치 쪽 좌우와 아래(홈 막대)가 페이지 바탕색 띠로 남고
   캔버스가 그 안쪽만 쓴다(사장 화면에서 본 모양). cover를 켜면 캔버스가 화면 전체 — 헤드리스 Chromium에서 캔버스 844×390 = 창 전체 확인. 안전 영역 값은 숨긴 요소의
   `padding: env(safe-area-inset-*)`를 `getComputedStyle`로 읽어 게임에 넘긴다 — Chromium 데스크톱의 env()는 0이라 padding을 덮어 흉내만 냈다, iPhone에서 읽힌 값은 아직 확인 못 함.
@@ -30,6 +33,9 @@ verified: |
   확인 못 함:
   - iOS 홈 화면 앱이 매니페스트 orientation을 따르는지. Android 설치 앱이 브라우저 탭과 기록을 함께 쓰는지(같은 출처라 그럴 것으로 봄).
 sources:
+  - https://github.com/openchamber/openchamber/issues/2287
+  - https://github.com/mrexodia/toilet-pi/pull/15
+  - https://github.com/tpdbf5509/busssss/pull/23
   - https://developer.chrome.com/blog/update-install-criteria
   - https://bugs.webkit.org/show_bug.cgi?id=257695
   - https://caniuse.com/wf-screen-orientation-lock
@@ -102,7 +108,14 @@ sources:
 - 매니페스트 `display: fullscreen`만으로는 iPhone에서 주소창이 사라지지 않는다(홈 화면 앱일 때만).
 - **iPhone 가로에서 검은 띠**: `<meta name="viewport" …>`에 `viewport-fit=cover`가 없으면 노치 쪽과 홈 막대 자리가 페이지 바탕으로 남는다. cover를 켜면 캔버스는 화면을 다 쓰지만
   그 자리(노치·둥근 모서리)에 놓인 터치 버튼은 손가락이 닿기 어렵다 — 안전 영역 값을 게임에 넘겨 버튼·HUD만 안쪽으로 비킨다. 캔버스 게임은 CSS `env()`를 직접 못 쓰니
-  숨긴 요소의 `padding: env(safe-area-inset-top) … ` 을 `getComputedStyle`로 읽어(돌릴 때마다 다시) 캔버스 화소(× devicePixelRatio)로 건넨다.
+  숨긴 요소의 `padding: env(safe-area-inset-top) … ` 을 `getComputedStyle`로 읽어(돌릴 때마다 다시) **CSS px 그대로** 건넨다 — macroquad의
+  `screen_width()`는 캔버스 화소를 dpi로 나눈 CSS px다. devicePixelRatio를 곱해 건넸더니 폰(배율 2.6~3)에서 비키는 폭이 2~3배가 되어 터치 버튼·HUD가
+  가운데로 몰렸다(knellroot 0252, 헤드리스 915×412 배율 2.625 + 가로 홈 32px로 재현: 84 → 고친 뒤 32).
+- **iOS 홈 화면 앱을 가로로 켜면 아래에 띠**(2차 — 현장 보고 여럿, 실기 확인 전): `black-translucent` + `viewport-fit=cover`에서 WebKit은 화면 맨 위부터
+  그리지만 높이(`100%`·`innerHeight`·`dvh`)를 상태 막대만큼 뺀 값으로 준다. 캔버스 다시 재기(위)는 그리기 크기를 **상자**에 맞출 뿐이라 상자가 짧으면
+  못 고친다. 처방: iOS 홈 화면 앱에서만(`@supports (-webkit-touch-callout: none)` + `display-mode: standalone`) `html, body, canvas { height: 100lvh }`,
+  그리고 `navigator.standalone`일 때 상자 높이가 화면의 짧은 변(가로)보다 모자라면 px로 늘린다(knellroot 0253 · nail 0297). 메타 태그를 바꾸면 홈 화면에
+  다시 추가해야 한다는 보고가 있어 메타는 그대로 두었다.
 
 ## 관련 노트
 - [CI에서 netlify-cli로 배포](../netlify/deploy-from-ci.md) — 헤더·캐시
