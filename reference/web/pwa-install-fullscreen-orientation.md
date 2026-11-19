@@ -11,7 +11,7 @@ verified: |
   2026-11-19 더함(knellroot 0253 · nail 0297): iOS 홈 화면 앱 가로 시작의 아래 띠 = 상태 막대만큼 짧은 뷰포트 높이, 처방 100lvh + 모자라면 화면 높이로.
   1차(실기): 고치기 전 iPhone 녹화(1284×2778)에서 가로의 아래 141px = 47pt가 그려지지 않았고 position:fixed; inset:0 로딩 덮개도 같은 자리에서 끊겼다,
   고친 빌드에서 사장이 "수정된 것 확인"(Knellroot). 원인 설명은 2차(GitHub 이슈·PR 현장 보고 openchamber #2287, toilet-pi #15, busssss #23 —
-  WebKit 공식 문서는 못 찾았다). nail은 같은 고침, 실기 확인 전.
+  WebKit 공식 문서는 못 찾았다). nail(0297)도 같은 고침으로 실기 확인.
   2026-11-19 더함(knellroot, 사장 iPhone 실기 스크린숏 + 헤드리스): `viewport-fit=cover`가 없는 페이지를 iPhone Safari 가로로 열면 노치 쪽 좌우와 아래(홈 막대)가 페이지 바탕색 띠로 남고
   캔버스가 그 안쪽만 쓴다(사장 화면에서 본 모양). cover를 켜면 캔버스가 화면 전체 — 헤드리스 Chromium에서 캔버스 844×390 = 창 전체 확인. 안전 영역 값은 숨긴 요소의
   `padding: env(safe-area-inset-*)`를 `getComputedStyle`로 읽어 게임에 넘긴다 — Chromium 데스크톱의 env()는 0이라 padding을 덮어 흉내만 냈다, iPhone에서 읽힌 값은 아직 확인 못 함.
