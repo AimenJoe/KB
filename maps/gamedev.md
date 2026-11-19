@@ -117,6 +117,7 @@ updated: 2026-11-18
   - [버전 올리기 = 릴리스](../reference/github-actions/release-from-version-bump.md) — 본문 파일이 스위치, CI가 태그·APK·Release
   - [WASM 빌드와 JS 번들](../reference/macroquad/wasm-build.md) — 번들 버전 계약, 에셋 로딩, 정수로 주고받는 내 플러그인(localStorage 설정 저장), 번들을 고치지 않는 로딩 화면
   - [소리(quad-snd)](../reference/macroquad/audio.md) — 네이티브 wav·ogg만·통째로 f32 44.1kHz(1분 ≈ 21MB)·가까운 점 리샘플·음높이 없음, 웹 mp3/네이티브 ogg, 교차는 직접, 들을 때 읽고 놓기(네이티브는 푸는 동안 멈칫)
+  - [앱이 백그라운드로 갈 때](../reference/macroquad/app-lifecycle-background.md) — 엔진은 최소화 사건만(소리 멈춤은 Android뿐), 게임이 일시정지 + 적기, 웹은 createGain을 감싸 AudioContext suspend/resume, 헤드리스 시험법
   - [정적 WASM 호스팅](../concepts/static-wasm-hosting.md) — 왜 번들러가 없어도 되는가
   - [0001 빌드는 CI, 호스팅은 Netlify](../decisions/0001-build-rust-wasm-in-github-actions-deploy-via-netlify-cli.md)
 
