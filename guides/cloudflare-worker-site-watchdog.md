@@ -22,6 +22,8 @@ verified: |
   직접 해 봄(2026-11-19, 다른 Worker — 앱 API를 읽어 나에게 메일): `wrangler dev`(workerd)에서 `this.fetch = fetch`로 넣어 둔 fetch를 `this.fetch(url)`로 부르자
   `TypeError: Illegal invocation`(Node `node --test`에서는 통과). 화살표 함수로 감싸니 해결. 여러 `Set-Cookie`는 `headers.getSetCookie()`로 하나씩 받아(workerd·Node 22 모두 됨) 쿠키 통을 직접 꾸렸다.
   실제 배포(wrangler 4.156.2) → `secret bulk` → `/run`으로 보낸 메일이 확인된 Outlook 메일함의 정크 폴더에 도착(2026-11-19).
+  Cron 요일(2026-11-20, cron-triggers 문서 dateModified 2026-11-18): "Days of the week go from 1 = Sunday to 7 = Saturday", 평일 예시는 `mon-fri` 또는 `2-6`.
+  직접 겪음(2026-11-20): `17 1 * * 1-5`로 둔 평일 메일이 금요일에 돌지 않았다(관측 로그에 그 Worker의 scheduled 없음, 같은 계정의 매일 Cron은 돎) → `MON-FRI`로 바꿈.
   확인 못 함: 실제 배포 뒤 메일 도착·Custom Domain 인증서 시간, `secret bulk`가 배포 전 Worker에도 되는지(그래서 배포 뒤에 넣는다).
 sources:
   - https://developers.cloudflare.com/email-service/api/send-emails/workers-api/
@@ -67,6 +69,7 @@ sources:
 ## 함정
 - 클라우드(Workers 포함)의 출구 IP에서 익명 GitHub API는 처음부터 막혀 있을 수 있다 — 토큰 없이 "되겠지" 하지 않는다.
 - Cron은 UTC. 한국 아침 7시 = 전날 22시 UTC. 요일 판단도 한국 시간으로 바꿔서.
+- **Cloudflare Cron의 요일 숫자는 1 = 일요일 ~ 7 = 토요일**(리눅스 cron의 0 = 일요일·1 = 월요일과 다르다). 평일을 `1-5`로 쓰면 일~목이 되어 금요일이 조용히 빠진다. 요일은 이름으로(`MON-FRI`). 배포한 뒤 첫 주는 요일마다 실제로 돌았는지 관측 로그(`$workers.eventType = scheduled`)로 본다.
 - 메일을 "매일 보고"로 만들면 읽지 않게 된다 — 문제 + 주간 살아 있음만.
 - 점검 대상 갈래 이름을 박아 두면 마일스톤이 바뀔 때 조용히 옛 갈래를 본다.
 - 무료판 Cron은 계정당 5개 — 점검을 Worker마다 따로 만들지 말고 하나에 모은다.
