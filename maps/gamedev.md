@@ -21,6 +21,7 @@ updated: 2026-11-18
 - [인디 게임 공식 페이지](../guides/indie-game-landing-page.md)
 - [공개 데모와 바깥 의견 받기](../concepts/public-demo-and-outside-feedback.md) — 첫 경험 먼저 시험, 로그라이트는 한 바퀴 온전히·깊이는 잠금, 기술 점검, 버전이 저절로 붙는 짧은 설문, itch.io HTML5 ZIP, 행사 전에 내기 — 첫 화면에 무엇·어디서, 싣는 칸(볼거리·해 보기·팩트시트·크레딧), 이야기를 스크롤로, CSS steps() 스프라이트 띠, 움직임 줄이기, 헤드리스 녹화는 도트를 뭉갠다
 - [무료 그림·사진 구하는 곳](../reference/assets/free-image-sources.md) — Openverse·미술관 CC0·사진 사이트, PDM과 CC0, API 요령(Met v1.1, UA)
+- [CC0 16px 식물 그림 팩](../reference/assets/cc0-16px-plant-packs.md) — Idylwild(크고 촘촘 → 화단)·SpiderDave(작고 평평 → 바탕 굽기)·ansimuz·PixelFarm, 라이선스 칸 직접 읽기, 역할을 나눠 섞기
 - [게임 그림 외주 맡기기](../guides/commissioning-game-art.md) — 임시 그림으로 먼저 판정, 사양서(안전 영역·색 약속), 계약: 저작재산권 + 2차적저작물작성권 특약(한국 제45조②), 공개 레포 커밋 허락
 - [이미지 생성 모델로 게임 일러스트 그리기](../guides/image-model-for-game-illustrations.md) — 나노바나나: 직접 그린 참고 그림 + 생김새 글, 목적·세계 규칙·캐릭터·장면 덩어리, 장면마다 새 대화·스타일 덩어리 매번, 비율은 글로(구도 그림은 베낀다), 캐릭터 시트 먼저, 지울 때 대신 그릴 것, 칸마다 가장 흔한 색·작은 캐릭터 자리, ✦ 되돌리기
 
@@ -41,6 +42,7 @@ updated: 2026-11-18
 - [능력치·장비 설계](../concepts/action-rpg-stats-and-equipment.md) — 무기는 모양·장신구는 수치·성장은 영구, 공격 속도 = 시계 배율, 큰 회복 = 목숨
 - [가방의 한도와 바닥에 떨어지는 아이템](../concepts/inventory-limits-and-ground-loot.md) — 한도의 일 셋(긴장·정리·상한), 가득이면 바닥에 남긴다, 줍는 재미(모델·등급의 빛), 정리·지키기
 - [무기 강화 설계](../concepts/weapon-upgrade-design.md) — 무기마다 따로 올리면 갇힌다(하나의 단·두 줄·되돌리기·이어받기), 정해진 수의 재료, 한 단 = 대 수가 하나 준다, 오른 것이 보이게
+- [로그라이트 메타 재화 점검](../guides/roguelite-economy-check.md) — 재화마다 들어오는 곳·나가는 곳 표, 진짜 생성기로 런 벌이 기대값·분포, 다 사기까지 런 수, 후반 남는 양, 끝없는 쓸 곳(돌려 바꾸기), 재는 시험이 새 보상을 빼먹는 함정
 - [로그라이트 저널(목표 목록)](../concepts/roguelite-journal-goals.md) — 평소 플레이를 런을 넘는 목표로, 앞 목표 뒤에 펼쳐짐, 받기 보상(재화·힘 아닌 것·옆으로), 진행은 기록에서 계산
 - [영구 성장 해금을 계획할 수 있게](../concepts/meta-progression-unlock-planning.md) — 다 보이는 칸·칸마다 그림·밝기 네 단, 잠긴 칸까지의 칸 수·합계·모자람, 목표 핀(길 표시·메뉴에서도), 캐릭터 사이 같은 꼴(고유 재주 한 칸), 탭이 넘치면 창 + ◀▶
 - [저장 슬롯·이어하기·런 중단 저장](../concepts/roguelite-save-slots-and-continue.md) — 기록과 런을 나누기, 슬롯은 기록 단위·설정은 밖, 시작하기/이어하기 → 슬롯 고르기, 옛 저장 = 슬롯 1, 두 번 눌러 지우기, 런 저장은 죽음이 런을 끝내나로 고르기(한 번 쓰는 중단 저장 vs 마지막 체크포인트), 저장 빈도 세 겹(사건·경계 이벤트·끄기 전 — 짧은 주기는 싸움 중을 적어 뺐다)과 같은 글이면 안 쓰기, 쓰기 실패를 알기(되읽기·한 번 알림), 끄는 순간(PC 창 닫기·웹 visibilitychange·fsync)

@@ -332,3 +332,4 @@ v1(타원 + 구 음영 + 몸 전체 2×2 디더)은 "자글자글"하고 형태�
 ## 관련 노트
 - [concepts/action-roguelite-for-solo-dev.md](../concepts/action-roguelite-for-solo-dev.md)
 - [reference/macroquad/pixel-perfect-rendering.md](../reference/macroquad/pixel-perfect-rendering.md)
+- [CC0 16px 식물 그림 팩](../reference/assets/cc0-16px-plant-packs.md) — 쓰던 팩에 없는 꽃·덤불을 CC0로 더한 예(역할 나눠 섞기)

@@ -72,6 +72,7 @@ sources:
 
 ## 관련 노트
 - [로그라이트 저널(목표 목록)](roguelite-journal-goals.md) — 메타 화폐를 보상으로 주는 목표 목록
+- [로그라이트 메타 재화 점검](../guides/roguelite-economy-check.md) — 런 벌이를 재고 쓸 곳을 런 수로, 끝없는 쓸 곳
 - [능력치·장비 설계](action-rpg-stats-and-equipment.md) — 회복을 퀵 아이템으로 바꾼 뒤의 설계(먹기 버튼, 큰 회복 = 목숨)
 - [1인 개발용 액션 로그라이트 설계 원칙](action-roguelite-for-solo-dev.md)
 - [고정 타임스텝 게임 루프와 히트스톱](fixed-timestep-and-hitstop.md)
