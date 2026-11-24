@@ -19,6 +19,11 @@ verified: |
   원본으로 간다(Custom Domain은 예외). Compatibility flags — `global_fetch_strictly_public`을 켜면 "requests to a Worker's own zone will loop back to the front door … treated like a request from the Internet".
   직접 해 봄(2026-11-19): 플래그 없이 점검이 nail `/play/`(Worker `web-game-nail`의 route)를 GitHub Pages에서 찾아 404·503, 플래그를 켠 뒤 23건 중 그 오류 0.
   Workers 정적 파일은 HEAD 응답에 `content-length`가 없다(curl -I, 2026-11-19) — "크기 0"으로 잘못 알렸다.
+  직접 해 봄(2026-11-19, 다른 Worker — 앱 API를 읽어 나에게 메일): `wrangler dev`(workerd)에서 `this.fetch = fetch`로 넣어 둔 fetch를 `this.fetch(url)`로 부르자
+  `TypeError: Illegal invocation`(Node `node --test`에서는 통과). 화살표 함수로 감싸니 해결. 여러 `Set-Cookie`는 `headers.getSetCookie()`로 하나씩 받아(workerd·Node 22 모두 됨) 쿠키 통을 직접 꾸렸다.
+  실제 배포(wrangler 4.156.2) → `secret bulk` → `/run`으로 보낸 메일이 확인된 Outlook 메일함의 정크 폴더에 도착(2026-11-19).
+  Cron 요일(2026-11-20, cron-triggers 문서 dateModified 2026-11-18): "Days of the week go from 1 = Sunday to 7 = Saturday", 평일 예시는 `mon-fri` 또는 `2-6`.
+  직접 겪음(2026-11-20): `17 1 * * 1-5`로 둔 평일 메일이 금요일에 돌지 않았다(관측 로그에 그 Worker의 scheduled 없음, 같은 계정의 매일 Cron은 돎) → `MON-FRI`로 바꿈.
   확인 못 함: 실제 배포 뒤 메일 도착·Custom Domain 인증서 시간, `secret bulk`가 배포 전 Worker에도 되는지(그래서 배포 뒤에 넣는다).
 sources:
   - https://developers.cloudflare.com/email-service/api/send-emails/workers-api/
@@ -64,11 +69,14 @@ sources:
 ## 함정
 - 클라우드(Workers 포함)의 출구 IP에서 익명 GitHub API는 처음부터 막혀 있을 수 있다 — 토큰 없이 "되겠지" 하지 않는다.
 - Cron은 UTC. 한국 아침 7시 = 전날 22시 UTC. 요일 판단도 한국 시간으로 바꿔서.
+- **Cloudflare Cron의 요일 숫자는 1 = 일요일 ~ 7 = 토요일**(리눅스 cron의 0 = 일요일·1 = 월요일과 다르다). 평일을 `1-5`로 쓰면 일~목이 되어 금요일이 조용히 빠진다. 요일은 이름으로(`MON-FRI`). 배포한 뒤 첫 주는 요일마다 실제로 돌았는지 관측 로그(`$workers.eventType = scheduled`)로 본다.
 - 메일을 "매일 보고"로 만들면 읽지 않게 된다 — 문제 + 주간 살아 있음만.
 - 점검 대상 갈래 이름을 박아 두면 마일스톤이 바뀔 때 조용히 옛 갈래를 본다.
 - 무료판 Cron은 계정당 5개 — 점검을 Worker마다 따로 만들지 말고 하나에 모은다.
 - **점검 Worker가 같은 영역의 페이지를 부르면 "밖에서 보이는 것"과 다르다 — `compatibility_flags: ["global_fetch_strictly_public"]`을 켠다.** 기본은 같은 영역(같은 도메인 아래)으로의 `fetch()`가 다른 Worker의 **route**를 건너뛰고 원본으로 간다. 그래서 다른 Worker가 route로 내는 경로(예: `/play/`)는 404로 보인다 — 방문자에게는 200인데 점검만 실패한다. 플래그를 켜면 점검 요청이 인터넷에서 온 것처럼 정문으로 들어가 방문자와 같은 것을 본다(보안 설정·봇 차단도 그대로 받는다 — Bot Fight Mode가 켜져 있으면 막힐 수 있다). Worker에 route를 손으로 더하지 말고(설정 파일에 있는 것만 — wrangler는 대시보드에서 더한 route를 지워 주지 않는다), 영역의 **Workers Routes** 목록을 때때로 본다. 중요한 페이지는 다른 출처(예: CI 러너)에서도 한 번 본다.
 - 알림 메일은 받는 쪽 스팸함으로 갈 수 있다 — 같은 보낸 곳이라도 어떤 날은 받은 편지함, 어떤 날은 스팸함(Outlook, 2026-11-19). 보낸 주소를 받는 쪽의 "안전한 보낸 사람"에 넣는다. 월요일 살아 있음 메일이 안 보이면 스팸함부터.
+- **주입할 수 있게 넣어 둔 `fetch`는 감싸서 쓴다.** `this.fetch = fetchImpl`(기본값 `fetch`) 뒤 `this.fetch(url)`로 부르면 Workers 런타임에서 `TypeError: Illegal invocation` — `fetch`의 `this`가 전역이 아니게 되기 때문. Node 시험은 통과해서 배포 뒤에야 터진다. `this.fetch = (u, i) => fetchImpl(u, i)`로 넣고, 배포 전에 `wrangler dev --test-scheduled`로 한 번 깨워 본다(시험의 가짜 fetch로는 안 잡힌다).
+- 로그인이 필요한 API를 Worker에서 부를 때 쿠키 통은 직접: 응답의 `Set-Cookie`가 여럿이면 `headers.get("set-cookie")`는 쉼표로 이어 붙여 날짜(`Expires=Fri, 19-Nov…`)와 섞인다 — `headers.getSetCookie()`로 줄마다 받는다. `redirect: "manual"`로 중간 응답의 쿠키도 놓치지 않는다. 세션이 오는데 API가 401이면 앱이 함께 보내는 다른 쿠키(기기 정보 등)가 빠진 것일 수 있다 — 브라우저·프록시로 잡은 요청의 쿠키를 하나씩 빼 보며 찾는다. 자동 로그인 값은 Worker 비밀 값에, 만료되면 실패 메일이 오게.
 - 파일 크기를 HEAD의 `content-length`로 보면 Cloudflare Workers 정적 파일에서는 늘 0이다(헤더를 안 준다) — 길이가 없으면 GET으로 받아 잰다.
 
 ## 관련 노트
