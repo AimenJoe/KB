@@ -4,7 +4,7 @@ type: guide
 tags: [macroquad, miniquad, android, apk, github-actions, ci-cd, rust]
 status: verified
 created: 2026-10-24
-updated: 2026-11-07
+updated: 2026-11-19
 verified: |
   1차 출처로 확인: cargo-quad-apk git master(커밋 d411c8f, 2026-07-28) 소스 — src/config.rs(NDK_HOME 필수, ANDROID_SDK_HOME→ANDROID_HOME,
   build-tools 중 가장 높은 버전 자동 선택, android_version 기본 36, min_sdk 기본 18), src/ops/build.rs(aapt2·d8·zipalign·javac -source/-target 1.8,
@@ -22,12 +22,18 @@ verified: |
   1차 출처로 확인(2026-10-26, nail 0087): cargo-quad-apk d411c8f의 `res`·`icon` 메타데이터로 앱 아이콘이 들어가고, CI의 `aapt2 dump badging`에 application-icon이 찍힌다. 실제 런처 모양(적응형 잘림)은 미확인.
   1차 출처로 확인(2026-11-04, Knellroot 0046): miniquad 0.4.11 소스(`src/native/android.rs`의 `conf.fullscreen` 분기, `java/MainActivity.java` `setFullScreen`), Android 개발자 문서 "Hide system bars for immersive mode"(바는 `hide(systemBars())`로 숨긴다, 동작 `BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE`). 고친 판은 컴파일(cargo check)까지 — 실기기에서 바가 숨는지는 아직 확인 못 함.
   1차 출처로 확인(2026-11-07, Knellroot 0070): cargo-quad-apk d411c8f `src/ops/build.rs` — `library_name = package_name.split(".").last()`, MainActivity의 `System.loadLibrary("LIBRARY_NAME")`를 그것으로 바꾼다. CI 에뮬레이터(API 31 google_apis x86_64, ARM 번역)에 `….knellroot.dev` APK를 깔아 켠 logcat: `UnsatisfiedLinkError: dlopen failed: library "libdev.so" not found`(켜자마자 FATAL). 패키지를 `….dev.knellroot`로 바꾼 APK는 같은 에뮬레이터에서 켜졌다(아래 확인 결과).
+  CI 실행(2026-11-19, nail 0295, run 44495342893): APK → `aapt2 convert --output-format proto` → 모듈 꼴로 옮겨 담기 → bundletool 1.18.3 `build-bundle`·`validate` → jarsigner,
+  번들에서 `build-apks --mode=universal`로 뽑은 APK의 aapt2 badging(패키지·targetSdk 36·아이콘·arm64-v8a)·exported·`lib<마지막 조각>.so`가 원래 APK와 같다. AAB 34MB(APK 35MB).
+  같은 실행의 `llvm-readelf -lW libnail.so`: LOAD 넷 모두 정렬 0x10000(러너 기본 NDK + 러스트 aarch64-linux-android, 링크 인자 없이).
+  확인 못 함(AAB): Play Console에 실제로 올려 받아들여지는지, 번들에서 뽑은 APK가 실기에서 켜지는지(2026-11-19 기준 계정 대기).
   확인 못 함: 디버그 키 서명 APK가 Android 14+ 기기에서 사이드로드되는지(기기 버전 기록이 없다).
 sources:
   - https://github.com/not-fl3/cargo-quad-apk
   - https://github.com/actions/runner-images/blob/main/images/ubuntu/Ubuntu2404-Readme.md
   - https://github.com/not-fl3/miniquad/tree/master/java
   - https://github.com/fornwall/gamepads
+  - https://github.com/google/bundletool
+  - https://developer.android.com/guide/app-bundle/app-bundle-format
   - https://macroquad.rs/articles/android/
   - https://github.com/ReactiveCircus/android-emulator-runner
   - https://developer.android.com/studio/publish/versioning
@@ -105,6 +111,7 @@ jobs:
 NDK 없이도 `rustup target add aarch64-linux-android && cargo check --target aarch64-linux-android`는 된다. Android에서만 깨지는 의존성을 CI 전에 잡는다.
 
 ## 왜?
+(AAB) APK에서 바꾸는 까닭: 실기에서 확인한 APK와 상점에 올리는 번들의 내용이 같아지고, 빌드 도구(cargo-quad-apk)를 포크하지 않는다. AAB와 APK의 차이는 담는 꼴(proto 리소스·모듈 폴더)뿐이라 변환으로 충분하다.
 - **Gradle 없이**: miniquad는 NativeActivity가 아니라 자체 `MainActivity.java`(+`QuadNative`)를 쓴다. cargo-quad-apk가 그 Java를 miniquad 크레이트 소스에서 찾아 `javac → d8 → aapt2 link → zipalign → apksigner` 순서로 묶는다. 일반 `cargo-apk`/`xbuild`는 NativeActivity 전제라 맞지 않는다.
 - **CI에서만 빌드**: 러너 이미지가 SDK·NDK·JDK 버전을 관리해 준다. 로컬은 `cargo check`만.
 - **커밋 고정**: 상류 master가 바뀌어 조용히 깨지는 것을 막는다. 올릴 때 CI 한 번 보고 올린다.
@@ -138,6 +145,16 @@ NDK 없이도 `rustup target add aarch64-linux-android && cargo check --target a
 - `MainActivity.java` 컴파일에 deprecation 경고 9개(`setSystemUiVisibility` 등). 에러 없음.
 - 산출물 `nail.apk` 455KB(`classes.dex` + `lib/arm64-v8a/libnail.so`), `zipalign` 검증 통과, `~/.android/debug.keystore`를 keytool로 새로 만들어 apksigner 서명(`nail.apk.idsig` 동봉). 아티팩트 zip 449KB.
 - Android 전용 코드 경로 없이 `cargo check --target aarch64-linux-android`만 통과시킨 상태에서 바로 성공했다. 즉 macroquad 0.4.16 + audio feature는 Android에서 추가 설정 없이 링크된다(quad-snd는 OpenSL ES 백엔드).
+
+## Google Play용 AAB(cargo-quad-apk는 APK만 만든다)
+Play는 새 앱을 AAB로만 받는다. cargo-quad-apk를 고치거나 Gradle로 옮기지 않고, **다 만든 APK를 바꾼다**(Naïl `tools/android/make_aab.sh`):
+1. `aapt2 convert --output-format proto -o proto.apk app.apk` — 바이너리 매니페스트·`resources.arsc`만 proto(`AndroidManifest.xml`·`resources.pb`)로 바뀌고 나머지는 그대로 실린다. aapt2는 러너 build-tools의 것.
+2. 풀어서 모듈 꼴로: `manifest/AndroidManifest.xml`, 뿌리에 `resources.pb`, `classes*.dex` → `dex/`, `lib/`·`assets/`·`res/`는 그대로. `META-INF`(APK 서명)는 버린다. 남는 파일이 있으면 멈춘다(자리 없는 파일을 조용히 흘리지 않게).
+3. `zip -r base.zip .` → `java -jar bundletool.jar build-bundle --modules=base.zip --config=BundleConfig.json --output=app.aab` → `validate`. 이미 눌린 ogg·png는 `compression.uncompressedGlob`로 다시 누르지 않는다.
+4. 서명: `jarsigner -sigalg SHA256withRSA -digestalg SHA-256`로 **올리기 키**(Play App Signing — 앱 서명 키는 Google이 쥔다). 디버그 키로 서명한 번들은 Play가 받지 않으니, 평소 빌드에서는 변환 길이 도는지만 본다.
+5. 검사: `bundletool build-apks --mode=universal`로 APK를 다시 뽑아 APK 때와 같은 aapt2 검사를 한다 — 번들 안에서 매니페스트·라이브러리가 그대로인지.
+- bundletool jar는 GitHub Releases에서 받는다 — 버전과 sha256을 워크플로에 박아 `sha256sum -c`로 확인.
+- **16KB 페이지**: Play는 targetSdk 35+ 앱의 64비트 `.so`가 16KB 정렬이기를 요구한다(2차: Android 공지). `$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/*/bin/llvm-readelf -lW lib.so`의 LOAD 줄 끝 값이 0x4000 이상이면 된다 — 러너 기본 NDK로 링크한 러스트 `.so`는 0x10000이었다.
 
 ## CI 에뮬레이터로 "켜지나"를 보기
 폰에서 "켜자마자 꺼짐"이면 로그가 없어 원인을 모른다. CI에서 에뮬레이터에 깔아 켜고 logcat을 받는다(Knellroot `android-smoke.yml`·`tools/test/android-smoke.sh`).

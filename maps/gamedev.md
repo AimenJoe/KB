@@ -21,6 +21,7 @@ updated: 2026-11-18
 - [인디 게임 공식 페이지](../guides/indie-game-landing-page.md)
 - [공개 데모와 바깥 의견 받기](../concepts/public-demo-and-outside-feedback.md) — 첫 경험 먼저 시험, 로그라이트는 한 바퀴 온전히·깊이는 잠금, 기술 점검, 버전이 저절로 붙는 짧은 설문, itch.io HTML5 ZIP, 행사 전에 내기 — 첫 화면에 무엇·어디서, 싣는 칸(볼거리·해 보기·팩트시트·크레딧), 이야기를 스크롤로, CSS steps() 스프라이트 띠, 움직임 줄이기, 헤드리스 녹화는 도트를 뭉갠다
 - [무료 그림·사진 구하는 곳](../reference/assets/free-image-sources.md) — Openverse·미술관 CC0·사진 사이트, PDM과 CC0, API 요령(Met v1.1, UA)
+- [CC0 16px 식물 그림 팩](../reference/assets/cc0-16px-plant-packs.md) — Idylwild(크고 촘촘 → 화단)·SpiderDave(작고 평평 → 바탕 굽기)·ansimuz·PixelFarm, 라이선스 칸 직접 읽기, 역할을 나눠 섞기
 - [게임 그림 외주 맡기기](../guides/commissioning-game-art.md) — 임시 그림으로 먼저 판정, 사양서(안전 영역·색 약속), 계약: 저작재산권 + 2차적저작물작성권 특약(한국 제45조②), 공개 레포 커밋 허락
 - [이미지 생성 모델로 게임 일러스트 그리기](../guides/image-model-for-game-illustrations.md) — 나노바나나: 직접 그린 참고 그림 + 생김새 글, 목적·세계 규칙·캐릭터·장면 덩어리, 장면마다 새 대화·스타일 덩어리 매번, 비율은 글로(구도 그림은 베낀다), 캐릭터 시트 먼저, 지울 때 대신 그릴 것, 칸마다 가장 흔한 색·작은 캐릭터 자리, ✦ 되돌리기
 
@@ -41,6 +42,7 @@ updated: 2026-11-18
 - [능력치·장비 설계](../concepts/action-rpg-stats-and-equipment.md) — 무기는 모양·장신구는 수치·성장은 영구, 공격 속도 = 시계 배율, 큰 회복 = 목숨
 - [가방의 한도와 바닥에 떨어지는 아이템](../concepts/inventory-limits-and-ground-loot.md) — 한도의 일 셋(긴장·정리·상한), 가득이면 바닥에 남긴다, 줍는 재미(모델·등급의 빛), 정리·지키기
 - [무기 강화 설계](../concepts/weapon-upgrade-design.md) — 무기마다 따로 올리면 갇힌다(하나의 단·두 줄·되돌리기·이어받기), 정해진 수의 재료, 한 단 = 대 수가 하나 준다, 오른 것이 보이게
+- [로그라이트 메타 재화 점검](../guides/roguelite-economy-check.md) — 재화마다 들어오는 곳·나가는 곳 표, 진짜 생성기로 런 벌이 기대값·분포, 다 사기까지 런 수, 후반 남는 양, 끝없는 쓸 곳(돌려 바꾸기), 재는 시험이 새 보상을 빼먹는 함정
 - [로그라이트 저널(목표 목록)](../concepts/roguelite-journal-goals.md) — 평소 플레이를 런을 넘는 목표로, 앞 목표 뒤에 펼쳐짐, 받기 보상(재화·힘 아닌 것·옆으로), 진행은 기록에서 계산
 - [영구 성장 해금을 계획할 수 있게](../concepts/meta-progression-unlock-planning.md) — 다 보이는 칸·칸마다 그림·밝기 네 단, 잠긴 칸까지의 칸 수·합계·모자람, 목표 핀(길 표시·메뉴에서도), 캐릭터 사이 같은 꼴(고유 재주 한 칸), 탭이 넘치면 창 + ◀▶
 - [저장 슬롯·이어하기·런 중단 저장](../concepts/roguelite-save-slots-and-continue.md) — 기록과 런을 나누기, 슬롯은 기록 단위·설정은 밖, 시작하기/이어하기 → 슬롯 고르기, 옛 저장 = 슬롯 1, 두 번 눌러 지우기, 런 저장은 죽음이 런을 끝내나로 고르기(한 번 쓰는 중단 저장 vs 마지막 체크포인트), 저장 빈도 세 겹(사건·경계 이벤트·끄기 전 — 짧은 주기는 싸움 중을 적어 뺐다)과 같은 글이면 안 쓰기, 쓰기 실패를 알기(되읽기·한 번 알림), 끄는 순간(PC 창 닫기·웹 visibilitychange·fsync)
@@ -111,12 +113,13 @@ updated: 2026-11-18
   - [글자 그리기 비용과 브라우저 프레임레이트](../reference/macroquad/text-rendering-and-browser-frame-rate.md) — 아틀라스 통째 올리기, 픽셀 폰트는 원래 크기로 굽고 정수배, 미리 굽기, WebGL 안티에일리어싱 끄기, Safari 저전력 30fps
 - 빌드·배포
   - [macroquad WASM을 GitHub Actions로 빌드해 Netlify에 배포](../guides/macroquad-wasm-netlify-github-actions.md) — 전체 절차
-  - [macroquad를 GitHub Actions에서 Android APK로](../guides/macroquad-android-apk-github-actions.md) — cargo-quad-apk git 고정, 러너 내장 SDK/NDK, gamepads 제외, 서명 키는 Secret에
+  - [macroquad를 GitHub Actions에서 Android APK로](../guides/macroquad-android-apk-github-actions.md) — cargo-quad-apk git 고정, 러너 내장 SDK/NDK, gamepads 제외, 서명 키는 Secret에, Google Play용 AAB는 APK를 aapt2 proto + bundletool로 바꿔서(16KB 정렬 검사)
   - [macroquad iOS 빌드](../reference/macroquad/ios-build.md) — macOS 러너로 서명 안 한 .ipa, Info.plist 최소 키, 샌드박스 저장 자리, 서명 갈림길(무료 7일 / $99 TestFlight), 패드는 gilrs에 iOS 없음 → GameController 직접
   - [macroquad PC 빌드](../reference/macroquad/desktop-build.md) — Windows·macOS(겸용 .app, lipo 뒤 임시 서명)·Linux(libudev-dev) 묶음, 에셋 경로를 실행 파일 기준으로(데스크톱은 작업 폴더 기준이라 바로가기로 켜면 못 찾는다), 공증
   - [버전 올리기 = 릴리스](../reference/github-actions/release-from-version-bump.md) — 본문 파일이 스위치, CI가 태그·APK·Release
   - [WASM 빌드와 JS 번들](../reference/macroquad/wasm-build.md) — 번들 버전 계약, 에셋 로딩, 정수로 주고받는 내 플러그인(localStorage 설정 저장), 번들을 고치지 않는 로딩 화면
   - [소리(quad-snd)](../reference/macroquad/audio.md) — 네이티브 wav·ogg만·통째로 f32 44.1kHz(1분 ≈ 21MB)·가까운 점 리샘플·음높이 없음, 웹 mp3/네이티브 ogg, 교차는 직접, 들을 때 읽고 놓기(네이티브는 푸는 동안 멈칫)
+  - [앱이 백그라운드로 갈 때](../reference/macroquad/app-lifecycle-background.md) — 엔진은 최소화 사건만(소리 멈춤은 Android뿐), 게임이 일시정지 + 적기, 웹은 createGain을 감싸 AudioContext suspend/resume, 헤드리스 시험법
   - [정적 WASM 호스팅](../concepts/static-wasm-hosting.md) — 왜 번들러가 없어도 되는가
   - [0001 빌드는 CI, 호스팅은 Netlify](../decisions/0001-build-rust-wasm-in-github-actions-deploy-via-netlify-cli.md)
 

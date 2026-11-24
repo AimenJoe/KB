@@ -4,7 +4,7 @@ type: reference
 tags: [macroquad, rust, github-actions, release, windows, macos, linux, steam]
 status: draft
 created: 2026-10-29
-updated: 2026-11-10
+updated: 2026-11-23
 verified: |
   1차(직접 실행, 2026-11-10, knellroot 0135): 모델(build.rs)·소리 wav·글꼴을 모두 `include_bytes!`로 넣은 게임은 리눅스 운영판을 작업 폴더 `/`에서
   Xvfb로 켜도 타이틀이 뜬다(에셋 경로 찾기 없음, 묶음 = 실행 파일 하나). miniquad 0.4.11 소스: `conf.fullscreen`은 X11(`linux_x11.rs`)·Windows·macOS 모두 시작 때 반영,
@@ -20,6 +20,13 @@ verified: |
   - Pillow 12로 .ico(16~256)·.icns(16~1024) 저장(리눅스에서).
   직접 해 봄(2026-11-05): 리눅스 운영판 `cargo build --release --no-default-features` → 4.9 MB, `ldd`·`strings`로 링크·dlopen 확인. 에셋 크기는 `du`.
   확인 못 함: Windows·Mac 실기에서 실행(화면·소리·패드·전체 화면), Steam 경유 설치의 격리(quarantine) 여부, Steam의 공증 요구.
+  1차(직접 CI, 2026-11-23, nail-under-the-roots 0301): windows-latest의 Windows SDK `makeappx pack /d <폴더> /p <파일>.msix /h SHA256`로
+  서명하지 않은 MSIX(35 MB)를 만듦 — Git Bash에서 그냥 부르면 `/d`·`/p`가 경로(D:/…)로 바뀌어 makeappx가 사용법만 찍고 실패했고,
+  `MSYS_NO_PATHCONV=1 MSYS2_ARG_CONV_EXCL='*'`로 통과. `.cargo/config.toml`의 `x86_64-pc-windows-msvc` `+crt-static` 뒤 실행 파일에
+  `vcruntime140.dll` 문자열이 없음을 CI가 확인. MSIX 판 넷째 자리 0·상점이 서명·MSI/EXE는 직접 서명 + 호스팅은 learn.microsoft.com 원문(1차).
+  Rust MSVC 대상의 C 런타임 기본값이 동적(`crt-static` 꺼짐, musl만 예외)인 것은 Rust RFC 1721(1차, 설계 문서). `+crt-static`이 UCRT까지 정적으로 넣고
+  VC 런타임만 넣으려면 `static_vcruntime` 크레이트를 쓴다는 것은 그 크레이트 README(2차).
+  확인 못 함: MSIX 설치 뒤 실기 실행, MSIX가 `%APPDATA%` 쓰기를 패키지 전용 폴더로 돌리는 것(문서로만), Partner Center 제출 통과.
   2차 출처만 있음: macOS 15(Sequoia)는 격리 표시가 붙은 공증 없는 앱의 첫 실행을 막고 "개인정보 보호 및 보안 → 그래도 열기"로 연다(Eclectic Light).
   Apple 문서: Developer ID 배포는 공증을 받아야 한다(1차, 다만 Steam 경유 규칙은 Valve 문서를 못 찾음).
 sources:
@@ -27,6 +34,10 @@ sources:
   - https://developer.apple.com/documentation/security/notarizing-macos-software-before-distribution
   - https://eclecticlight.co/2024/08/10/gatekeeper-and-notarization-in-sequoia/
   - https://github.com/electron/rcedit
+  - https://rust-lang.github.io/rfcs/1721-crt-static.html
+  - https://docs.rs/crate/static_vcruntime/3.0.0
+  - https://learn.microsoft.com/en-us/windows/apps/publish/publish-your-app/msix/app-package-requirements
+  - https://learn.microsoft.com/en-us/windows/apps/publish/publish-your-app/msi/app-package-requirements
 ---
 
 # macroquad PC 빌드
@@ -54,7 +65,7 @@ macroquad(miniquad)는 Windows·macOS·Linux를 원래 지원해 코드 변경�
 ## OS마다
 | | 빌드 | 묶음 | 함정 |
 |---|---|---|---|
-| Windows | windows-latest, `x86_64-pc-windows-msvc` | zip: `Game.exe` + assets | `#![windows_subsystem = "windows"]`(릴리스만) 안 하면 콘솔 창이 같이 뜬다. 아이콘은 빌드 의존성 없이 `rcedit --set-icon`. 서명 없으면 SmartScreen 경고 |
+| Windows | windows-latest, `x86_64-pc-windows-msvc` | zip: `Game.exe` + assets | `#![windows_subsystem = "windows"]`(릴리스만) 안 하면 콘솔 창이 같이 뜬다. 아이콘은 빌드 의존성 없이 `rcedit --set-icon`. 서명 없으면 SmartScreen 경고. **C 런타임은 기본이 동적**(`VCRUNTIME140.dll`) — VC++ 재배포 패키지가 없는 PC에서 안 켜지니 `.cargo/config.toml`에 `[target.x86_64-pc-windows-msvc] rustflags = ["-C", "target-feature=+crt-static"]` |
 | macOS | macos-latest, `aarch64-apple-darwin` + `x86_64-apple-darwin` → `lipo -create` | `.app`(Info.plist, `Contents/Resources/assets`, `.icns`) → `ditto -c -k --keepParent` | lipo로 합치면 링커가 붙인 arm64 서명이 깨진다 → `codesign --force --deep -s -`(임시 서명)라도 다시. `Info.plist`에 `NSHighResolutionCapable`. 공증 없으면 첫 실행이 막힌다 |
 | Linux | ubuntu-22.04(glibc를 낮게 → 오래된 배포판·SteamOS) | tar.gz | apt: `libx11-dev libxi-dev libgl1-mesa-dev libasound2-dev` + 패드(gilrs)를 쓰면 `libudev-dev` |
 
@@ -63,7 +74,7 @@ macroquad(miniquad)는 Windows·macOS·Linux를 원래 지원해 코드 변경�
 
 ## 바이너리는 어떻게 생기고, 묶음 크기는 무엇이 정하나
 - **C 라이브러리 없이 전부 Rust.** macroquad 아래의 miniquad가 창·입력·GL을 SDL·GLFW 없이 OS API로 직접 맡고, 글꼴(fontdue)·소리(quad-snd)·그림 디코더도 Rust 크레이트다. cargo가 전부를 **실행 파일 하나에 정적 링크**한다 — 같이 줄 DLL·런타임이 없다.
-- **OS에 원래 있는 것만 쓴다.** 리눅스는 `ldd`에 libc·libm·libasound(소리)·libudev(패드 gilrs)만 보이고, X11·GL은 실행 때 `dlopen`으로 찾는다(바이너리 문자열에 `libGL.so`·`libXi.so`). Windows는 시스템 DLL, macOS는 시스템 프레임워크.
+- **OS에 원래 있는 것만 쓴다.** 리눅스는 `ldd`에 libc·libm·libasound(소리)·libudev(패드 gilrs)만 보이고, X11·GL은 실행 때 `dlopen`으로 찾는다(바이너리 문자열에 `libGL.so`·`libXi.so`). macOS는 시스템 프레임워크. Windows는 시스템 DLL **+ MSVC C 런타임**(`VCRUNTIME140.dll`) — 이것은 Windows에 늘 있지 않다(위 표의 `crt-static`). 예전 이 줄은 "Windows는 시스템 DLL만"이라고 적었었다(틀림, 2026-11-23 고침).
 - **에셋은 바이너리에 넣지 않는 게 기본**이다. 실행 파일 옆 `assets`에서 읽고(위 "에셋 경로"), `include_bytes!`·`include_str!`로 박는 것만 바이너리에 들어간다.
 - **그래서 묶음 크기는 에셋이 정한다.** OS마다 실행 파일만 다르고 에셋은 똑같이 들어가니 세 OS 묶음·APK가 거의 같은 크기가 된다. ogg·png는 이미 압축돼 있어 zip이 거의 못 줄인다. 줄이려면 코드가 아니라 음악(비트레이트·곡 수)을 본다.
   - 숫자(nail-under-the-roots v0.9.1, 2026-11-05): 리눅스 운영판 실행 파일 4.9 MB(`opt-level = "z"` + `lto = true` + `codegen-units = 1`, 직접 빌드), 묶기 전 에셋 34 MB(CI 로그 `34M stage/assets` — 음악 ogg 27곡 약 31 MB), Release 묶음 Linux 35.3 · Windows 35.0 · macOS 36.8 · APK 36.0 MB.
@@ -73,6 +84,15 @@ macroquad(miniquad)는 Windows·macOS·Linux를 원래 지원해 코드 변경�
 ## PC에서만 필요한 것
 - 타이틀 "끝내기"(`miniquad::window::order_quit`), 전체 화면 토글(`set_fullscreen`, F11 — 키 배치 밖에 둔다), 다음에 켤 때 기억(설정 칸 → 시작 `conf.fullscreen`), 창 아이콘(`Conf::icon` — 안 주면 miniquad 로고) — 웹·모바일 빌드에서는 숨긴다(`cfg!(not(any(wasm32, android, ios)))`).
 - 창 ✕로 닫을 때 저장: `prevent_quit()`로 닫기를 붙잡고 `is_quit_requested()`가 오면 런을 적은 뒤 `order_quit()`(nail 0264). 안 하면 ✕가 저장 없이 끝낸다.
+
+## Microsoft Store(MSIX)
+- 두 갈래: **MSIX**는 상점이 서명한다(서명하지 않은 묶음을 올린다). **MSI/EXE**는 Microsoft Trusted Root에 닿는 인증서로 직접 서명(자체 서명 불가) + 내 서버의 판 고정 URL로 호스팅. 인증서 없이 가려면 MSIX.
+- 묶기: zip 판 폴더 + 로고 넷(44·150·50·넓은 310×150) + `AppxManifest.xml` → Windows SDK `makeappx pack /d 폴더 /p 파일.msix /o /h SHA256`(windows 러너에 있다, `Windows Kits/10/bin/10.*/x64/`). 매니페스트 형식은 묶을 때 검사된다.
+  - 데스크톱 게임: `<Application Executable="Game.exe" EntryPoint="Windows.FullTrustApplication">` + `<rescap:Capability Name="runFullTrust"/>`, `TargetDeviceFamily Windows.Desktop`.
+  - 로고 파일 이름에 `scale-200` 같은 꼬리를 붙이면 `resources.pri` 없이는 못 찾는다 — 꼬리 없이 한 장씩.
+  - `Identity` Name·Publisher·PublisherDisplayName은 Partner Center "제품 ID" 값 그대로(비밀 아님). 판 `X.Y.Z.0` — 넷째 자리는 상점 몫, 같은 판은 다시 못 올린다.
+- **Git Bash 함정**: `/d`·`/p`처럼 `/`로 시작하는 Windows 도구 인자를 MSYS가 경로로 바꾼다 → `MSYS_NO_PATHCONV=1 MSYS2_ARG_CONV_EXCL='*'`를 그 호출에만.
+- 기록 위치: MSIX 앱이 `%APPDATA%`에 쓰면 패키지 전용 폴더로 돌려진다(앱에게는 같은 자리, 문서로만 — 실기 확인 전). zip 판과 기록이 나뉜다.
 
 ## 비용·서명
 - macOS 러너는 분당 리눅스의 약 10배 → main push마다가 아니라 개발 갈래(`release/**`) push·릴리스·손으로만([공개 레포를 비공개로](../github-actions/public-to-private-repo.md)).

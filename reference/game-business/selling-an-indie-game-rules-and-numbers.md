@@ -4,8 +4,11 @@ type: reference
 tags: [gamedev, marketing, steam, business, legal, ai-image, itch-io, epic]
 status: draft
 created: 2026-10-29
-updated: 2026-11-05
+updated: 2026-11-23
 verified: |
+  2026-11-23 더함(Microsoft Store): 개인 개발자 등록 무료(Windows 개발자 블로그 2025-09-10 — storedeveloper.microsoft.com 새 경로에서만, 옛 경로·일부 시장은 아직 유료),
+  회사 계정 $99 없앰(같은 블로그 2026-05-07), MSIX는 상점이 서명·MSI/EXE는 직접 서명 + 호스팅, 등급 화면에서 기존 IARC/Global Rating ID 가져오기 — 모두 Microsoft 원문(1차).
+  계정을 실제로 만들거나 제출해 보지는 않았다.
   2026-11-05 더함(일곱째, EU DSA 거래자): Epic 'Trader Status' 원문(legal.epicgames.com, 2026-08-28판, 헤드리스 브라우저로 읽음). 다른 상점(Steam)의 DSA 처리는 찾지 못함.
   2026-11-04 더함(여섯째, Epic): 요구사항·한국 배포·가격·IARC 무료는 dev.epicgames.com 원문(헤드리스 브라우저로 읽음). 100%/$1M은 Epic 공지의 검색 요약, $100 등록비는 보도·가이드로만.
   2026-11-04 더함(다섯째, IARC): IARC 참여 기관·상점·무료·설문 위치는 globalratings.com 원문, Steam의 독일·인도네시아 등급은 Steamworks 원문. IARC로 받은 한국 등급을 다른 상점(Steam)에 옮겨 쓸 수 있는지는 확인 못 함.
@@ -16,12 +19,15 @@ verified: |
   2026-11-04 더함(둘째): "Steam에서는 Steam판만 알린다"(Steamworks FAQ 인용)와 상점 설명 글의 바깥 링크 금지(2024-09)는 보도(PC Gamer·GamesRadar)로만 봤다 — 원문 직접 못 읽음. 무료판 + Steam 유료판의 예(Mindustry)와 사는 까닭은 GamingOnLinux 기사·itch 댓글(2차, 2019~2022).
   2026-11-04 더함: 가격 바닥($0.99 등급)은 Steamworks 가격 문서의 검색 요약과 보도(Game World Observer·PC Gamer)로만 봤다(partner 사이트가 작업 환경에서 막힘). macOS 공증은 2차(공지 댓글·개발자 블로그).
   1차 출처로 확인(2026-10-29, 원문을 직접 받아 읽음): Steamworks 문서(Content Survey의 AI 절, Steam Direct, Coming Soon, Next Fest와 2027-02판, 오픈소스 배포, 세금 FAQ),
-  IRS 조세조약 표 1(2023-05판, 한국 줄), Google Play Console 도움말(서비스 수수료·12명 시험), Android Developers(target SDK·개발자 확인)·Developer Console 도움말,
+  IRS 조세조약 표 1(2023-05판, 한국 줄), Google Play Console 도움말(서비스 수수료·12명 시험, 계정 유형·공개 정보·D-U-N-S — answer 13634885·13628312, 2026-11-19 원문), Android Developers(target SDK·개발자 확인)·Developer Console 도움말,
   Apple Developer(회비 면제·Small Business Program), itch.io FAQ와 오픈 수익 배분 공지, Gemini API 추가 약관(2026-03-23판), 문체부 보도자료(2019 시행령).
   데이터 회사·분석가의 원문(1차 데이터지만 추정치): Gamalytic 위시리스트 전환(2024-04-29), GameDiscoverCo EA 졸업작(2026), Sulka Haro의 Steam AI 표시 전수 조사(2023-07~2026-07).
   2차 출처만 있음: 매출 중앙값($249·$1,136), Boxleiter 배수(리뷰×20~60), Next Fest 위시리스트 중앙값(설문), 플레이어 AI 반감 설문(8% "절대 안 산다"), 캡슐 외주 시세.
   확인 못 함: Valve의 한국 자체등급분류사업자 지정 여부(2026-10까지 소식 없음), GCRB 현행 수수료표(원문), STOVE 수수료.
 sources:
+  - https://blogs.windows.com/windowsdeveloper/2025/09/10/free-developer-registration-for-individual-developers-on-microsoft-store/
+  - https://blogs.windows.com/windowsdeveloper/2026/05/07/publish-to-microsoft-store-as-a-company-now-with-free-registration-and-faster-onboarding/
+  - https://learn.microsoft.com/en-us/windows/apps/publish/publish-your-app/msix/age-ratings
   - https://partner.steamgames.com/doc/gettingstarted/contentsurvey
   - https://partner.steamgames.com/steamdirect
   - https://partner.steamgames.com/doc/store/coming_soon
@@ -114,9 +120,10 @@ sources:
 ### 다른 스토어
 | 스토어 | 내용 |
 |---|---|
-| Google Play | 개인 계정(2023-11-13 뒤)은 **12명 × 14일 비공개 시험** 뒤 정식 출시. 새 앱·업데이트는 **targetSdk 36**(2026-08-31~). 수수료: EEA·영국·미국(2026-06-30)·호주·일본(2026-09-30)은 새 구조(첫 $1M 10% + 결제 5% 등), **한국 등 나머지는 아직 15%(첫 $1M)/30%**, 한국은 대체 결제 시 4%p 낮음 |
+| Google Play | 개인 계정(2023-11-13 뒤)은 **12명 × 14일 비공개 시험** 뒤 정식 출시. **조직 계정**은 D-U-N-S(D&B 무료·최대 30영업일, 빠른 발급만 유료)가 필요하고 시험이 없다 — 대신 법적 이름·주소·D-U-N-S·이메일·**전화번호**가 Play에 보인다. 개인 계정도 **수익을 내면 전체 주소**가 보인다. 결제 프로필 이름·주소 = D&B 기록(글자까지, 다르면 계정 제한). 새 앱·업데이트는 **targetSdk 36**(2026-08-31~). 수수료: EEA·영국·미국(2026-06-30)·호주·일본(2026-09-30)은 새 구조(첫 $1M 10% + 결제 5% 등), **한국 등 나머지는 아직 15%(첫 $1M)/30%**, 한국은 대체 결제 시 4%p 낮음 |
 | Android 직접 설치 | 개발자 확인: 2026-09-30 일부 나라, **2027년 전 세계**. 확인 안 된 앱은 고급 흐름(경고·대기)으로만. 정식 배포 계정 $25, **제한 배포 계정은 무료·신분증 없이 기기 20대까지**. ADB는 그대로 |
 | App Store | 연 $99(회비 면제는 비영리·교육기관·정부만). Small Business Program 15%(전년 수익 $1M 이하·신규) |
+| Microsoft Store | **등록 무료** — 개인(2025-09, storedeveloper.microsoft.com 새 경로에서만, Partner Center로 바로 가면 옛 유료 경로가 뜰 수 있다)·회사(2026-05, $99 없앰). 신분증·셀카 확인. 게임 묶음은 **MSIX**(상점이 서명) 또는 MSI/EXE(직접 코드 서명 + 내 서버 호스팅). IARC 참여 상점이라 등급 화면에서 **다른 상점의 Global Rating ID를 가져온다** — 한국 게임위 등급도 같이 [원문] |
 | itch.io | 수익 배분을 개발자가 정한다(**기본 10%**), Stripe·PayPal로 바로 받는다, EU VAT 자동 |
 
 ### 그림 도구·에셋·한국 규칙

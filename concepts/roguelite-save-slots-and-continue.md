@@ -22,7 +22,8 @@ verified: |
   1차 문서: MDN `Storage.setItem`은 용량 초과·저장 금지 때 QuotaExceededError를 던진다. Chrome Page Lifecycle 글: 탭 전환·앱 전환은
   visibilitychange, 버려질 때(discard)는 아무 이벤트도 없다, 얼면 타이머가 안 돈다.
   2차(메일링 리스트): ext4 auto_da_alloc(이름 바꾸기 교체 휴리스틱)은 보장이 아니며 정석은 rename 전 fsync(T. Ts'o, LKML 2022·Kafka 이슈).
-  웹 visibilitychange 저장은 이 게임에 아직 안 넣었다(hidden이 되면 프레임이 멈춰 앱 상태에 동기 접근이 필요).
+  웹 visibilitychange 저장은 JS에서 동기로는 안 넣었다(hidden이 되면 프레임이 멈춰 앱 상태에 동기 접근이 필요) — 대신 엔진의 최소화 사건
+  (웹은 포커스를 잃는 순간에도 온다)에서 일시정지 창을 열어 그 저장이 돈다(Naïl 0298, 2026-11-19, 헤드리스 시험 `bg:`).
   2차 출처만 있음: Returnal 2.0의 "Suspend Cycle"(한 번 쓰면 지워지는 중단 저장, 보스·컷씬·전투 중에는 못 만든다,
   클라우드 복사로 되살리는 꼼수) — 게임 뉴스 기사들. Hades에 여러 슬롯이 있고 슬롯 번호가 파일 이름(Profile1.sav)이라는 것 —
   Supergiant 지원 글·기사 요약. Hades의 정확한 슬롯 수는 확인 못 함.
@@ -119,6 +120,7 @@ sources:
 - 쓰기 횟수를 실제로 재 본다: 헤드리스 브라우저에서 `Storage.prototype.setItem`을 감싸 열쇠·길이·시각을 모으면 "가만히 있을 때 0번, 바뀐 뒤 주기 안에 한 번"을 숫자로 확인할 수 있다.
 
 ## 관련 노트
+- [macroquad 앱이 백그라운드로 갈 때](../reference/macroquad/app-lifecycle-background.md) — 플랫폼별 엔진 동작, 일시정지 + 적기, 웹 AudioContext
 - [WASM 빌드와 JS 번들](../reference/macroquad/wasm-build.md) — 칸 번호를 받는 저장 플러그인
 - [로그라이트 다회차의 세 축](roguelite-replay-axes.md)
 - [로그라이트 저널(목표 목록)](roguelite-journal-goals.md) — 진행을 기록에서 계산하기
