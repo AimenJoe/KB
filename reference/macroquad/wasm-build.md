@@ -4,8 +4,11 @@ type: reference
 tags: [macroquad, miniquad, rust, wasm, gamedev]
 status: verified
 created: 2026-10-24
-updated: 2026-11-18
+updated: 2026-11-19
 verified: |
+  1차(직접 실행, 2026-11-19, knellroot 0258): opt-level z → 3 — 웹 wasm 8,306,419 → 9,213,702 바이트(gzip -9 4,322,135 → 4,556,689), PC 네이티브(llvmpipe 가상 화면)에서 틱 0.60 → 0.38ms·방랑자 그리기 0.71 → 0.49ms·소품 0.42 → 0.13ms(부하 80마리 장면). 웹 브라우저·실기기에서의 비는 재지 않았다.
+  1차(직접 실행, 2026-11-19, knellroot touch.js — 시간 기다림 옛 스크립트를 그대로 다시 돌려 멈춤 창이 안 열린 채 통과하는 것을 봤다, 시험 깃발을 켠 새 스크립트는 통과).
+  1차(직접 실행, 2026-11-19, knellroot save.js): 장면 이름을 적는 가져오기 함수 + waitForFunction으로 바꾼 뒤, CPU 10배 느리게 한 실행에서 옛 스크립트가 숨기던 자리(새 판이 열림)를 새 스크립트가 바로 잡았고, 전제(플레이 시간이 적힌 기록)를 기다리게 고친 뒤 보통·10배 두 번 모두 통과.
   1차 출처로 확인: macroquad 0.4.16 README(빌드 명령, 산출물 경로, index.html 템플릿),
   js/mq_js_bundle.js 소스(프로토콜 version=2, 플러그인 버전, 버전 체크 로직),
   Cargo.toml(macroquad 0.4.16 → miniquad =0.4.11 고정), .github/workflows/rust.yml.
@@ -63,14 +66,17 @@ cargo build --release --target wasm32-unknown-unknown
 ### `audio`는 기본 feature가 아니다
 macroquad 0.4.16의 `[features] default = []`. 소리를 쓰려면 `macroquad = { version = "0.4.16", features = ["audio"] }`. Linux 데스크톱 링크에 `libasound2-dev`가 필요하고, 디코더는 audrey(wav/ogg, 모노·스테레오, 임의 샘플레이트 → 44.1kHz 스테레오로 리샘플). `load_sound_from_bytes()`가 있어서 **런타임에 합성한 WAV 바이트**도 로드된다(에셋 없이 임시 효과음을 만들 때 유용).
 
-### 크기 줄이기 (선택)
+### 크기 줄이기 (선택) — 3D 게임이면 속도와 바꾸는 것이다
 ```toml
 [profile.release]
-opt-level = "z"
+opt-level = "z"   # 크기 우선. 계산이 많은 게임은 3을 먼저 재 본다(아래)
 lto = true
 codegen-units = 1
 ```
 더 줄이려면 binaryen의 `wasm-opt -Oz`를 한 단계 추가. 필수는 아니다.
+- **"z"는 계산을 느리게 한다.** CPU에서 정점 빛·자세·충돌을 셈하는 3D 게임(Knellroot)에서 `3`으로 바꾸니 같은 장면의 우리 코드 구간이
+  30~60% 빨라졌고(PC 네이티브 재기), wasm은 8.31 → 9.21MB, **gzip으로는 4.32 → 4.56MB(+5%)** — 에셋을 바이너리에 넣은 게임은 코드 몫이
+  작아 차이가 더 작다. 크기를 고르기 전에 gzip 크기와 프레임 시간을 같이 잰다. 같은 프로필이 Android·데스크톱에도 걸린다는 것도 잊지 말 것.
 
 ## index.html (README 템플릿 요지)
 
@@ -178,6 +184,19 @@ await page.screenshot({ path: 'web.png' });
   가끔 두 누름이 한 프레임에 들어간다 — 메뉴에서 ↑ 두 번이 한 번이 되어 다른 칸을 고르고, 시험이 엉뚱한 곳에서 실패한다(같은 자리에서
   두 번, 하루 걸러). CDP `Emulation.setCPUThrottlingRate` 5~8배로 로컬에서 재현된다. 누를 때마다
   `await page.evaluate(() => new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r))))`로 게임 루프(rAF)가 두 번 돌기를 기다린다.
+- **장면이 바뀌는 누름 뒤에는 시간이 아니라 상태를 기다린다**(2026-11-19, knellroot `save.js` — 같은 자리 네 번째 실패 뒤): CI 소프트웨어 GL은
+  10 fps 안팎이라 `waitForTimeout(300)`이 몇 프레임인지 정해지지 않는다. 게임이 맨 위 장면이 바뀐 프레임에 JS 가져오기 함수 하나로
+  `window.knellScene = "<Scene의 Debug>"`를 적게 하고(`importObject.env`에 함수를 더하면 wasm이 부를 수 있다 — 글은 `wasm_memory`에서 읽는다),
+  시험은 `page.waitForFunction(w => window.knellScene.startsWith(w))`로 기다린다. 못 오면 **지금 장면을 말하며** 멈추게 하면 실패가 진단이 된다:
+  느린 CPU(`setCPUThrottlingRate` 10배)에서 "덮어쓰기 묻는 창 대신 새 판"으로 바로 잡혔고, 원인은 키 처리가 아니라 **시험의 전제**였다 —
+  슬롯 창은 플레이 시간 1초 이상인 슬롯만 기록으로 보는데, 벽시계 2~3초로는 느린 러너에서 게임 시간이 1초를 못 채워 그 슬롯이 빈 슬롯이 되고
+  커서 셈(↑↑)이 엉뚱한 칸에 닿았다. 게임 시간에 기대는 전제(쌓인 시간·저장된 기록)는 저장소를 폴링해 확인한 뒤 다음 걸음으로.
+- **시간으로 기다리는 헤드리스 시험은 틀린 화면을 찍고도 통과한다**(2026-11-19, knellroot 스크립트 열 개를 장면 기다림으로 옮기며): 스크린숏만 남기는
+  스크립트는 기대한 화면이 아니어도 실패하지 않는다. 옮기자마자 둘이 드러났다 — (1) 긴 터치 시험 도중 주인공이 곁의 적에게 쓰러져, 멈춤·장비
+  창 대신 결과 화면을 찍고 있었다(옛 스크립트로 다시 돌려도 같은 자리에서 창이 안 열렸다), (2) UI가 바뀌어(새 판에는 바꿀 장비가 없음) 기대한
+  목록이 더는 뜨지 않았다. 고친 길: 개발 빌드에만 있는 시험 깃발(페이지 `window.<게임>TestFlags` → 가져오기 함수 → 월드의 "맞지 않음")을
+  `addInitScript`로 켜고, 기대 자체를 지금 규칙에 맞게 고쳤다. 장면 이름을 기다리는 길은 이런 조용한 틀림을 바로 실패로 바꾼다. 화면 안 탭
+  넘기기처럼 이름 대신 "바뀌었다"만 알면 될 때는 누르기 전 이름을 적어 두고 다른 이름이 올 때까지 기다린다.
 - 기대하는 콘솔: `Plugin sapp_jsutils is present in JS bundle, but is not used`(정상), AudioContext 자동재생 경고(정상, 첫 클릭에 번들이 resume하며 "fix"를 찍음). `ReferenceError: register_plugin is not defined`(mq_js_bundle.js 안, 2026-10-26 확인)도 원래 난다: 번들에 든 quad-net 웹소켓 플러그인이 엄격 모드에서 선언 없이 전역 `register_plugin`에 대입한다. 그 플러그인을 안 쓰면 무해하다. `Version mismatch`·`version mismatch`·`Missed function`이 있으면 번들/플러그인/링크 문제.
 
 ## 에셋 로딩
