@@ -33,6 +33,7 @@ updated: 2026-11-18
 ## Cloudflare
 - [Email Routing — 도메인 메일 받기](../reference/cloudflare/email-routing.md) — MX·SPF만으론 부족, 주소마다 규칙 + 확인된 메일함, `550 5.1.1 Address does not exist`(RCPT 단계) = 규칙 없음, 보내기는 따로(Email Sending은 Workers Paid)
 - [정적 사이트 운영에 쓰기](../reference/cloudflare/static-site-extras.md) — 프록시 뒤 엣지 통계·쿠키 없는 Web Analytics(Free는 하위 도메인 전체에 주입)·리디렉트, R2 내려받기 무료, Pages/Workers 파일 25 MiB
+- [무료 플랜에서 JavaScript Detections 끄기](../reference/cloudflare/javascript-detections-off-on-free.md) — Bot Fight Mode를 꺼도 `jsd/main.js`·`cf_clearance` 쿠키가 남는다, API `enable_js: false`로 끈다, 확인은 curl + 브라우저 쿠키
 
 - [Worker로 사이트 점검기 + GitHub API 캐시](../guides/cloudflare-worker-site-watchdog.md) — Cron 아침 점검(배포 커밋 = 갈래 머리·몇 시간 유예·필수 파일 HEAD·주간 살아 있음), 확인된 내 메일함으로 무료 메일, Releases 캐시(토큰·10분·마지막 값 키), 클라우드 출구 IP는 익명 GitHub 한도가 이미 0일 수 있다
 
