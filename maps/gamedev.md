@@ -24,6 +24,7 @@ updated: 2026-11-18
 - [CC0 16px 식물 그림 팩](../reference/assets/cc0-16px-plant-packs.md) — Idylwild(크고 촘촘 → 화단)·SpiderDave(작고 평평 → 바탕 굽기)·ansimuz·PixelFarm, 라이선스 칸 직접 읽기, 역할을 나눠 섞기
 - [게임 그림 외주 맡기기](../guides/commissioning-game-art.md) — 임시 그림으로 먼저 판정, 사양서(안전 영역·색 약속), 계약: 저작재산권 + 2차적저작물작성권 특약(한국 제45조②), 공개 레포 커밋 허락
 - [이미지 생성 모델로 게임 일러스트 그리기](../guides/image-model-for-game-illustrations.md) — 나노바나나: 직접 그린 참고 그림 + 생김새 글, 목적·세계 규칙·캐릭터·장면 덩어리, 장면마다 새 대화·스타일 덩어리 매번, 비율은 글로(구도 그림은 베낀다), 캐릭터 시트 먼저, 지울 때 대신 그릴 것, 칸마다 가장 흔한 색·작은 캐릭터 자리, ✦ 되돌리기
+- [sprite-gen — 이미지 모델 스프라이트 파이프라인](../reference/assets/sprite-gen-ai-sprite-pipeline.md) — 공개 스킬·CLI(Apache-2.0, GPT·Grok): 바탕 크로마는 대상 색에서 먼 쪽·칠한 바탕색은 테두리에서, 격자 위상 실측 채점, 밀도는 참고 그림이 정한다, 숨쉬기는 목 위 고정, 영상 → 투명 루프
 
 ## 3D·카메라
 - [시점 전환(쿼터뷰 ↔ 숄더뷰)과 락온 카메라](../concepts/camera-mode-switch-and-lock-on.md) — 게임 규칙 하나 + 리그 둘 + 입력 기준 둘, 기준은 즉시·카메라만 보간, 둘 다 Perspective·FOV 격차 줄이기, 어깨 너머 1/3 구도, 가림은 당기기 → 페이드, Nesky 50 실수
