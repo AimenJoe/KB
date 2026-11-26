@@ -16,6 +16,8 @@ verified: |
   Rust RFC 3514 — 초월 함수의 정확한 결과는 타깃 · 버전 · 플래그에 따라 달라질 수 있다.
   2차 출처만 있음: `libm` 크레이트로 Linux · macOS에서 같은 결과를 얻었다는 포럼 글. Windows · macOS · Android 실기기에서 우리 해시가
   같은지는 재지 않았다(CI의 Linux 둘과 wasm 빌드만).
+  확인 못 함: 함정의 "컴파일러 상수 접기가 호스트 libm을 쓴다"는 rust-lang/rust 이슈 109118(opt-level에 따라 sin의 비트가 달랐다는 보고)에서
+  짐작한 것 — 직접 재현하지 않았다.
   못 잰 것: 네이티브에서 `libm` 크레이트가 glibc보다 얼마나 느린지(한 프레임의 호출이 수천 아래라 재지 않았다).
 sources:
   - https://gcc.gnu.org/pipermail/libc-alpha/2025-January/164378.html
@@ -23,6 +25,7 @@ sources:
   - https://docs.rs/bevy_math/latest/src/bevy_math/ops.rs.html
   - https://users.rust-lang.org/t/f64-ln-1p-platform-specific-behavior/77113
   - https://docs.rs/libm
+  - https://github.com/rust-lang/rust/issues/109118
 ---
 
 # 골든 트레이스와 플랫폼 수학
@@ -70,7 +73,7 @@ std의 것을 린트로 막는 것이다.
   다시 쓴 push는 CI 결과까지 본다.
 - 짧은 골든(6초 · 서 있는 적)은 두 플랫폼에서 같았다 — "CI에서 한 번 통과했다"가 결정론의 증명은 아니다.
 - 해시에 접는 값을 1e-3으로 양자화해도 소용없다: 끝자리가 경계를 넘거나 사건의 차례를 바꾸면 그대로 갈린다.
-- 컴파일러의 상수 접기(컴파일 때 호스트의 libm으로 `sin(상수)`를 셈)도 std 함수에서는 변수다. 크레이트 함수 호출은 접히지 않는다.
+- 컴파일러의 상수 접기(컴파일 때 `sin(상수)`를 미리 셈)도 std 함수에서는 변수일 수 있다(확인 못 함 — `verified`). 순수 Rust 구현은 접히든 아니든 같은 코드의 결과다.
 - `libm` 크레이트의 `sqrt`까지 쓸 필요는 없다(std의 `sqrt`는 IEEE가 정한다) — 수학 크레이트의 `libm` 기능을 통째로 켜면 `sqrt`도
   그리로 가서 느려질 수 있다.
 - 리플레이 · 록스텝 네트워킹을 하려면 이것만으로는 모자란다(FMA 융합 · x87 · 스레드 차례). 여기서 다룬 것은 "같은 바이너리 꼴,
