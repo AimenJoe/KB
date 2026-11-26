@@ -4,7 +4,7 @@ type: map
 tags: [gamedev, macroquad, rust, game-design, pixel-art, game-feel]
 status: verified
 created: 2026-10-24
-updated: 2026-11-18
+updated: 2026-11-26
 ---
 
 # 지도: 게임 개발
@@ -41,6 +41,7 @@ updated: 2026-11-18
 ## 보상·경제
 - [회복과 화폐 드롭](../concepts/roguelite-healing-and-currency.md) — 깎인 만큼 확률 + 불운 보정, 자석·줍기 지연·오르는 소리, 메타 화폐 맡기기(쉼터 자동)·둘 중 하나 영구 기술·살 수 있을 때 쓰는 곳이 빛나기
 - [능력치·장비 설계](../concepts/action-rpg-stats-and-equipment.md) — 무기는 모양·장신구는 수치·성장은 영구, 공격 속도 = 시계 배율, 큰 회복 = 목숨
+- [무기 종류를 RPG 클래스처럼](../concepts/weapon-classes-as-rpg-classes.md) — 계열 → 종류 → 무기 세 층, 종류 = 클래스(칭호 없이 하는 일로), 주특성·보조특성(멀티클래스 맛보기)·빈 손의 결, 방어 금지 셋 + 보스 모의 4% 상한(문턱·길어지는 싸움), 교체 공격, 종류마다 트리·레벨은 스킬에 하나(기록 키 그대로), 발동 순간의 그림·소리·그림 ≤ 판정, 균형은 그 클래스의 주 공격으로
 - [가방의 한도와 바닥에 떨어지는 아이템](../concepts/inventory-limits-and-ground-loot.md) — 한도의 일 셋(긴장·정리·상한), 가득이면 바닥에 남긴다, 줍는 재미(모델·등급의 빛), 정리·지키기
 - [무기 강화 설계](../concepts/weapon-upgrade-design.md) — 무기마다 따로 올리면 갇힌다(하나의 단·두 줄·되돌리기·이어받기), 정해진 수의 재료, 한 단 = 대 수가 하나 준다, 오른 것이 보이게
 - [로그라이트 메타 재화 점검](../guides/roguelite-economy-check.md) — 재화마다 들어오는 곳·나가는 곳 표, 진짜 생성기로 런 벌이 기대값·분포, 다 사기까지 런 수, 후반 남는 양, 끝없는 쓸 곳(돌려 바꾸기), 재는 시험이 새 보상을 빼먹는 함정
