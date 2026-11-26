@@ -80,6 +80,7 @@ updated: 2026-11-26
 
 ## 테스트·연출
 - [1인 게임 코드의 건강 신호](../concepts/solo-game-codebase-health-signals.md) — 표로 넓히는 축 vs 틱 함수가 깊어지는 축, 재는 신호(틱 함수 줄 수·구조체 필드 수·부작용 핸들·복붙·테스트 분포), 소리 큐가 테스트 문을 연다, 리팩터링 순서, 다시 짜기는 안 한다
+- [골든 트레이스와 플랫폼 수학](../concepts/deterministic-float-math-for-golden-traces.md) — sin·atan2의 끝자리는 libc 판마다 다르다(내 기계 초록 · CI 빨강), `libm` 크레이트 + clippy `disallowed-methods`, 경합과 플랫폼 차이 가르기, 안전망을 넣은 push는 CI까지 본다
 - [캔버스 게임의 헤드리스 브라우저 시험](../guides/headless-browser-tests-for-canvas-games.md) — 시간이 아니라 상태를 기다린다(덮개가 사라짐·기록에 적힘·rAF 둘), CDP CPU 스로틀로 느린 러너 재현, 저장은 빈 탭에서 심기, z 순서도 시험, push 전에 CI 스크립트를 다
 - [개발용 시나리오 진입점과 스텝 스크립트 컷씬](../concepts/dev-scenarios-and-scripted-cutscenes.md) — 시나리오 목록 → 월드 구성, JRPG식 대화창, 길게 눌러 건너뛰기, 배우 좌표계·싸움 끝 연타 함정, 일러스트 장면(2배 밀도 한 장 그림·패닝·입자·내레이션, 홀수 배율), 컷씬이 보간을 얼려 플레이어가 미끄러지는 함정, 고친 뒤 확인 세 겹(수정 전 실패하는 시험·헤드리스·실기)
 
