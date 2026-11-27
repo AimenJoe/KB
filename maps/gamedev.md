@@ -25,6 +25,7 @@ updated: 2026-11-26
 - [게임 그림 외주 맡기기](../guides/commissioning-game-art.md) — 임시 그림으로 먼저 판정, 사양서(안전 영역·색 약속), 계약: 저작재산권 + 2차적저작물작성권 특약(한국 제45조②), 공개 레포 커밋 허락
 - [이미지 생성 모델로 게임 일러스트 그리기](../guides/image-model-for-game-illustrations.md) — 나노바나나: 직접 그린 참고 그림 + 생김새 글, 목적·세계 규칙·캐릭터·장면 덩어리, 장면마다 새 대화·스타일 덩어리 매번, 비율은 글로(구도 그림은 베낀다), 캐릭터 시트 먼저, 지울 때 대신 그릴 것, 칸마다 가장 흔한 색·작은 캐릭터 자리, ✦ 되돌리기
 - [sprite-gen — 이미지 모델 스프라이트 파이프라인](../reference/assets/sprite-gen-ai-sprite-pipeline.md) — 공개 스킬·CLI(Apache-2.0, GPT·Grok): 바탕 크로마는 대상 색에서 먼 쪽·칠한 바탕색은 테두리에서, 격자 위상 실측 채점, 밀도는 참고 그림이 정한다, 숨쉬기는 목 위 고정, 영상 → 투명 루프
+- [agent-sprite-forge에서 배운 것 — 작은 스프라이트](../reference/assets/agent-sprite-forge-small-sprite-lessons.md) — 줄이지 말고 격자를 읽기·픽셀 크기는 자 그림이·외곽선 색은 그림에서·머리 고정, 우리가 해 본 것: 눈 도장(가장 큰 차이)·물들인 외곽선·안쪽 선·영상 걷기·머리 비율
 
 ## 3D·카메라
 - [시점 전환(쿼터뷰 ↔ 숄더뷰)과 락온 카메라](../concepts/camera-mode-switch-and-lock-on.md) — 게임 규칙 하나 + 리그 둘 + 입력 기준 둘, 기준은 즉시·카메라만 보간, 둘 다 Perspective·FOV 격차 줄이기, 어깨 너머 1/3 구도, 가림은 당기기 → 페이드, Nesky 50 실수
