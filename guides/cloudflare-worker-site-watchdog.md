@@ -24,6 +24,9 @@ verified: |
   실제 배포(wrangler 4.156.2) → `secret bulk` → `/run`으로 보낸 메일이 확인된 Outlook 메일함의 정크 폴더에 도착(2026-11-19).
   Cron 요일(2026-11-20, cron-triggers 문서 dateModified 2026-11-18): "Days of the week go from 1 = Sunday to 7 = Saturday", 평일 예시는 `mon-fri` 또는 `2-6`.
   직접 겪음(2026-11-20): `17 1 * * 1-5`로 둔 평일 메일이 금요일에 돌지 않았다(관측 로그에 그 Worker의 scheduled 없음, 같은 계정의 매일 Cron은 돎) → `MON-FRI`로 바꿈.
+  직접 겪음(2026-11-27, wrangler 4.156.2 dev): 진입 파일(`main`)에 `export const X = "…"`를 더하자 workerd가
+  `Incorrect type for map entry 'X': the provided value is not of type 'function or ExportedHandler'`로 시작하지 못했다(`node --test`는 통과). export를 지우니 됨.
+  Cron 두 개를 한 Worker에: `scheduled`의 `controller.cron`이 설정 문자열 그대로(`20 7 * * FRI`) 와서 갈랐다(wrangler dev `__scheduled?cron=`, 실제 배포 둘 다 확인).
   확인 못 함: 실제 배포 뒤 메일 도착·Custom Domain 인증서 시간, `secret bulk`가 배포 전 Worker에도 되는지(그래서 배포 뒤에 넣는다).
 sources:
   - https://developers.cloudflare.com/email-service/api/send-emails/workers-api/
@@ -76,6 +79,8 @@ sources:
 - **점검 Worker가 같은 영역의 페이지를 부르면 "밖에서 보이는 것"과 다르다 — `compatibility_flags: ["global_fetch_strictly_public"]`을 켠다.** 기본은 같은 영역(같은 도메인 아래)으로의 `fetch()`가 다른 Worker의 **route**를 건너뛰고 원본으로 간다. 그래서 다른 Worker가 route로 내는 경로(예: `/play/`)는 404로 보인다 — 방문자에게는 200인데 점검만 실패한다. 플래그를 켜면 점검 요청이 인터넷에서 온 것처럼 정문으로 들어가 방문자와 같은 것을 본다(보안 설정·봇 차단도 그대로 받는다 — Bot Fight Mode가 켜져 있으면 막힐 수 있다). Worker에 route를 손으로 더하지 말고(설정 파일에 있는 것만 — wrangler는 대시보드에서 더한 route를 지워 주지 않는다), 영역의 **Workers Routes** 목록을 때때로 본다. 중요한 페이지는 다른 출처(예: CI 러너)에서도 한 번 본다.
 - 알림 메일은 받는 쪽 스팸함으로 갈 수 있다 — 같은 보낸 곳이라도 어떤 날은 받은 편지함, 어떤 날은 스팸함(Outlook, 2026-11-19). 보낸 주소를 받는 쪽의 "안전한 보낸 사람"에 넣는다. 월요일 살아 있음 메일이 안 보이면 스팸함부터.
 - **주입할 수 있게 넣어 둔 `fetch`는 감싸서 쓴다.** `this.fetch = fetchImpl`(기본값 `fetch`) 뒤 `this.fetch(url)`로 부르면 Workers 런타임에서 `TypeError: Illegal invocation` — `fetch`의 `this`가 전역이 아니게 되기 때문. Node 시험은 통과해서 배포 뒤에야 터진다. `this.fetch = (u, i) => fetchImpl(u, i)`로 넣고, 배포 전에 `wrangler dev --test-scheduled`로 한 번 깨워 본다(시험의 가짜 fetch로는 안 잡힌다).
+- **진입 파일에서는 핸들러(`default`, Durable Object·Workflow 클래스) 말고 아무것도 export하지 않는다.** workerd는 진입 모듈의 이름 있는 export를 모두 진입점으로 읽어, 상수 하나만 export해도 Worker가 시작하지 못한다(배포 전 `wrangler dev`에서 잡힌다, Node 시험으로는 안 잡힌다). 시험에서 쓸 값은 다른 모듈에 둔다.
+- Cron 여러 개를 한 Worker에 두면 `scheduled(controller)`의 `controller.cron`(설정에 적은 문자열 그대로)으로 할 일을 가른다 — 무료판 Cron 다섯 개를 Worker마다 쓰지 않아도 된다. 문자열을 코드와 `wrangler.jsonc` 두 곳에 쓰게 되니 서로를 가리키는 주석을 남긴다.
 - 로그인이 필요한 API를 Worker에서 부를 때 쿠키 통은 직접: 응답의 `Set-Cookie`가 여럿이면 `headers.get("set-cookie")`는 쉼표로 이어 붙여 날짜(`Expires=Fri, 19-Nov…`)와 섞인다 — `headers.getSetCookie()`로 줄마다 받는다. `redirect: "manual"`로 중간 응답의 쿠키도 놓치지 않는다. 세션이 오는데 API가 401이면 앱이 함께 보내는 다른 쿠키(기기 정보 등)가 빠진 것일 수 있다 — 브라우저·프록시로 잡은 요청의 쿠키를 하나씩 빼 보며 찾는다. 자동 로그인 값은 Worker 비밀 값에, 만료되면 실패 메일이 오게.
 - 파일 크기를 HEAD의 `content-length`로 보면 Cloudflare Workers 정적 파일에서는 늘 0이다(헤더를 안 준다) — 길이가 없으면 GET으로 받아 잰다.
 
