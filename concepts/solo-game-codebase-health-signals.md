@@ -4,7 +4,7 @@ type: concept
 tags: [gamedev, rust, architecture, testing, game-design]
 status: draft
 created: 2026-10-27
-updated: 2026-11-19
+updated: 2026-11-27
 verified: |
   1차 출처: nail-under-the-roots v0.3.8(2026-10-27)을 wc·grep·awk로 잰 것 — Rust 45,469줄, World::step 1,226줄(여덟 단계 번호 주석),
   World 공개 필드 118개, sfx.play 직접 호출 51곳 vs 소리 큐 19곳, 적 쓰러짐 처리 복붙 6곳, 월드 테스트 8개(플레이어 19·적 16),
@@ -48,6 +48,17 @@ verified: |
   `cargo test --no-run --message-format=json`에서 "no field `X` on type `…Enemy`" 오류의 주 span만 새 경로(`stance.poise` 등)로 바꾸고 다시 돌리기를
   반복, 두 바퀴에 191곳·86곳. 같은 이름의 칸을 가진 다른 구조체(스킬 표의 `poise`·`slow`)는 건드리지 않았다. 생성자의 구조체 리터럴과 묶음 이름이
   옛 칸 이름과 같을 때(그러면 타입 오류가 나서 자리를 못 집는다)만 손으로.
+  1차(2026-11-27, nail 0307, v1.1 도중 — 84,209줄, +39%): 100줄 넘는 함수 58 그대로, 200줄 넘는 것 7 → 14(자주 고치는 것은 셋뿐). 새 약점은 또 "한 곳"의 빈틈 둘:
+  ① **기록에서 나오는 상태(마을 모습)를 월드의 사본으로 들고, 살 때마다 칸을 손으로 맞추던 일곱 군데** — 빠뜨린 자리가 있었다(재주를 깨워 반딧불을 써도
+  우물 위 반딧불 단계가 그대로, 그리기 함수가 매 프레임 한 칸을 월드에 씀). 기록만 받는 순수 함수 하나 + "기록을 바꾼 뒤 다시 만들기" 한 줄로 바꾸자
+  시험 셋이 붙고 빠뜨릴 자리가 없어졌다(일부러 틀리게 하면 셋 다 실패 확인).
+  ② "저장은 한 곳" 규칙이 한 달 사이 직접 호출 19곳으로 풀려 있었다(그 길은 상점 업적 맞추기를 건너뛴다). 다시 모을 때 **모으는 함수에 얹힌 일이
+  모든 부르는 곳에 맞지 않았다**: `save_profile`은 "월드에서 만난 이웃을 기록에 적기"도 하는데, 슬롯 창·기록 지우기처럼 월드가 그 기록의 것이 아닌 자리에서
+  부르면 섞인다 → 층을 둘로(모든 저장이 지나는 `write` = 쓰기 + 업적, 런의 저장 = 이웃 적기 + `write`). 풀리지 않게 "그 호출이 소스에 한 곳뿐" 낱말 시험.
+  1차(Rust Reference "Constant items" 읽음, 2026-11-27): `const`는 쓰는 곳마다 인라인되고 같은 상수의 참조가 같은 주소라는 보장이 없다 —
+  `std::ptr::eq(tabs, SOME_CONST_SLICE)`로 "어느 표인가"를 가리던 코드를 찾았다(지금은 맞게 돈다, 표의 칸으로 바꿀 예정).
+  1차(Fowler "OpportunisticRefactoring"·"BranchByAbstraction" 읽음): 오래 사는 갈래는 합치기가 어려워 리팩터링을 꺼리게 한다, 일부러 틀리게 해 시험이
+  잡는지 본다, 큰 교체는 옛것 곁에 새 틀을 두고 하나씩. 2차(검색 요약): Kent Beck *Tidy First?*의 구조·동작 커밋 나누기, Feathers의 특성 시험.
 sources:
   - https://github.com/AimenJoe/nail-under-the-roots
   - https://github.com/AimenJoe/nail-under-the-roots/blob/main/docs/decisions/0169-code-health-review-and-refactoring-plan.md
@@ -59,6 +70,10 @@ sources:
   - https://www.destroyallsoftware.com/screencasts/catalog/functional-core-imperative-shell
   - https://github.com/AimenJoe/nail-under-the-roots/blob/main/docs/decisions/0248-refactoring-review-after-v0.6.8.md
   - https://blogs.perl.org/users/mascip/2014/06/functional-core-imperative-shell-oo-design-and-isolated-tests-without-mocks.html
+  - https://github.com/AimenJoe/nail-under-the-roots/blob/release/v1.1/docs/decisions/0307-refactoring-review-during-v1.1.md
+  - https://martinfowler.com/bliki/OpportunisticRefactoring.html
+  - https://martinfowler.com/bliki/BranchByAbstraction.html
+  - https://doc.rust-lang.org/reference/items/constant-items.html
 ---
 
 # 1인 게임 코드의 건강 신호
@@ -128,6 +143,19 @@ grep 수치는 **판정 전에 한 번 더 본다**: 테스트 모듈을 빼지 
 - 기능 묶음을 만든 직후, 만든 대화의 맥락 없이 **변경분만 읽는 리뷰**를 한 번 돌린다. 묶음마다 3~12개를 찾았다 — 남아 있는 효과가 "지금 든 무기"를 읽음,
   씨앗 비트가 잘림, 꿰뚫는 탄이 몫을 여러 번 받음, 막히는 튜토리얼 걸음 같은, 만든 사람의 머릿속 가정이 코드에 없는 것들.
 - 고친 것마다 "고침을 빼면 실패하는 시험"을 둔다(리뷰가 찾은 것은 다음 기능에서 다시 깨지기 쉽다).
+
+### 넷째 점검: "한 곳"이 아직 한 곳인가, 사본을 손으로 맞추고 있지 않은가(2026-11-27, nail 0307)
+| 신호 | 재는 법 | 뜻·처방 |
+|---|---|---|
+| 손으로 맞추는 사본 | 위층이 아래층 상태의 칸에 쓰는 자리(`grep "state.as_mut()"`·`v.x = …`)와, 그 상태를 처음 만드는 함수가 받는 것 | 처음 만드는 함수가 **기록만** 받는다면 그 상태는 기록의 함수다. 칸을 하나씩 고치지 말고 `State::of(기록, …)` 순수 함수 + "기록을 바꾼 뒤 다시 만들기" 한 줄. 손으로 맞추는 자리는 반드시 하나가 빠진다(우리는 일곱 중 둘) |
+| 그리기가 상태에 쓴다 | 그리기·HUD 함수 안의 월드 대입 | 빠뜨린 맞추기를 매 프레임 덮어 숨기는 자리다 — 위 처방으로 없어진다 |
+| 풀린 "한 곳" | 한 곳이어야 하는 호출(`profile::save(`)을 소스에서 세기 | 한 달이면 다시 는다. 모은 뒤 **낱말 시험**(그 호출이 소스에 한 곳뿐)으로 막는다 |
+| 모으는 함수에 얹힌 일 | 모을 함수가 하는 일을 하나씩 적고, 부르는 곳마다 다 맞는지 | 한 가지라도 안 맞는 곳이 있으면 층을 나눈다(모든 곳이 지나는 좁은 것 + 그 위에 얹는 것). "다 이 함수로"는 틀린 통일이 될 수 있다 |
+| 정체를 주소로 가린다 | `ptr::eq`·주소 비교 | Rust의 `const`는 주소가 보장되지 않는다. "어느 표인가"는 표의 칸(이름·종류)으로 |
+
+리팩터링 갈래: **작업 갈래에 바로, 한 걸음 = 한 커밋**(구조 커밋과 동작 커밋을 나눈다 — 동작이 바뀌는 고침은 제목에 적는다). 따로 갈래를 오래 두면
+그 사이 들어온 일과 합칠 때 부딪친다. 출시 갈래가 따로 있으면(패치만) 거기엔 넣지 않고, **파일을 나누는 리팩터링은 출시 갈래의 패치가 끝난 뒤**에
+(git은 파일 나누기를 따라가지 못해 그 파일의 패치가 저절로 합쳐지지 않는다).
 
 ## 왜?
 - 1인 개발은 속도가 자산이라 표·테스트처럼 **속도를 안 줄이는 안전장치**만 살아남는다. 틱 함수 쪼개기와 소리 큐는 속도를 줄이지 않으면서 테스트 문을 연다.
